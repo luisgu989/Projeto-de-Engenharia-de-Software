@@ -25,6 +25,7 @@ export default function ClientesPage() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleRegistrarClick = () => {
     setEditingCliente(null);
@@ -40,12 +41,26 @@ export default function ClientesPage() {
 
   const handleSave = (dados: Omit<Cliente, "id" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">) => {
     if (editingCliente) {
-      // Update
-      return atualizarCliente(editingCliente.id, dados);
+      const success = atualizarCliente(editingCliente.id, dados);
+      if (success) {
+        setSuccessMessage(`Cliente "${dados.nome}" atualizado com sucesso!`);
+        setTimeout(() => setSuccessMessage(null), 4000);
+      }
+      return success;
     } else {
-      // Add new
-      return adicionarCliente(dados);
+      const success = adicionarCliente(dados);
+      if (success) {
+        setSuccessMessage(`Cliente "${dados.nome}" cadastrado com sucesso!`);
+        setTimeout(() => setSuccessMessage(null), 4000);
+      }
+      return success;
     }
+  };
+
+  const handleDelete = (id: string) => {
+    removerCliente(id);
+    setSuccessMessage("Cliente removido da base de dados.");
+    setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const handleFormClose = () => {
@@ -55,7 +70,14 @@ export default function ClientesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Success Toast */}
+      {successMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white text-xs font-semibold px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-5 duration-300">
+          <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+          <span>{successMessage}</span>
+        </div>
+      )}
       {/* Page Header */}
       <div className="flex flex-col gap-1 border-b border-border pb-4">
         <h2 className="text-xl md:text-2xl font-bold tracking-tight">Gestão de Clientes</h2>
@@ -81,7 +103,7 @@ export default function ClientesPage() {
           busca={busca}
           setBusca={setBusca}
           onEdit={handleEditClick}
-          onDelete={removerCliente}
+          onDelete={handleDelete}
           onRegistrarClick={handleRegistrarClick}
         />
       </div>
