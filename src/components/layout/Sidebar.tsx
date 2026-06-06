@@ -13,9 +13,14 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Menu,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export interface SidebarProps {
   collapsed: boolean;
@@ -63,6 +68,12 @@ const menuItems: MenuItem[] = [
     category: "Módulos",
   },
   {
+    title: "Funcionários",
+    href: "/funcionarios",
+    icon: Briefcase,
+    category: "Administração",
+  },
+  {
     title: "Configurações",
     href: "/configuracoes",
     icon: Settings,
@@ -70,11 +81,65 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: SidebarProps) {
-  const pathname = usePathname();
+const categories = ["Geral", "Módulos", "Administração"] as const;
 
-  // Group items by category
-  const categories = ["Geral", "Módulos", "Administração"] as const;
+/**
+ * SidebarNavItem: Responsabilidade única — renderiza um item de navegação
+ * com suporte a tooltip quando o sidebar está colapsado.
+ */
+function SidebarNavItem({
+  item,
+  isActive,
+  collapsed,
+  onNavigate,
+}: {
+  item: MenuItem;
+  isActive: boolean;
+  collapsed: boolean;
+  onNavigate: () => void;
+}) {
+  const Icon = item.icon;
+
+  const linkEl = (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={cn(
+        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-150",
+        isActive
+          ? "bg-primary text-primary-foreground shadow-sm shadow-primary/10"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+        collapsed && "justify-center px-2"
+      )}
+    >
+      <Icon className="h-5 w-5 shrink-0" />
+      {!collapsed && <span>{item.title}</span>}
+    </Link>
+  );
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger render={linkEl} />
+        <TooltipContent side="right">{item.title}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return linkEl;
+}
+
+/**
+ * Sidebar: Responsabilidade única — navegação lateral da aplicação
+ * com suporte a colapso (desktop) e abertura por overlay (mobile).
+ */
+export function Sidebar({
+  collapsed,
+  setCollapsed,
+  mobileOpen,
+  setMobileOpen,
+}: SidebarProps) {
+  const pathname = usePathname();
 
   return (
     <>
@@ -90,89 +155,92 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
       <aside
         className={cn(
           "fixed top-0 bottom-0 left-0 z-50 flex flex-col border-r border-border bg-card text-card-foreground transition-all duration-300 ease-in-out lg:translate-x-0",
-          collapsed ? "w-20" : "w-64",
+          collapsed ? "w-16" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Header/Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
+        {/* Header / Logo */}
+        <div className="flex h-16 items-center justify-between px-4 border-b border-border shrink-0">
           <Link href="/" className="flex items-center gap-2 overflow-hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-md shadow-primary/20">
               EP
             </div>
             {!collapsed && (
-              <span className="font-semibold text-lg tracking-tight bg-gradient-to-r from-foreground to-foreground/75 bg-clip-text">
+              <span className="font-semibold text-base tracking-tight truncate">
                 ERP Pro
               </span>
             )}
           </Link>
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex hover:bg-accent hover:text-accent-foreground"
+            className="hidden lg:flex hover:bg-accent hover:text-accent-foreground shrink-0"
+            aria-label={collapsed ? "Expandir menu" : "Colapsar menu"}
           >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
           </Button>
         </div>
 
-        {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
           {categories.map((category) => {
             const items = menuItems.filter((item) => item.category === category);
             return (
-              <div key={category} className="space-y-1.5">
+              <div key={category} className="space-y-1">
                 {!collapsed && (
-                  <h4 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                     {category}
-                  </h4>
+                  </p>
                 )}
-                <nav className="space-y-1">
+                {collapsed && (
+                  <div className="h-px bg-border my-2 mx-1" />
+                )}
+                <div className="space-y-0.5">
                   {items.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-                    const Icon = item.icon;
-
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href !== "/" && pathname.startsWith(item.href));
                     return (
-                      <Link
+                      <SidebarNavItem
                         key={item.href}
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-150 relative group",
-                          isActive
-                            ? "bg-primary text-primary-foreground shadow-sm shadow-primary/10"
-                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                        )}
-                      >
-                        <Icon className="h-5 w-5 shrink-0" />
-                        {!collapsed && <span>{item.title}</span>}
-
-                        {/* Collapsed Tooltip */}
-                        {collapsed && (
-                          <div className="absolute left-full ml-2 hidden group-hover:block z-50 rounded-md bg-popover border border-border px-2 py-1 text-xs text-popover-foreground shadow-md pointer-events-none whitespace-nowrap">
-                            {item.title}
-                          </div>
-                        )}
-                      </Link>
+                        item={item}
+                        isActive={isActive}
+                        collapsed={collapsed}
+                        onNavigate={() => setMobileOpen(false)}
+                      />
                     );
                   })}
-                </nav>
+                </div>
               </div>
             );
           })}
-        </div>
+        </nav>
 
-        {/* Footer info */}
-        <div className="p-4 border-t border-border flex items-center gap-3 overflow-hidden">
-          <div className="h-9 w-9 shrink-0 rounded-full bg-accent flex items-center justify-center font-semibold text-sm">
-            US
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-medium truncate">Usuário Suporte</span>
-              <span className="text-xs text-muted-foreground truncate">admin@erppro.com.</span>
+        {/* Footer — User Info */}
+        <div className="p-3 border-t border-border shrink-0">
+          <div
+            className={cn(
+              "flex items-center gap-3 rounded-md px-2 py-2 hover:bg-accent transition-colors cursor-pointer",
+              collapsed && "justify-center px-0"
+            )}
+          >
+            <div className="h-8 w-8 shrink-0 rounded-full bg-accent flex items-center justify-center font-semibold text-xs text-accent-foreground border border-border">
+              US
             </div>
-          )}
+            {!collapsed && (
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-medium truncate">Usuário Suporte</span>
+                <span className="text-xs text-muted-foreground truncate">
+                  admin@erppro.com
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </aside>
     </>

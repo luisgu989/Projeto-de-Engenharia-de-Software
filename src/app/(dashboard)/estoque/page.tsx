@@ -10,8 +10,11 @@ export default function EstoquePage() {
     estoque,
     busca,
     setBusca,
+    error,
+    setError,
     adicionarItem,
-    ajustarEstoque,
+    atualizarItem,
+    registrarMovimentacao,
     valorTotalEstoque,
     totalItens,
     alertasBaixoEstoque,
@@ -45,7 +48,10 @@ export default function EstoquePage() {
           busca={busca}
           setBusca={setBusca}
           onAdicionarItem={adicionarItem}
-          onAjustarEstoque={ajustarEstoque}
+          onAjustarEstoque={registrarMovimentacao}
+          onAtualizarItem={atualizarItem}
+          error={error}
+          setError={setError}
         />
       </div>
     </div>
