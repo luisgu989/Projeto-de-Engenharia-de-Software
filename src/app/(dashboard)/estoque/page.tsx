@@ -14,6 +14,7 @@ export default function EstoquePage() {
     setError,
     adicionarItem,
     atualizarItem,
+    removerItem,
     registrarMovimentacao,
     valorTotalEstoque,
     totalItens,
@@ -50,6 +51,7 @@ export default function EstoquePage() {
           onAdicionarItem={adicionarItem}
           onAjustarEstoque={registrarMovimentacao}
           onAtualizarItem={atualizarItem}
+          onRemoverItem={removerItem}
           error={error}
           setError={setError}
         />

@@ -19,7 +19,7 @@ export interface ItemEstoque {
   estoqueMinimo: number;
   precoCusto: number;
   precoVenda: number;
-  // Audit details
+  status: "ativo" | "excluido";
   criadoEm: string;
   criadoPor: string;
   atualizadoEm?: string;
@@ -37,6 +37,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
     estoqueMinimo: 10,
     precoCusto: 180.0,
     precoVenda: 349.9,
+    status: "ativo",
     criadoEm: "2026-05-15T09:00:00.000Z",
     criadoPor: "Renata Souza",
     movimentacoes: [
@@ -65,6 +66,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
     estoqueMinimo: 12,
     precoCusto: 120.0,
     precoVenda: 229.9,
+    status: "ativo",
     criadoEm: "2026-05-16T10:30:00.000Z",
     criadoPor: "Luís Fernando",
     movimentacoes: [
@@ -93,6 +95,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
     estoqueMinimo: 5,
     precoCusto: 900.0,
     precoVenda: 1699.0,
+    status: "ativo",
     criadoEm: "2026-05-17T11:45:00.000Z",
     criadoPor: "Admin User",
     movimentacoes: [
@@ -114,6 +117,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
     estoqueMinimo: 20,
     precoCusto: 15.0,
     precoVenda: 49.9,
+    status: "ativo",
     criadoEm: "2026-05-18T08:15:00.000Z",
     criadoPor: "Renata Souza",
     movimentacoes: [
@@ -135,6 +139,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
     estoqueMinimo: 8,
     precoCusto: 250.0,
     precoVenda: 499.0,
+    status: "ativo",
     criadoEm: "2026-05-19T14:20:00.000Z",
     criadoPor: "Luís Fernando",
     atualizadoEm: "2026-05-20T16:00:00.000Z",
@@ -167,12 +172,12 @@ export function useEstoque() {
     const cleanedSku = sku.trim().toUpperCase();
     if (!cleanedSku) return false;
     return estoque.some(
-      (item) => item.id !== excludeId && item.sku.trim().toUpperCase() === cleanedSku
+      (item) => item.status === "ativo" && item.id !== excludeId && item.sku.trim().toUpperCase() === cleanedSku
     );
   };
 
   const adicionarItem = (
-    novoItem: Omit<ItemEstoque, "id" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor" | "movimentacoes">
+    novoItem: Omit<ItemEstoque, "id" | "status" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor" | "movimentacoes">
   ) => {
     setError(null);
     if (checkDuplicateSku(novoItem.sku)) {
@@ -186,6 +191,7 @@ export function useEstoque() {
       ...novoItem,
       sku: novoItem.sku.trim().toUpperCase(),
       id: idGerado,
+      status: "ativo",
       criadoEm: dataAtual,
       criadoPor: "Admin User",
       movimentacoes: [
@@ -204,7 +210,7 @@ export function useEstoque() {
 
   const atualizarItem = (
     id: string,
-    dadosAlterados: Omit<ItemEstoque, "id" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor" | "movimentacoes">
+    dadosAlterados: Omit<ItemEstoque, "id" | "status" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor" | "movimentacoes">
   ) => {
     setError(null);
     if (checkDuplicateSku(dadosAlterados.sku, id)) {
@@ -216,7 +222,6 @@ export function useEstoque() {
     setEstoque((prev) =>
       prev.map((item) => {
         if (item.id === id) {
-          // If quantity has changed inside the general edit modal, register it as a direct adjustment movement
           const qtdDiferenca = dadosAlterados.quantidade - item.quantidade;
           let novasMovs = item.movimentacoes || [];
           if (qtdDiferenca !== 0) {
@@ -331,17 +336,43 @@ export function useEstoque() {
     );
   };
 
-  const estoqueFiltrado = estoque.filter(
-    (item) =>
-      item.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      item.sku.toLowerCase().includes(busca.toLowerCase()) ||
-      item.categoria.toLowerCase().includes(busca.toLowerCase())
-  );
+  const removerItem = (id: string) => {
+    setError(null);
+    const itemExiste = estoque.some((item) => item.id === id && item.status === "ativo");
+    if (!itemExiste) {
+      setError("Produto não encontrado ou já excluído.");
+      return false;
+    }
 
-  // Calcs
-  const valorTotalEstoque = estoque.reduce((acc, item) => acc + item.quantidade * item.precoCusto, 0);
-  const totalItens = estoque.reduce((acc, item) => acc + item.quantidade, 0);
-  const alertasBaixoEstoque = estoque.filter((item) => item.quantidade <= item.estoqueMinimo).length;
+    setEstoque((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            status: "excluido",
+            atualizadoEm: new Date().toISOString(),
+            atualizadoPor: "Admin User",
+          };
+        }
+        return item;
+      })
+    );
+    return true;
+  };
+
+  const estoqueFiltrado = estoque
+    .filter((item) => item.status === "ativo")
+    .filter(
+      (item) =>
+        item.nome.toLowerCase().includes(busca.toLowerCase()) ||
+        item.sku.toLowerCase().includes(busca.toLowerCase()) ||
+        item.categoria.toLowerCase().includes(busca.toLowerCase())
+    );
+
+  const itensAtivos = estoque.filter((item) => item.status === "ativo");
+  const valorTotalEstoque = itensAtivos.reduce((acc, item) => acc + item.quantidade * item.precoCusto, 0);
+  const totalItens = itensAtivos.reduce((acc, item) => acc + item.quantidade, 0);
+  const alertasBaixoEstoque = itensAtivos.filter((item) => item.quantidade <= item.estoqueMinimo).length;
 
   return {
     estoque: estoqueFiltrado,
@@ -351,6 +382,7 @@ export function useEstoque() {
     setError,
     adicionarItem,
     atualizarItem,
+    removerItem,
     registrarMovimentacao,
     ajustarEstoque,
     valorTotalEstoque,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ItemEstoque } from "@/hooks/useEstoque";
-import { Search, Plus, AlertTriangle, ArrowUpDown, ShieldAlert, Edit2, Info, Calendar, User } from "lucide-react";
+import { Search, Plus, AlertTriangle, ShieldAlert, Edit2, Info, Calendar, User, Trash2, ArrowUpRight, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -8,9 +8,10 @@ interface TabelaEstoqueProps {
   estoque: ItemEstoque[];
   busca: string;
   setBusca: (busca: string) => void;
-  onAdicionarItem: (item: Omit<ItemEstoque, "id" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">) => boolean;
-  onAjustarEstoque: (id: string, novaQuantidade: number) => void;
-  onAtualizarItem: (id: string, item: Omit<ItemEstoque, "id" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">) => boolean;
+  onAdicionarItem: (item: Omit<ItemEstoque, "id" | "status" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">) => boolean;
+  onAjustarEstoque: (id: string, tipo: "entrada" | "saida", quantidade: number, motivo: string) => boolean;
+  onAtualizarItem: (id: string, item: Omit<ItemEstoque, "id" | "status" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">) => boolean;
+  onRemoverItem: (id: string) => boolean;
   error: string | null;
   setError: (err: string | null) => void;
 }
@@ -22,15 +23,37 @@ export function TabelaEstoque({
   onAdicionarItem,
   onAjustarEstoque,
   onAtualizarItem,
+  onRemoverItem,
   error,
   setError,
 }: TabelaEstoqueProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [ajusteOpen, setAjusteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ItemEstoque | null>(null);
   const [activeAudit, setActiveAudit] = useState<ItemEstoque | null>(null);
-  const [novaQtd, setNovaQtd] = useState(0);
+
+  // Role simulation state (R014)
+  const [userRole, setUserRole] = useState<"admin" | "operador">("admin");
+
+  // Success message toast simulation
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+
+  // SKU Availability simulation states
+  const [isCheckingSku, setIsCheckingSku] = useState(false);
+  const [skuAvailability, setSkuAvailability] = useState<"available" | "unavailable" | null>(null);
+
+  // Errors for Add and Edit Forms
+  const [addErrors, setAddErrors] = useState<Record<string, string>>({});
+  const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+
+  // Confirm delete modal state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  // Stock Inbound modal states (R015)
+  const [inboundOpen, setInboundOpen] = useState(false);
+  const [inboundQtd, setInboundQtd] = useState<number | "">("");
+  const [inboundMotivo, setInboundMotivo] = useState("");
+  const [inboundError, setInboundError] = useState<string | null>(null);
 
   // Filters state (R007)
   const [statusFiltro, setStatusFiltro] = useState<"todos" | "baixo" | "normal">("todos");
@@ -47,49 +70,162 @@ export function TabelaEstoque({
 
   // Edit Item states
   const [editNome, setEditNome] = useState("");
-  const [editSku, setEditSku] = useState("");
   const [editCategoria, setEditCategoria] = useState("Periféricos");
-  const [editQuantidade, setEditQuantidade] = useState(0);
   const [editEstoqueMinimo, setEditEstoqueMinimo] = useState(10);
   const [editPrecoCusto, setEditPrecoCusto] = useState(0);
   const [editPrecoVenda, setEditPrecoVenda] = useState(0);
 
+  const triggerToast = (msg: string) => {
+    setSuccessToast(msg);
+    setTimeout(() => {
+      setSuccessToast(null);
+    }, 3000);
+  };
+
+  const handleSkuChange = (value: string) => {
+    const cleaned = value.trim().toUpperCase();
+    setSku(cleaned);
+    setSkuAvailability(null);
+    if (!cleaned) {
+      setAddErrors(prev => ({ ...prev, sku: "SKU é obrigatório." }));
+      return;
+    }
+    const skuRegex = /^[A-Z0-9-]+$/;
+    if (!skuRegex.test(cleaned)) {
+      setAddErrors(prev => ({ ...prev, sku: "Formato inválido. Use apenas letras maiúsculas, números e hífens." }));
+      return;
+    }
+    setAddErrors(prev => {
+      const copy = { ...prev };
+      delete copy.sku;
+      return copy;
+    });
+
+    setIsCheckingSku(true);
+    setTimeout(() => {
+      const duplicado = estoque.some(item => item.sku.trim().toUpperCase() === cleaned);
+      if (duplicado) {
+        setSkuAvailability("unavailable");
+        setAddErrors(prev => ({ ...prev, sku: `O SKU "${cleaned}" já está em uso.` }));
+      } else {
+        setSkuAvailability("available");
+        setAddErrors(prev => {
+          const copy = { ...prev };
+          delete copy.sku;
+          return copy;
+        });
+      }
+      setIsCheckingSku(false);
+    }, 400);
+  };
+
+  const handleNomeChange = (value: string, isEdit = false) => {
+    if (isEdit) {
+      setEditNome(value);
+      if (value.trim().length < 3) {
+        setEditErrors(prev => ({ ...prev, nome: "O nome deve ter pelo menos 3 caracteres." }));
+      } else {
+        setEditErrors(prev => {
+          const copy = { ...prev };
+          delete copy.nome;
+          return copy;
+        });
+      }
+    } else {
+      setNome(value);
+      if (value.trim().length < 3) {
+        setAddErrors(prev => ({ ...prev, nome: "O nome deve ter pelo menos 3 caracteres." }));
+      } else {
+        setAddErrors(prev => {
+          const copy = { ...prev };
+          delete copy.nome;
+          return copy;
+        });
+      }
+    }
+  };
+
+  const handlePrecosChange = (custo: number, venda: number, isEdit = false) => {
+    if (isEdit) {
+      setEditPrecoCusto(custo);
+      setEditPrecoVenda(venda);
+      const errorsTemp: Record<string, string> = {};
+      if (custo < 0) errorsTemp.precoCusto = "Preço de custo não pode ser negativo.";
+      if (venda <= 0) errorsTemp.precoVenda = "Preço de venda deve ser maior que zero.";
+      if (venda <= custo) errorsTemp.precoVenda = "Preço de venda deve ser maior que o preço de custo.";
+      
+      setEditErrors(prev => {
+        const copy = { ...prev };
+        delete copy.precoCusto;
+        delete copy.precoVenda;
+        return { ...copy, ...errorsTemp };
+      });
+    } else {
+      setPrecoCusto(custo);
+      setPrecoVenda(venda);
+      const errorsTemp: Record<string, string> = {};
+      if (custo < 0) errorsTemp.precoCusto = "Preço de custo não pode ser negativo.";
+      if (venda <= 0) errorsTemp.precoVenda = "Preço de venda deve ser maior que zero.";
+      if (venda <= custo) errorsTemp.precoVenda = "Preço de venda deve ser maior que o preço de custo.";
+      
+      setAddErrors(prev => {
+        const copy = { ...prev };
+        delete copy.precoCusto;
+        delete copy.precoVenda;
+        return { ...copy, ...errorsTemp };
+      });
+    }
+  };
+
+  const handleQuantidadeChange = (val: number) => {
+    setQuantidade(val);
+    if (val < 0) {
+      setAddErrors(prev => ({ ...prev, quantidade: "A quantidade não pode ser negativa." }));
+    } else {
+      setAddErrors(prev => {
+        const copy = { ...prev };
+        delete copy.quantidade;
+        return copy;
+      });
+    }
+  };
+
+  const handleEstoqueMinimoChange = (val: number, isEdit = false) => {
+    if (isEdit) {
+      setEditEstoqueMinimo(val);
+      if (val < 1) {
+        setEditErrors(prev => ({ ...prev, estoqueMinimo: "Estoque mínimo deve ser de pelo menos 1." }));
+      } else {
+        setEditErrors(prev => {
+          const copy = { ...prev };
+          delete copy.estoqueMinimo;
+          return copy;
+        });
+      }
+    } else {
+      setEstoqueMinimo(val);
+      if (val < 1) {
+        setAddErrors(prev => ({ ...prev, estoqueMinimo: "Estoque mínimo deve ser de pelo menos 1." }));
+      } else {
+        setAddErrors(prev => {
+          const copy = { ...prev };
+          delete copy.estoqueMinimo;
+          return copy;
+        });
+      }
+    }
+  };
+
   const handleAddItemSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validations
-    if (nome.trim().length < 3) {
-      setError("O nome do produto deve ter pelo menos 3 caracteres.");
-      return;
-    }
-
-    const skuRegex = /^[A-Z0-9-]+$/;
-    const cleanSku = sku.trim().toUpperCase();
-    if (!skuRegex.test(cleanSku)) {
-      setError("O SKU deve conter apenas letras maiúsculas, números e hífens.");
-      return;
-    }
-
-    if (Number(precoVenda) <= 0) {
-      setError("O preço de venda deve ser maior que zero.");
-      return;
-    }
-    if (Number(precoCusto) < 0) {
-      setError("O preço de custo não pode ser negativo.");
-      return;
-    }
-    if (Number(quantidade) < 0) {
-      setError("A quantidade não pode ser negativa.");
-      return;
-    }
-    if (Number(estoqueMinimo) < 1) {
-      setError("O estoque mínimo deve ser de pelo menos 1.");
+    if (Object.keys(addErrors).length > 0 || !nome || !sku || skuAvailability !== "available") {
+      setError("Preencha todos os campos obrigatórios corretamente.");
       return;
     }
 
     const success = onAdicionarItem({
       nome: nome.trim(),
-      sku: cleanSku,
+      sku: sku.trim().toUpperCase(),
       categoria,
       quantidade: Number(quantidade),
       estoqueMinimo: Number(estoqueMinimo),
@@ -98,82 +234,84 @@ export function TabelaEstoque({
     });
 
     if (success) {
-      // Reset fields
       setNome("");
       setSku("");
       setQuantidade(0);
       setEstoqueMinimo(10);
       setPrecoCusto(0);
       setPrecoVenda(0);
+      setSkuAvailability(null);
+      setAddErrors({});
       setError(null);
       setModalOpen(false);
+      triggerToast("Produto cadastrado com sucesso!");
     }
   };
 
   const handleEditItemSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedItem) return;
-
-    // Validations
-    if (editNome.trim().length < 3) {
-      setError("O nome do produto deve ter pelo menos 3 caracteres.");
-      return;
-    }
-
-    const skuRegex = /^[A-Z0-9-]+$/;
-    const cleanSku = editSku.trim().toUpperCase();
-    if (!skuRegex.test(cleanSku)) {
-      setError("O SKU deve conter apenas letras maiúsculas, números e hífens.");
-      return;
-    }
-
-    if (Number(editPrecoVenda) <= 0) {
-      setError("O preço de venda deve ser maior que zero.");
-      return;
-    }
-    if (Number(editPrecoCusto) < 0) {
-      setError("O preço de custo não pode ser negativo.");
-      return;
-    }
-    if (Number(editQuantidade) < 0) {
-      setError("A quantidade não pode ser negativa.");
-      return;
-    }
-    if (Number(editEstoqueMinimo) < 1) {
-      setError("O estoque mínimo deve ser de pelo menos 1.");
+    if (!selectedItem || Object.keys(editErrors).length > 0 || !editNome) {
+      setError("Preencha todos os campos corretamente.");
       return;
     }
 
     const success = onAtualizarItem(selectedItem.id, {
       nome: editNome.trim(),
-      sku: cleanSku,
+      sku: selectedItem.sku,
       categoria: editCategoria,
-      quantidade: Number(editQuantidade),
+      quantidade: selectedItem.quantidade,
       estoqueMinimo: Number(editEstoqueMinimo),
       precoCusto: Number(editPrecoCusto),
       precoVenda: Number(editPrecoVenda),
     });
 
     if (success) {
+      setEditErrors({});
       setError(null);
       setEditOpen(false);
       setSelectedItem(null);
+      triggerToast("Produto atualizado com sucesso!");
     }
   };
 
-  const handleAdjustSubmit = (e: React.FormEvent) => {
+  const handleDeleteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem) return;
-
-    // R006 Validation
-    if (novaQtd < 0) {
-      alert("A quantidade de estoque não pode ser negativa.");
+    if (userRole !== "admin") {
+      setError("Permissão Negada: Apenas administradores podem excluir produtos.");
       return;
     }
 
-    onAjustarEstoque(selectedItem.id, novaQtd);
-    setAjusteOpen(false);
-    setSelectedItem(null);
+    const success = onRemoverItem(selectedItem.id);
+    if (success) {
+      setDeleteOpen(false);
+      setSelectedItem(null);
+      triggerToast("Produto removido com sucesso!");
+    }
+  };
+
+  const handleInboundSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedItem || !inboundQtd || Number(inboundQtd) <= 0) {
+      setInboundError("A quantidade deve ser maior que zero.");
+      return;
+    }
+    if (!inboundMotivo.trim()) {
+      setInboundError("O motivo da movimentação é obrigatório.");
+      return;
+    }
+
+    const success = onAjustarEstoque(selectedItem.id, "entrada", Number(inboundQtd), inboundMotivo.trim());
+    if (success) {
+      setInboundOpen(false);
+      setInboundQtd("");
+      setInboundMotivo("");
+      setInboundError(null);
+      setSelectedItem(null);
+      triggerToast("Entrada de estoque registrada com sucesso!");
+    } else {
+      setInboundError("Erro ao registrar a movimentação no estoque.");
+    }
   };
 
   const formatCurrency = (val: number) => {
@@ -230,6 +368,57 @@ export function TabelaEstoque({
 
   return (
     <div className="space-y-4">
+      {/* Simulated Permission Selector (R014) */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 dark:bg-blue-500/10 shadow-sm animate-in fade-in duration-300">
+        <div className="flex items-center gap-3">
+          <ShieldAlert className="h-5 w-5 text-blue-500 shrink-0" />
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Simulador de Controle de Acesso</h4>
+            <p className="text-xs text-muted-foreground">Alterne o perfil para validar as restrições da interface de usuário (R014).</p>
+          </div>
+        </div>
+        <div className="flex items-center bg-card p-1 rounded-lg border border-border self-start sm:self-auto shadow-sm">
+          <button
+            type="button"
+            onClick={() => {
+              setUserRole("admin");
+              setError(null);
+            }}
+            className={cn(
+              "px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 flex items-center gap-1.5 cursor-pointer",
+              userRole === "admin"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Administrador
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setUserRole("operador");
+              setError(null);
+            }}
+            className={cn(
+              "px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 flex items-center gap-1.5 cursor-pointer",
+              userRole === "operador"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Operador de Estoque
+          </button>
+        </div>
+      </div>
+
+      {/* Simulated Success Toast */}
+      {successToast && (
+        <div className="fixed bottom-4 right-4 z-50 p-4 bg-emerald-600 text-white rounded-xl shadow-lg border border-emerald-500/20 flex items-center gap-3 animate-in slide-in-from-bottom duration-300">
+          <CheckCircle2 className="h-5 w-5 text-white shrink-0" />
+          <span className="text-sm font-semibold">{successToast}</span>
+        </div>
+      )}
+
       {/* Search and Action */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="relative flex-1 max-w-sm">
@@ -243,16 +432,23 @@ export function TabelaEstoque({
           />
         </div>
 
-        <Button
-          onClick={() => {
-            setError(null);
-            setModalOpen(true);
-          }}
-          className="flex items-center gap-2 shadow-md shadow-primary/10 self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          Cadastrar Produto
-        </Button>
+        {userRole === "admin" ? (
+          <Button
+            onClick={() => {
+              setError(null);
+              setModalOpen(true);
+            }}
+            className="flex items-center gap-2 shadow-md shadow-primary/10 self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            Cadastrar Produto
+          </Button>
+        ) : (
+          <div className="text-xs text-muted-foreground bg-accent/40 px-3 py-2 rounded-lg border border-border flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-yellow-500" />
+            Modo Operador: Cadastro Desabilitado
+          </div>
+        )}
       </div>
 
       {/* Advanced Filter Toolbar (R007) */}
@@ -408,48 +604,69 @@ export function TabelaEstoque({
                             variant="ghost"
                             size="icon"
                             onClick={() => setActiveAudit(item)}
-                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer"
                             title="Ver Detalhes de Auditoria"
                           >
                             <Info className="h-4 w-4" />
                           </Button>
 
-                          {/* Editar Cadastro Completo */}
+                          {/* Entrada de Estoque (R015) - Acessível para Admin e Operador */}
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => {
                               setSelectedItem(item);
-                              setEditNome(item.nome);
-                              setEditSku(item.sku);
-                              setEditCategoria(item.categoria);
-                              setEditQuantidade(item.quantidade);
-                              setEditEstoqueMinimo(item.estoqueMinimo);
-                              setEditPrecoCusto(item.precoCusto);
-                              setEditPrecoVenda(item.precoVenda);
-                              setError(null);
-                              setEditOpen(true);
+                              setInboundQtd("");
+                              setInboundMotivo("");
+                              setInboundError(null);
+                              setInboundOpen(true);
                             }}
-                            className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-accent"
-                            title="Editar Produto"
+                            className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10 cursor-pointer"
+                            title="Registrar Entrada de Estoque"
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                           </Button>
 
-                          {/* Ajustar Estoque Rápido */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setSelectedItem(item);
-                              setNovaQtd(item.quantidade);
-                              setAjusteOpen(true);
-                            }}
-                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
-                            title="Ajustar Saldo"
-                          >
-                            <ArrowUpDown className="h-4 w-4" />
-                          </Button>
+                          {/* Ações restritas a Administradores (R014) */}
+                          {userRole === "admin" && (
+                            <>
+                              {/* Editar Cadastro Completo (R012) */}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedItem(item);
+                                  setEditNome(item.nome);
+                                  setEditCategoria(item.categoria);
+                                  setEditEstoqueMinimo(item.estoqueMinimo);
+                                  setEditPrecoCusto(item.precoCusto);
+                                  setEditPrecoVenda(item.precoVenda);
+                                  setEditErrors({});
+                                  setError(null);
+                                  setEditOpen(true);
+                                }}
+                                className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-accent cursor-pointer"
+                                title="Editar Produto"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+
+                              {/* Excluir Produto (R013) */}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedItem(item);
+                                  setError(null);
+                                  setDeleteOpen(true);
+                                }}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-accent cursor-pointer"
+                                title="Excluir Produto"
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -461,367 +678,146 @@ export function TabelaEstoque({
         </div>
       </div>
 
-      {/* Modal 1: Add New Product */}
+      {/* Unified Add/Edit Product Form using ProductForm component */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-border p-4">
-              <h3 className="text-base font-semibold">Cadastrar Novo Produto</h3>
-              <button
-                onClick={() => {
-                  setError(null);
-                  setModalOpen(false);
-                }}
-                className="text-muted-foreground hover:text-foreground text-sm font-semibold"
-              >
-                Cancelar
-              </button>
-            </div>
-
-            {error && (
-              <div className="mx-4 mt-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-lg flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleAddItemSubmit} className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">SKU / Código</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="PRD-TEC-001"
-                    value={sku}
-                    onChange={(e) => {
-                      setSku(e.target.value);
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Categoria</label>
-                  <select
-                    value={categoria}
-                    onChange={(e) => {
-                      setCategoria(e.target.value);
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  >
-                    <option value="Periféricos">Periféricos</option>
-                    <option value="Monitores">Monitores</option>
-                    <option value="Acessórios">Acessórios</option>
-                    <option value="Áudio">Áudio</option>
-                    <option value="Componentes">Componentes</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Nome do Produto</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nome descritivo"
-                  value={nome}
-                  onChange={(e) => {
-                    setNome(e.target.value);
-                    setError(null);
-                  }}
-                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Estoque Inicial</label>
-                  <input
-                    type="number"
-                    min="0"
-                    required
-                    value={quantidade}
-                    onChange={(e) => {
-                      setQuantidade(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Estoque Mínimo</label>
-                  <input
-                    type="number"
-                    min="1"
-                    required
-                    value={estoqueMinimo}
-                    onChange={(e) => {
-                      setEstoqueMinimo(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Preço de Custo (R$)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    value={precoCusto}
-                    onChange={(e) => {
-                      setPrecoCusto(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Preço de Venda (R$)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    required
-                    value={precoVenda}
-                    onChange={(e) => {
-                      setPrecoVenda(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2 flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setError(null);
-                    setModalOpen(false);
-                  }}
-                  className="text-xs"
-                >
-                  Fechar
-                </Button>
-                <Button type="submit" className="text-xs">
-                  Cadastrar SKU
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ProductForm
+          mode="add"
+          onSubmit={onAdicionarItem}
+          onClose={() => {
+            setError(null);
+            setModalOpen(false);
+            setAddErrors({});
+            setSkuAvailability(null);
+          }}
+          existingItems={estoque.map(item => ({ sku: item.sku }))}
+          errors={addErrors}
+          setErrors={setAddErrors}
+        />
       )}
 
-      {/* Modal 3: Edit Existing Product */}
       {editOpen && selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-border p-4">
-              <h3 className="text-base font-semibold">Editar Detalhes do Produto</h3>
-              <button
-                onClick={() => {
-                  setError(null);
-                  setEditOpen(false);
-                  setSelectedItem(null);
-                }}
-                className="text-muted-foreground hover:text-foreground text-sm font-semibold"
-              >
-                Cancelar
-              </button>
-            </div>
+    <ProductForm
+      mode="edit"
+      initialData={{
+        sku: selectedItem.sku,
+        nome: selectedItem.nome,
+        categoria: selectedItem.categoria,
+        quantidade: selectedItem.quantidade,
+        estoqueMinimo: selectedItem.estoqueMinimo,
+        precoCusto: selectedItem.precoCusto,
+        precoVenda: selectedItem.precoVenda,
+      }}
+      onSubmit={(data) => {
+        const success = onAtualizarItem(selectedItem.id, {
+          sku: selectedItem.sku,
+          nome: data.nome.trim(),
+          categoria: data.categoria,
+          quantidade: selectedItem.quantidade,
+          estoqueMinimo: Number(data.estoqueMinimo),
+          precoCusto: Number(data.precoCusto),
+          precoVenda: Number(data.precoVenda),
+        });
+        if (success) {
+          setEditOpen(false);
+          setSelectedItem(null);
+          triggerToast("Produto atualizado com sucesso!");
+        }
+        return success;
+      }}
+      onClose={() => {
+        setEditOpen(false);
+        setSelectedItem(null);
+        setEditErrors({});
+      }}
+      existingItems={estoque.map(item => ({ sku: item.sku }))}
+      errors={editErrors}
+      setErrors={setEditErrors}
+    />
+  )}
 
-            {error && (
-              <div className="mx-4 mt-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-lg flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleEditItemSubmit} className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">ID do Produto (Bloqueado)</label>
-                  <input
-                    type="text"
-                    disabled
-                    value={selectedItem.id}
-                    className="w-full bg-accent/20 border border-border text-muted-foreground rounded-md px-3 py-2 text-sm cursor-not-allowed font-mono"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Categoria</label>
-                  <select
-                    value={editCategoria}
-                    onChange={(e) => {
-                      setEditCategoria(e.target.value);
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  >
-                    <option value="Periféricos">Periféricos</option>
-                    <option value="Monitores">Monitores</option>
-                    <option value="Acessórios">Acessórios</option>
-                    <option value="Áudio">Áudio</option>
-                    <option value="Componentes">Componentes</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">SKU / Código</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="PRD-TEC-001"
-                    value={editSku}
-                    onChange={(e) => {
-                      setEditSku(e.target.value);
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Estoque Atual</label>
-                  <input
-                    type="number"
-                    min="0"
-                    required
-                    value={editQuantidade}
-                    onChange={(e) => {
-                      setEditQuantidade(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Nome do Produto</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nome descritivo"
-                  value={editNome}
-                  onChange={(e) => {
-                    setEditNome(e.target.value);
-                    setError(null);
-                  }}
-                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1 col-span-1">
-                  <label className="text-xs font-medium text-muted-foreground">Mínimo</label>
-                  <input
-                    type="number"
-                    min="1"
-                    required
-                    value={editEstoqueMinimo}
-                    onChange={(e) => {
-                      setEditEstoqueMinimo(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-1 col-span-1">
-                  <label className="text-xs font-medium text-muted-foreground">Custo (R$)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    value={editPrecoCusto}
-                    onChange={(e) => {
-                      setEditPrecoCusto(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-1 col-span-1">
-                  <label className="text-xs font-medium text-muted-foreground">Venda (R$)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    required
-                    value={editPrecoVenda}
-                    onChange={(e) => {
-                      setEditPrecoVenda(Number(e.target.value));
-                      setError(null);
-                    }}
-                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2 flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setError(null);
-                    setEditOpen(false);
-                    setSelectedItem(null);
-                  }}
-                  className="text-xs"
-                >
-                  Fechar
-                </Button>
-                <Button type="submit" className="text-xs">
-                  Salvar Alterações
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal 2: Adjust Stock Quantity */}
-      {ajusteOpen && selectedItem && (
+      {/* Modal 2: Inbound Stock Movement (R015) */}
+      {inboundOpen && selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-border p-4">
-              <h3 className="text-base font-semibold">Ajustar Saldo de Estoque</h3>
+            <div className="flex items-center justify-between border-b border-border p-4 bg-emerald-500/5">
+              <h3 className="text-base font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                <ArrowUpRight className="h-5 w-5 text-emerald-500" />
+                Registrar Entrada de Estoque
+              </h3>
               <button
                 onClick={() => {
-                  setAjusteOpen(false);
+                  setInboundOpen(false);
                   setSelectedItem(null);
+                  setInboundError(null);
                 }}
-                className="text-muted-foreground hover:text-foreground text-sm font-semibold"
+                className="text-muted-foreground hover:text-foreground text-sm font-semibold cursor-pointer"
               >
                 Cancelar
               </button>
             </div>
 
-            <form onSubmit={handleAdjustSubmit} className="p-4 space-y-4">
+            <form onSubmit={handleInboundSubmit} className="p-4 space-y-4">
               <div className="bg-accent/30 p-3 rounded-lg text-xs space-y-1">
-                <div className="text-muted-foreground">Item selecionado:</div>
-                <div className="font-semibold text-sm">{selectedItem.nome}</div>
-                <div className="text-[10px] font-mono text-muted-foreground">SKU: {selectedItem.sku}</div>
+                <div className="text-muted-foreground">Produto selecionado:</div>
+                <div className="font-semibold text-sm text-foreground">{selectedItem.nome}</div>
+                <div className="flex justify-between items-center mt-2 pt-2 border-t border-border/50 text-[11px] text-muted-foreground">
+                  <span>SKU: <strong className="font-mono text-foreground">{selectedItem.sku}</strong></span>
+                  <span>Saldo Atual: <strong className="text-foreground">{selectedItem.quantidade} un</strong></span>
+                </div>
+              </div>
+
+              {inboundError && (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs rounded-lg flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>{inboundError}</span>
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-muted-foreground">
+                  Quantidade a Inserir <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  required
+                  placeholder="Ex: 50"
+                  value={inboundQtd}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, "");
+                    if (val === "") {
+                      setInboundQtd("");
+                    } else {
+                      const num = Number(val);
+                      if (num > 0) {
+                        setInboundQtd(num);
+                        setInboundError(null);
+                      }
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (["-", "+", "e", "E", ".", ","].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
+                />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Nova Quantidade Física</label>
+                <label className="text-xs font-semibold text-muted-foreground">
+                  Motivo / Justificativa <span className="text-destructive">*</span>
+                </label>
                 <input
-                  type="number"
-                  min="0"
+                  type="text"
                   required
-                  value={novaQtd}
-                  onChange={(e) => setNovaQtd(Number(e.target.value))}
+                  placeholder="Ex: Compra fornecedor TechDistrib"
+                  value={inboundMotivo}
+                  onChange={(e) => {
+                    setInboundMotivo(e.target.value);
+                    if (e.target.value.trim()) setInboundError(null);
+                  }}
                   className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
                 />
               </div>
@@ -831,15 +827,86 @@ export function TabelaEstoque({
                   type="button"
                   variant="ghost"
                   onClick={() => {
-                    setAjusteOpen(false);
+                    setInboundOpen(false);
+                    setSelectedItem(null);
+                    setInboundError(null);
+                  }}
+                  className="text-xs font-semibold cursor-pointer"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                  disabled={!inboundQtd || Number(inboundQtd) <= 0 || !inboundMotivo.trim()}
+                >
+                  Confirmar Entrada
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Confirm deletion (R013) */}
+      {deleteOpen && selectedItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-border p-4 bg-destructive/5">
+              <h3 className="text-base font-semibold text-destructive flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                Confirmar Exclusão Controlada
+              </h3>
+              <button
+                onClick={() => {
+                  setError(null);
+                  setDeleteOpen(false);
+                  setSelectedItem(null);
+                }}
+                className="text-muted-foreground hover:text-foreground text-sm font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+            </div>
+
+            <form onSubmit={handleDeleteSubmit} className="p-4 space-y-4">
+              <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg space-y-2">
+                <h4 className="text-sm font-bold flex items-center gap-1.5">
+                  <ShieldAlert className="h-4 w-4" />
+                  Aviso Administrativo Crítico
+                </h4>
+                <p className="text-xs text-destructive/90 leading-relaxed">
+                  A exclusão de <strong>{selectedItem.nome}</strong> (SKU: <strong>{selectedItem.sku}</strong>) é uma alteração de inventário permanente. 
+                  O produto será removido visualmente de todas as listagens ativas e desconsiderado nos cálculos globais de estoque.
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-3 bg-destructive/15 border border-destructive/20 text-destructive text-xs rounded-lg flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="pt-2 flex justify-end gap-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setError(null);
+                    setDeleteOpen(false);
                     setSelectedItem(null);
                   }}
-                  className="text-xs"
+                  className="text-xs font-semibold cursor-pointer"
                 >
-                  Fechar
+                  Cancelar
                 </Button>
-                <Button type="submit" className="text-xs">
-                  Atualizar Saldo
+                <Button 
+                  type="submit" 
+                  variant="destructive" 
+                  className="text-xs font-semibold cursor-pointer"
+                >
+                  Confirmar Exclusão
                 </Button>
               </div>
             </form>
@@ -859,7 +926,7 @@ export function TabelaEstoque({
               </h3>
               <button
                 onClick={() => setActiveAudit(null)}
-                className="text-muted-foreground hover:text-foreground text-sm font-semibold"
+                className="text-muted-foreground hover:text-foreground text-sm font-semibold cursor-pointer"
               >
                 Fechar
               </button>
@@ -874,7 +941,7 @@ export function TabelaEstoque({
                 <div className="text-[10px] font-mono text-muted-foreground">ID: {activeAudit.id}</div>
               </div>
 
-              <div className="space-y-4 border-l border-border pl-4 ml-2 relative">
+              <div className="max-h-[300px] overflow-y-auto space-y-4 border-l border-border pl-4 ml-2 relative pr-2">
                 {/* Creation event */}
                 <div className="relative space-y-1">
                   <div className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-card" />
@@ -902,12 +969,47 @@ export function TabelaEstoque({
                     </div>
                   </div>
                 )}
+
+                {/* Movimentações de Estoque no Histórico de Auditoria */}
+                {activeAudit.movimentacoes && activeAudit.movimentacoes.length > 0 && (
+                  <>
+                    <div className="pt-2 border-t border-border text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Movimentações de Estoque
+                    </div>
+                    {activeAudit.movimentacoes.map((mov, mIdx) => (
+                      <div key={mIdx} className="relative space-y-1 pl-1">
+                        <div className={cn(
+                          "absolute -left-[21px] top-1.5 h-2 w-2 rounded-full ring-4 ring-card",
+                          mov.tipo === "entrada" ? "bg-emerald-500" : "bg-red-500"
+                        )} />
+                        <div className="text-xs font-semibold text-foreground flex items-center justify-between">
+                          <span className="flex items-center gap-1">
+                            {mov.tipo === "entrada" ? "Entrada" : "Saída"}:
+                          </span>
+                          <span className={cn(
+                            "font-bold font-mono",
+                            mov.tipo === "entrada" ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
+                          )}>
+                            {mov.tipo === "entrada" ? "+" : "-"}{mov.quantidade} un
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-foreground/80 leading-snug">
+                          Motivo: <span className="italic">{mov.motivo}</span>
+                        </div>
+                        <div className="text-[10px] text-muted-foreground flex items-center justify-between">
+                          <span className="flex items-center gap-1"><User className="h-3 w-3" /> {mov.usuario}</span>
+                          <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {formatDate(mov.data)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
 
               <div className="pt-2 flex justify-end">
                 <Button
                   onClick={() => setActiveAudit(null)}
-                  className="w-full sm:w-auto text-xs"
+                  className="w-full sm:w-auto text-xs font-semibold cursor-pointer"
                 >
                   OK
                 </Button>
