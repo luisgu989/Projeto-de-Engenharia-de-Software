@@ -16,6 +16,7 @@ export interface UserProfile {
   name: string;
   email: string;
   role: "admin" | "employee";
+  cargo: string;
   permissions: UserPermissions;
 }
 
@@ -86,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     name: "Usuário Suporte",
     email: "admin@erppro.com",
     role: "admin",
+    cargo: "Administrador",
     permissions: defaultPermissionsAdmin,
   });
 
@@ -157,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       name: profile.name,
       email: profile.email,
       role: profile.role,
+      cargo: profile.cargo,
       permissions,
     });
   }, [availableProfiles]);
@@ -173,6 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       name: profile.name,
       email: profile.email,
       role: profile.role,
+      cargo: profile.cargo,
       permissions,
     });
 
@@ -230,6 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role,
         name: profile.name,
         email: profile.email,
+        cargo: profile.cargo,
         permissions: getUserPermissions(profile.email, role, profile.cargo),
       };
     });

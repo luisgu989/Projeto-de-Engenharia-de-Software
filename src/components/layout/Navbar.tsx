@@ -2,9 +2,11 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Menu, Bell, Search, Sun, Moon, Laptop } from "lucide-react";
+import { Menu, Bell, Search, Sun, Moon, Laptop, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
+import { useTheme } from "@/contexts/theme-context";
+import { useNotifications } from "@/contexts/notifications-context";
 import { cn } from "@/lib/utils";
 
 export interface NavbarProps {
@@ -15,6 +17,9 @@ export interface NavbarProps {
 export function Navbar({ setMobileOpen, collapsed }: NavbarProps) {
   const pathname = usePathname();
   const { user, switchProfile, availableProfiles } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { filteredNotifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
+  const [notifsOpen, setNotifsOpen] = React.useState(false);
 
   // Helper to format breadcrumb based on pathname
   const getPageTitle = () => {
@@ -60,16 +65,147 @@ export function Navbar({ setMobileOpen, collapsed }: NavbarProps) {
           />
         </div>
 
-        {/* Quick actions */}
-        <Button variant="ghost" size="icon" className="relative hover:bg-accent">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
-        </Button>
+        {/* Notifications Dropdown */}
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setNotifsOpen(!notifsOpen)}
+            className={cn("relative hover:bg-accent", notifsOpen && "bg-accent")}
+            aria-label="Abrir notificações"
+            id="notifications-bell"
+          >
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />
+            )}
+          </Button>
 
-        {/* Theme Toggle Placeholder */}
-        <Button variant="ghost" size="icon" className="hover:bg-accent text-muted-foreground">
-          <Sun className="h-4 w-4 dark:hidden" />
-          <Moon className="h-4 w-4 hidden dark:block" />
+          {notifsOpen && (
+            <>
+              {/* Overlay background to close the modal */}
+              <div
+                className="fixed inset-0 z-40 bg-transparent"
+                onClick={() => setNotifsOpen(false)}
+              />
+
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl border border-border bg-card text-card-foreground shadow-xl z-50 overflow-hidden divide-y divide-border transform scale-100 animate-in fade-in slide-in-from-top-2 duration-150">
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 bg-accent/40">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm">Notificações</span>
+                    {unreadCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary text-primary-foreground">
+                        {unreadCount} novas
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      title="Marcar todas como lidas"
+                      onClick={() => {
+                        markAllAsRead();
+                      }}
+                      className="hover:bg-accent hover:text-foreground text-muted-foreground"
+                    >
+                      <CheckCheck className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      title="Limpar todas"
+                      onClick={() => {
+                        clearAll();
+                      }}
+                      className="hover:bg-accent hover:text-foreground text-muted-foreground"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* List */}
+                <div className="max-h-72 overflow-y-auto divide-y divide-border/60">
+                  {filteredNotifications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                      <Bell className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Nenhuma notificação por aqui
+                      </span>
+                    </div>
+                  ) : (
+                    filteredNotifications.map((notif) => {
+                      let Icon = Info;
+                      let iconColor = "text-blue-500";
+                      if (notif.tipo === "success") {
+                        Icon = CheckCircle2;
+                        iconColor = "text-emerald-500";
+                      } else if (notif.tipo === "warning") {
+                        Icon = AlertTriangle;
+                        iconColor = "text-amber-500";
+                      } else if (notif.tipo === "error") {
+                        Icon = XCircle;
+                        iconColor = "text-destructive";
+                      }
+
+                      return (
+                        <div
+                          key={notif.id}
+                          onClick={() => {
+                            markAsRead(notif.id);
+                          }}
+                          className={cn(
+                            "flex gap-3 p-3 text-left transition-colors cursor-pointer hover:bg-accent/40",
+                            !notif.lida && "bg-primary/5 dark:bg-primary/10"
+                          )}
+                        >
+                          <div className={cn("p-1.5 rounded-lg bg-accent/60 shrink-0 self-start", iconColor)}>
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0 space-y-0.5">
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className={cn("text-xs font-bold truncate", !notif.lida && "text-foreground font-extrabold")}>
+                                {notif.title}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                {new Date(notif.timestamp).toLocaleTimeString("pt-BR", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-[11px] leading-snug text-muted-foreground break-words line-clamp-2">
+                              {notif.message}
+                            </p>
+                          </div>
+                          {!notif.lida && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0 self-center" />
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Theme Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="hover:bg-accent text-muted-foreground"
+          aria-label="Alternar tema"
+        >
+          {theme === "dark" ? (
+            <Sun className="h-4 w-4 text-amber-500" />
+          ) : (
+            <Moon className="h-4 w-4 text-slate-700" />
+          )}
         </Button>
 
         <div className="h-8 w-px bg-border no-print" />

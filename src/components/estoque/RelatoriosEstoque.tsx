@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ItemEstoque } from "@/hooks/useEstoque";
 import { useLogs } from "@/contexts/logs-context";
 import { useAuth } from "@/contexts/auth-context";
-import { Calendar, DollarSign, Package, TrendingUp, AlertTriangle, FileText, Download, Printer, CheckCircle, BarChart3 } from "lucide-react";
+import { Calendar, DollarSign, Package, TrendingUp, AlertTriangle, FileText, Download, Printer, CheckCircle, BarChart3, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

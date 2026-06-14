@@ -14,6 +14,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Briefcase,
+  Hammer,
+  Truck,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,6 +60,18 @@ const menuItems: MenuItem[] = [
     category: "Módulos",
   },
   {
+    title: "Produção",
+    href: "/producao",
+    icon: Hammer,
+    category: "Módulos",
+  },
+  {
+    title: "Logística",
+    href: "/logistica",
+    icon: Truck,
+    category: "Módulos",
+  },
+  {
     title: "Financeiro",
     href: "/financeiro",
     icon: DollarSign,
@@ -66,6 +81,12 @@ const menuItems: MenuItem[] = [
     title: "Clientes",
     href: "/clientes",
     icon: Users,
+    category: "Módulos",
+  },
+  {
+    title: "Relatórios",
+    href: "/relatorios",
+    icon: BarChart3,
     category: "Módulos",
   },
   {

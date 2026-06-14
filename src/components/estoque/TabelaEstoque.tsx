@@ -279,7 +279,7 @@ export function TabelaEstoque({
   const handleDeleteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem) return;
-    if (userRole !== "admin") {
+    if (user.role !== "admin") {
       setError("Permissão Negada: Apenas administradores podem excluir produtos.");
       return;
     }
