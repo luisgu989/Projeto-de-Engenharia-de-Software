@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
+import { useAuth } from "@/contexts/auth-context";
 
 export interface MovimentacaoEstoque {
   tipo: "entrada" | "saida";
@@ -82,7 +84,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
         quantidade: 2,
         motivo: "Uso interno TI",
         data: "2026-05-18T16:00:00.000Z",
-        usuario: "Admin User",
+        usuario: "Usuário Suporte",
       },
     ],
   },
@@ -97,14 +99,14 @@ const mockEstoqueInicial: ItemEstoque[] = [
     precoVenda: 1699.0,
     status: "ativo",
     criadoEm: "2026-05-17T11:45:00.000Z",
-    criadoPor: "Admin User",
+    criadoPor: "Usuário Suporte",
     movimentacoes: [
       {
         tipo: "entrada",
         quantidade: 15,
         motivo: "Transferência CD Campinas",
         data: "2026-05-17T11:45:00.000Z",
-        usuario: "Admin User",
+        usuario: "Usuário Suporte",
       },
     ],
   },
@@ -143,7 +145,7 @@ const mockEstoqueInicial: ItemEstoque[] = [
     criadoEm: "2026-05-19T14:20:00.000Z",
     criadoPor: "Luís Fernando",
     atualizadoEm: "2026-05-20T16:00:00.000Z",
-    atualizadoPor: "Admin User",
+    atualizadoPor: "Usuário Suporte",
     movimentacoes: [
       {
         tipo: "entrada",
@@ -157,16 +159,54 @@ const mockEstoqueInicial: ItemEstoque[] = [
         quantidade: 2,
         motivo: "Venda cupom #8911",
         data: "2026-05-20T16:00:00.000Z",
-        usuario: "Admin User",
+        usuario: "Usuário Suporte",
       },
     ],
   },
 ];
 
 export function useEstoque() {
+  const { addLog } = useLogs();
+  const { user } = useAuth();
+  
   const [estoque, setEstoque] = useState<ItemEstoque[]>(mockEstoqueInicial);
-  const [busca, setBusca] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("erp_estoque");
+    if (saved) {
+      try {
+        setEstoque(JSON.parse(saved));
+      } catch (e) {
+        console.error("Erro ao carregar estoque:", e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("erp_estoque", JSON.stringify(estoque));
+    }
+  }, [estoque, isLoaded]);
+
+  // Sync state across storage events (tabs / simulation)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem("erp_estoque");
+      if (saved) {
+        try {
+          setEstoque(JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const checkDuplicateSku = (sku: string, excludeId?: string) => {
     const cleanedSku = sku.trim().toUpperCase();
@@ -185,7 +225,7 @@ export function useEstoque() {
       return false;
     }
 
-    const idGerado = `PROD-00${estoque.length + 1}`;
+    const idGerado = `PROD-00${estoque.length + 1}-${Math.floor(Math.random() * 100)}`;
     const dataAtual = new Date().toISOString();
     const itemCompleto: ItemEstoque = {
       ...novoItem,
@@ -193,18 +233,22 @@ export function useEstoque() {
       id: idGerado,
       status: "ativo",
       criadoEm: dataAtual,
-      criadoPor: "Admin User",
+      criadoPor: user.name,
       movimentacoes: [
         {
           tipo: "entrada",
           quantidade: novoItem.quantidade,
           motivo: "Saldo de abertura de cadastro",
           data: dataAtual,
-          usuario: "Admin User",
+          usuario: user.name,
         },
       ],
     };
     setEstoque((prev) => [...prev, itemCompleto]);
+    addLog(
+      `Cadastrou o produto ${novoItem.nome} (SKU: ${novoItem.sku.trim().toUpperCase()}) com estoque inicial de ${novoItem.quantidade} un.`,
+      "estoque"
+    );
     return true;
   };
 
@@ -219,6 +263,8 @@ export function useEstoque() {
     }
 
     const dataAtual = new Date().toISOString();
+    const oldItem = estoque.find((i) => i.id === id);
+
     setEstoque((prev) =>
       prev.map((item) => {
         if (item.id === id) {
@@ -232,7 +278,7 @@ export function useEstoque() {
                 quantidade: Math.abs(qtdDiferenca),
                 motivo: "Ajuste manual de cadastro completo",
                 data: dataAtual,
-                usuario: "Admin User",
+                usuario: user.name,
               },
             ];
           }
@@ -242,13 +288,20 @@ export function useEstoque() {
             ...dadosAlterados,
             sku: dadosAlterados.sku.trim().toUpperCase(),
             atualizadoEm: dataAtual,
-            atualizadoPor: "Admin User",
+            atualizadoPor: user.name,
             movimentacoes: novasMovs,
           };
         }
         return item;
       })
     );
+
+    if (oldItem) {
+      addLog(
+        `Atualizou os dados de cadastro do produto ${dadosAlterados.nome} (SKU: ${dadosAlterados.sku})`,
+        "estoque"
+      );
+    }
     return true;
   };
 
@@ -266,6 +319,8 @@ export function useEstoque() {
 
     const dataAtual = new Date().toISOString();
     let sucesso = true;
+    const item = estoque.find((i) => i.id === id);
+    if (!item) return false;
 
     setEstoque((prev) =>
       prev.map((item) => {
@@ -285,14 +340,14 @@ export function useEstoque() {
             quantidade,
             motivo: motivo.trim() || (tipo === "entrada" ? "Entrada de estoque" : "Saída de estoque"),
             data: dataAtual,
-            usuario: "Admin User",
+            usuario: user.name,
           };
 
           return {
             ...item,
             quantidade: novaQtd,
             atualizadoEm: dataAtual,
-            atualizadoPor: "Admin User",
+            atualizadoPor: user.name,
             movimentacoes: [...(item.movimentacoes || []), novaMov],
           };
         }
@@ -300,11 +355,21 @@ export function useEstoque() {
       })
     );
 
+    if (sucesso) {
+      addLog(
+        `Registrou ${tipo === "entrada" ? "entrada" : "saída"} de ${quantidade} un. do produto ${item.nome} - Motivo: ${motivo}`,
+        "estoque"
+      );
+    }
+
     return sucesso;
   };
 
   const ajustarEstoque = (id: string, novaQuantidade: number) => {
     const dataAtual = new Date().toISOString();
+    const item = estoque.find((i) => i.id === id);
+    if (!item) return;
+
     setEstoque((prev) =>
       prev.map((item) => {
         if (item.id === id) {
@@ -318,7 +383,7 @@ export function useEstoque() {
                 quantidade: Math.abs(qtdDiferenca),
                 motivo: "Ajuste físico direto",
                 data: dataAtual,
-                usuario: "Admin User",
+                usuario: user.name,
               },
             ];
           }
@@ -327,19 +392,24 @@ export function useEstoque() {
             ...item,
             quantidade: Math.max(0, novaQuantidade),
             atualizadoEm: dataAtual,
-            atualizadoPor: "Admin User",
+            atualizadoPor: user.name,
             movimentacoes: novasMovs,
           };
         }
         return item;
       })
     );
+
+    addLog(
+      `Ajustou o saldo do produto ${item.nome} de ${item.quantidade} un. para ${novaQuantidade} un.`,
+      "estoque"
+    );
   };
 
   const removerItem = (id: string) => {
     setError(null);
-    const itemExiste = estoque.some((item) => item.id === id && item.status === "ativo");
-    if (!itemExiste) {
+    const item = estoque.find((item) => item.id === id && item.status === "ativo");
+    if (!item) {
       setError("Produto não encontrado ou já excluído.");
       return false;
     }
@@ -351,14 +421,19 @@ export function useEstoque() {
             ...item,
             status: "excluido",
             atualizadoEm: new Date().toISOString(),
-            atualizadoPor: "Admin User",
+            atualizadoPor: user.name,
           };
         }
         return item;
       })
     );
+
+    addLog(`Excluiu o produto ${item.nome} (SKU: ${item.sku}) do catálogo de ativos`, "estoque");
     return true;
   };
+
+  const [error, setError] = useState<string | null>(null);
+  const [busca, setBusca] = useState("");
 
   const estoqueFiltrado = estoque
     .filter((item) => item.status === "ativo")
@@ -376,6 +451,7 @@ export function useEstoque() {
 
   return {
     estoque: estoqueFiltrado,
+    todosItens: estoque, // Para relatórios gerais
     busca,
     setBusca,
     error,

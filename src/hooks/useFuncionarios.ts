@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
+import { useAuth } from "@/contexts/auth-context";
 
 export interface Funcionario {
   id: string;
@@ -27,7 +29,7 @@ const mockFuncionariosIniciais: Funcionario[] = [
     status: "ativo",
     dataAdmissao: "2024-03-10",
     criadoEm: "2024-03-10T09:00:00.000Z",
-    criadoPor: "Admin User",
+    criadoPor: "Administrador Geral",
   },
   {
     id: "FUNC-002",
@@ -38,7 +40,7 @@ const mockFuncionariosIniciais: Funcionario[] = [
     status: "ativo",
     dataAdmissao: "2025-01-15",
     criadoEm: "2025-01-15T10:30:00.000Z",
-    criadoPor: "Admin User",
+    criadoPor: "Administrador Geral",
   },
   {
     id: "FUNC-003",
@@ -49,14 +51,59 @@ const mockFuncionariosIniciais: Funcionario[] = [
     status: "inativo",
     dataAdmissao: "2025-08-01",
     criadoEm: "2025-08-01T14:00:00.000Z",
-    criadoPor: "Admin User",
+    criadoPor: "Administrador Geral",
     atualizadoEm: "2025-12-05T16:00:00.000Z",
-    atualizadoPor: "Admin User",
+    atualizadoPor: "Administrador Geral",
   },
 ];
 
 export function useFuncionarios() {
+  const { addLog } = useLogs();
+  const { user } = useAuth();
+
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>(mockFuncionariosIniciais);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("erp_funcionarios");
+    if (saved) {
+      try {
+        setFuncionarios(JSON.parse(saved));
+      } catch (e) {
+        console.error("Erro ao carregar funcionários:", e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("erp_funcionarios", JSON.stringify(funcionarios));
+      // Dispatch storage event so AuthProvider can sync available profiles
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("storage"));
+      }
+    }
+  }, [funcionarios, isLoaded]);
+
+  // Sync state across storage events (tabs / simulation)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem("erp_funcionarios");
+      if (saved) {
+        try {
+          setFuncionarios(JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   const [busca, setBusca] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -77,17 +124,18 @@ export function useFuncionarios() {
       return false;
     }
 
-    const idGerado = `FUNC-00${funcionarios.length + 1}`;
+    const idGerado = `FUNC-00${funcionarios.length + 1}-${Math.floor(Math.random() * 100)}`;
     const dataAtual = new Date().toISOString();
     const funcionarioCompleto: Funcionario = {
       ...novoFunc,
       email: novoFunc.email.trim().toLowerCase(),
       id: idGerado,
       criadoEm: dataAtual,
-      criadoPor: "Admin User", // Em sistema real seria do contexto auth
+      criadoPor: user.name,
     };
 
     setFuncionarios((prev) => [funcionarioCompleto, ...prev]);
+    addLog(`Cadastrou o colaborador ${novoFunc.nome} (${novoFunc.cargo} - ${novoFunc.departamento})`, "funcionarios");
     return true;
   };
 
@@ -102,6 +150,8 @@ export function useFuncionarios() {
     }
 
     const dataAtual = new Date().toISOString();
+    const oldFunc = funcionarios.find((f) => f.id === id);
+
     setFuncionarios((prev) =>
       prev.map((f) =>
         f.id === id
@@ -110,16 +160,24 @@ export function useFuncionarios() {
               ...dadosAlterados,
               email: dadosAlterados.email.trim().toLowerCase(),
               atualizadoEm: dataAtual,
-              atualizadoPor: "Admin User",
+              atualizadoPor: user.name,
             }
           : f
       )
     );
+
+    if (oldFunc) {
+      addLog(`Atualizou o cadastro do colaborador ${dadosAlterados.nome} (ID: ${id})`, "funcionarios");
+    }
     return true;
   };
 
   const removerFuncionario = (id: string) => {
+    const oldFunc = funcionarios.find((f) => f.id === id);
     setFuncionarios((prev) => prev.filter((f) => f.id !== id));
+    if (oldFunc) {
+      addLog(`Excluiu o cadastro do colaborador ${oldFunc.nome} (ID: ${id})`, "funcionarios");
+    }
   };
 
   const funcionariosFiltrados = funcionarios.filter(
@@ -130,7 +188,6 @@ export function useFuncionarios() {
       f.cargo.toLowerCase().includes(busca.toLowerCase())
   );
 
-  // Computations
   const totalFuncionarios = funcionarios.length;
   const ativos = funcionarios.filter((f) => f.status === "ativo").length;
   const inativos = funcionarios.filter((f) => f.status === "inativo").length;

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { ItemEstoque } from "@/hooks/useEstoque";
-import { Search, Plus, AlertTriangle, ShieldAlert, Edit2, Info, Calendar, User, Trash2, ArrowUpRight, CheckCircle2, Loader2 } from "lucide-react";
+import { Search, Plus, AlertTriangle, ShieldAlert, Edit2, Info, Calendar, User, Trash2, ArrowUpRight, ArrowDownLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ProductForm } from "@/components/ProductForm";
+import { useAuth } from "@/contexts/auth-context";
 
 interface TabelaEstoqueProps {
   estoque: ItemEstoque[];
@@ -32,8 +34,8 @@ export function TabelaEstoque({
   const [selectedItem, setSelectedItem] = useState<ItemEstoque | null>(null);
   const [activeAudit, setActiveAudit] = useState<ItemEstoque | null>(null);
 
-  // Role simulation state (R014)
-  const [userRole, setUserRole] = useState<"admin" | "operador">("admin");
+  const { user } = useAuth();
+  const [inboundType, setInboundType] = useState<"entrada" | "saida">("entrada");
 
   // Success message toast simulation
   const [successToast, setSuccessToast] = useState<string | null>(null);
@@ -301,14 +303,19 @@ export function TabelaEstoque({
       return;
     }
 
-    const success = onAjustarEstoque(selectedItem.id, "entrada", Number(inboundQtd), inboundMotivo.trim());
+    if (inboundType === "saida" && Number(inboundQtd) > selectedItem.quantidade) {
+      setInboundError(`Saldo insuficiente. O produto possui apenas ${selectedItem.quantidade} unidades.`);
+      return;
+    }
+
+    const success = onAjustarEstoque(selectedItem.id, inboundType, Number(inboundQtd), inboundMotivo.trim());
     if (success) {
       setInboundOpen(false);
       setInboundQtd("");
       setInboundMotivo("");
       setInboundError(null);
       setSelectedItem(null);
-      triggerToast("Entrada de estoque registrada com sucesso!");
+      triggerToast(inboundType === "entrada" ? "Entrada de estoque registrada com sucesso!" : "Saída de estoque registrada com sucesso!");
     } else {
       setInboundError("Erro ao registrar a movimentação no estoque.");
     }
@@ -368,49 +375,6 @@ export function TabelaEstoque({
 
   return (
     <div className="space-y-4">
-      {/* Simulated Permission Selector (R014) */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 dark:bg-blue-500/10 shadow-sm animate-in fade-in duration-300">
-        <div className="flex items-center gap-3">
-          <ShieldAlert className="h-5 w-5 text-blue-500 shrink-0" />
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Simulador de Controle de Acesso</h4>
-            <p className="text-xs text-muted-foreground">Alterne o perfil para validar as restrições da interface de usuário (R014).</p>
-          </div>
-        </div>
-        <div className="flex items-center bg-card p-1 rounded-lg border border-border self-start sm:self-auto shadow-sm">
-          <button
-            type="button"
-            onClick={() => {
-              setUserRole("admin");
-              setError(null);
-            }}
-            className={cn(
-              "px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 flex items-center gap-1.5 cursor-pointer",
-              userRole === "admin"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Administrador
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setUserRole("operador");
-              setError(null);
-            }}
-            className={cn(
-              "px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 flex items-center gap-1.5 cursor-pointer",
-              userRole === "operador"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Operador de Estoque
-          </button>
-        </div>
-      </div>
-
       {/* Simulated Success Toast */}
       {successToast && (
         <div className="fixed bottom-4 right-4 z-50 p-4 bg-emerald-600 text-white rounded-xl shadow-lg border border-emerald-500/20 flex items-center gap-3 animate-in slide-in-from-bottom duration-300">
@@ -432,7 +396,7 @@ export function TabelaEstoque({
           />
         </div>
 
-        {userRole === "admin" ? (
+        {user.permissions.gerenciarEstoque ? (
           <Button
             onClick={() => {
               setError(null);
@@ -446,7 +410,7 @@ export function TabelaEstoque({
         ) : (
           <div className="text-xs text-muted-foreground bg-accent/40 px-3 py-2 rounded-lg border border-border flex items-center gap-2">
             <ShieldAlert className="h-4 w-4 text-yellow-500" />
-            Modo Operador: Cadastro Desabilitado
+            Apenas Leitura: Cadastro de Produto Bloqueado
           </div>
         )}
       </div>
@@ -610,25 +574,48 @@ export function TabelaEstoque({
                             <Info className="h-4 w-4" />
                           </Button>
 
-                          {/* Entrada de Estoque (R015) - Acessível para Admin e Operador */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setSelectedItem(item);
-                              setInboundQtd("");
-                              setInboundMotivo("");
-                              setInboundError(null);
-                              setInboundOpen(true);
-                            }}
-                            className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10 cursor-pointer"
-                            title="Registrar Entrada de Estoque"
-                          >
-                            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                          </Button>
+                          {/* Entrada de Estoque - Acessível se tiver permissão de movimentar */}
+                          {user.permissions.movimentarEstoque && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setSelectedItem(item);
+                                setInboundType("entrada");
+                                setInboundQtd("");
+                                setInboundMotivo("");
+                                setInboundError(null);
+                                setInboundOpen(true);
+                              }}
+                              className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10 cursor-pointer"
+                              title="Registrar Entrada de Estoque"
+                            >
+                              <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                            </Button>
+                          )}
 
-                          {/* Ações restritas a Administradores (R014) */}
-                          {userRole === "admin" && (
+                          {/* Saída de Estoque - Acessível se tiver permissão de movimentar */}
+                          {user.permissions.movimentarEstoque && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setSelectedItem(item);
+                                setInboundType("saida");
+                                setInboundQtd("");
+                                setInboundMotivo("");
+                                setInboundError(null);
+                                setInboundOpen(true);
+                              }}
+                              className="h-8 w-8 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 cursor-pointer"
+                              title="Registrar Saída de Estoque"
+                            >
+                              <ArrowDownLeft className="h-4 w-4 text-rose-500" />
+                            </Button>
+                          )}
+
+                          {/* Ações restritas a quem pode Gerenciar Estoque */}
+                          {user.permissions.gerenciarEstoque && (
                             <>
                               {/* Editar Cadastro Completo (R012) */}
                               <Button
@@ -735,14 +722,24 @@ export function TabelaEstoque({
     />
   )}
 
-      {/* Modal 2: Inbound Stock Movement (R015) */}
+      {/* Modal 2: Inbound/Outbound Stock Movement (R015 / US016) */}
       {inboundOpen && selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-border p-4 bg-emerald-500/5">
-              <h3 className="text-base font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                <ArrowUpRight className="h-5 w-5 text-emerald-500" />
-                Registrar Entrada de Estoque
+            <div className={cn(
+              "flex items-center justify-between border-b border-border p-4 transition-colors",
+              inboundType === "entrada" ? "bg-emerald-500/5" : "bg-rose-500/5"
+            )}>
+              <h3 className={cn(
+                "text-base font-semibold flex items-center gap-2 transition-colors",
+                inboundType === "entrada" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+              )}>
+                {inboundType === "entrada" ? (
+                  <ArrowUpRight className="h-5 w-5 text-emerald-500" />
+                ) : (
+                  <ArrowDownLeft className="h-5 w-5 text-rose-500" />
+                )}
+                Registrar Movimentação
               </h3>
               <button
                 onClick={() => {
@@ -773,26 +770,67 @@ export function TabelaEstoque({
                 </div>
               )}
 
+              {/* Segmented controller for movement type */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-muted-foreground">Tipo de Movimentação</label>
+                <div className="flex bg-accent/30 p-1 rounded-lg border border-border">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInboundType("entrada");
+                      setInboundError(null);
+                    }}
+                    className={cn(
+                      "flex-1 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer text-center",
+                      inboundType === "entrada" ? "bg-emerald-600 text-white shadow" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Entrada (+)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInboundType("saida");
+                      setInboundError(null);
+                      if (inboundQtd && Number(inboundQtd) > selectedItem.quantidade) {
+                        setInboundError(`Saldo insuficiente. O produto possui apenas ${selectedItem.quantidade} unidades.`);
+                      }
+                    }}
+                    className={cn(
+                      "flex-1 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer text-center",
+                      inboundType === "saida" ? "bg-rose-600 text-white shadow" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Saída (-)
+                  </button>
+                </div>
+              </div>
+
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-muted-foreground">
-                  Quantidade a Inserir <span className="text-destructive">*</span>
+                  Quantidade a {inboundType === "entrada" ? "Inserir" : "Retirar"} <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="number"
                   min="1"
                   step="1"
                   required
-                  placeholder="Ex: 50"
+                  placeholder={inboundType === "entrada" ? "Ex: 50" : "Ex: 10"}
                   value={inboundQtd}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9]/g, "");
                     if (val === "") {
                       setInboundQtd("");
+                      setInboundError(null);
                     } else {
                       const num = Number(val);
                       if (num > 0) {
                         setInboundQtd(num);
-                        setInboundError(null);
+                        if (inboundType === "saida" && num > selectedItem.quantidade) {
+                          setInboundError(`Saldo insuficiente. O produto possui apenas ${selectedItem.quantidade} unidades.`);
+                        } else {
+                          setInboundError(null);
+                        }
                       }
                     }
                   }}
@@ -812,7 +850,7 @@ export function TabelaEstoque({
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Compra fornecedor TechDistrib"
+                  placeholder={inboundType === "entrada" ? "Ex: Compra fornecedor TechDistrib" : "Ex: Venda cupom #9213"}
                   value={inboundMotivo}
                   onChange={(e) => {
                     setInboundMotivo(e.target.value);
@@ -837,10 +875,13 @@ export function TabelaEstoque({
                 </Button>
                 <Button 
                   type="submit" 
-                  className="text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
-                  disabled={!inboundQtd || Number(inboundQtd) <= 0 || !inboundMotivo.trim()}
+                  className={cn(
+                    "text-xs font-semibold text-white cursor-pointer transition-colors",
+                    inboundType === "entrada" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
+                  )}
+                  disabled={!inboundQtd || Number(inboundQtd) <= 0 || !inboundMotivo.trim() || !!inboundError}
                 >
-                  Confirmar Entrada
+                  {inboundType === "entrada" ? "Confirmar Entrada" : "Confirmar Saída"}
                 </Button>
               </div>
             </form>

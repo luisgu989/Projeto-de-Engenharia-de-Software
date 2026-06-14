@@ -4,6 +4,8 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { Menu, Bell, Search, Sun, Moon, Laptop } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth-context";
+import { cn } from "@/lib/utils";
 
 export interface NavbarProps {
   setMobileOpen: (open: boolean) => void;
@@ -12,6 +14,7 @@ export interface NavbarProps {
 
 export function Navbar({ setMobileOpen, collapsed }: NavbarProps) {
   const pathname = usePathname();
+  const { user, switchProfile, availableProfiles } = useAuth();
 
   // Helper to format breadcrumb based on pathname
   const getPageTitle = () => {
@@ -69,12 +72,36 @@ export function Navbar({ setMobileOpen, collapsed }: NavbarProps) {
           <Moon className="h-4 w-4 hidden dark:block" />
         </Button>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border no-print" />
+
+        {/* Profile Simulator Dropdown (US021) */}
+        <div className="flex items-center gap-2 no-print">
+          <label htmlFor="simulador-acesso" className="text-[10px] font-bold text-muted-foreground uppercase hidden lg:inline-block">
+            Simular:
+          </label>
+          <select
+            id="simulador-acesso"
+            value={user.email}
+            onChange={(e) => switchProfile(e.target.value)}
+            className="bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-2 py-1 text-xs font-medium cursor-pointer max-w-[130px] sm:max-w-[180px] md:max-w-none text-foreground"
+          >
+            {availableProfiles.map((p) => (
+              <option key={p.email} value={p.email}>
+                {p.name} ({p.cargo})
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* User Status/Role badge */}
-        <div className="hidden md:flex flex-col items-end">
-          <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-            Online
+        <div className="hidden md:flex flex-col items-end no-print">
+          <span className={cn(
+            "text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider",
+            user.role === "admin" 
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" 
+              : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+          )}>
+            {user.role === "admin" ? "Admin" : "Colaborador"}
           </span>
         </div>
       </div>

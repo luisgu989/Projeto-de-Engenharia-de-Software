@@ -77,7 +77,7 @@ export function ProductForm({
           const copy = { ...prev };
           delete copy.sku;
           return copy;
-        }));
+        });
       }
       setIsCheckingSku(false);
     }, 400);

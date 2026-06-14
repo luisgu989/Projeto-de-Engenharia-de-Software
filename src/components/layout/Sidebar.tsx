@@ -21,6 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/contexts/auth-context";
 
 export interface SidebarProps {
   collapsed: boolean;
@@ -140,6 +141,14 @@ export function Sidebar({
   setMobileOpen,
 }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const allowedMenuItems = menuItems.filter((item) => {
+    if (item.href === "/funcionarios" && !user.permissions.gerenciarEquipe) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -189,7 +198,7 @@ export function Sidebar({
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
           {categories.map((category) => {
-            const items = menuItems.filter((item) => item.category === category);
+            const items = allowedMenuItems.filter((item) => item.category === category);
             return (
               <div key={category} className="space-y-1">
                 {!collapsed && (
@@ -222,21 +231,22 @@ export function Sidebar({
         </nav>
 
         {/* Footer — User Info */}
-        <div className="p-3 border-t border-border shrink-0">
+        <div className="p-3 border-t border-border shrink-0 no-print">
           <div
             className={cn(
               "flex items-center gap-3 rounded-md px-2 py-2 hover:bg-accent transition-colors cursor-pointer",
               collapsed && "justify-center px-0"
             )}
+            title={`${user.name} (${user.email})`}
           >
-            <div className="h-8 w-8 shrink-0 rounded-full bg-accent flex items-center justify-center font-semibold text-xs text-accent-foreground border border-border">
-              US
+            <div className="h-8 w-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center font-bold text-xs text-primary border border-primary/20 uppercase">
+              {user.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
             </div>
             {!collapsed && (
               <div className="flex flex-col min-w-0">
-                <span className="text-sm font-medium truncate">Usuário Suporte</span>
-                <span className="text-xs text-muted-foreground truncate">
-                  admin@erppro.com
+                <span className="text-xs font-semibold text-foreground truncate">{user.name}</span>
+                <span className="text-[10px] text-muted-foreground truncate">
+                  {user.email}
                 </span>
               </div>
             )}

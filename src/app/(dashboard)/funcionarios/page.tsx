@@ -4,8 +4,12 @@ import React from "react";
 import { useFuncionarios } from "@/hooks/useFuncionarios";
 import { ResumoFuncionarios } from "@/components/funcionarios/ResumoFuncionarios";
 import { TabelaFuncionarios } from "@/components/funcionarios/TabelaFuncionarios";
+import { useAuth } from "@/contexts/auth-context";
+import { ShieldAlert } from "lucide-react";
 
 export default function FuncionariosPage() {
+  const { user } = useAuth();
+  
   const {
     funcionarios,
     busca,
@@ -19,6 +23,22 @@ export default function FuncionariosPage() {
     ativos,
     inativos,
   } = useFuncionarios();
+
+  // Route protection (US021)
+  if (!user.permissions.gerenciarEquipe) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-6 space-y-4 bg-card border border-border rounded-2xl shadow-sm animate-in fade-in duration-300">
+        <div className="p-4 rounded-full bg-destructive/10 text-destructive border border-destructive/20">
+          <ShieldAlert className="h-10 w-10" />
+        </div>
+        <h3 className="text-xl font-bold tracking-tight">Acesso Negado</h3>
+        <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
+          Você não possui privilégios de acesso suficientes para gerenciar colaboradores do sistema.
+          Contate um administrador para solicitar a atribuição de papéis ou permissões.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
