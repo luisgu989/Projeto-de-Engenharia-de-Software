@@ -78,29 +78,24 @@ export function useProducao() {
   const { addNotification } = useNotifications();
   const { registrarMovimentacao } = useEstoque();
 
-  const [ordens, setOrdens] = useState<OrdemProducao[]>(ordensIniciais);
-  const [recursos] = useState<RecursoProducao[]>(recursosIniciais);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("erp_producao");
-    if (saved) {
-      try {
-        setOrdens(JSON.parse(saved));
-      } catch (e) {
-        console.error("Erro ao carregar ordens de produção:", e);
+  const [ordens, setOrdens] = useState<OrdemProducao[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("erp_producao");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Erro ao carregar ordens de produção:", e);
+        }
       }
     }
-    setIsLoaded(true);
-  }, []);
+    return ordensIniciais;
+  });
+  const [recursos] = useState<RecursoProducao[]>(recursosIniciais);
 
-  // Save to localStorage
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("erp_producao", JSON.stringify(ordens));
-    }
-  }, [ordens, isLoaded]);
+    localStorage.setItem("erp_producao", JSON.stringify(ordens));
+  }, [ordens]);
 
   // Sync between tabs/events
   useEffect(() => {

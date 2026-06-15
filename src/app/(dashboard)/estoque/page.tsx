@@ -23,6 +23,7 @@ export default function EstoquePage() {
     atualizarItem,
     removerItem,
     registrarMovimentacao,
+    registrarMovimentacaoEstoque,
     valorTotalEstoque,
     totalItens,
     alertasBaixoEstoque,
@@ -144,7 +145,12 @@ export default function EstoquePage() {
         {abaAtiva === "movimentacoes" && (
           <div className="space-y-2">
             <h3 className="text-base font-semibold tracking-tight">Registro Cronológico de Movimentações</h3>
-            <HistoricoMovimentacoes estoque={todosItens || estoque} />
+            <HistoricoMovimentacoes
+              estoque={todosItens || estoque}
+              onRegistrarMovimentacao={registrarMovimentacaoEstoque}
+              error={error}
+              setError={setError}
+            />
           </div>
         )}
 

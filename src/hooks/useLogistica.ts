@@ -165,36 +165,43 @@ const coordenadasCidades: Record<string, { lat: number; lng: number }> = {
 export function useLogistica() {
   const { addNotification } = useNotifications();
 
-  const [cargas, setCargas] = useState<CargaLogistica[]>(cargasIniciais);
-  const [rotas, setRotas] = useState<RotaLogistica[]>(rotasIniciais);
+  const [cargas, setCargas] = useState<CargaLogistica[]>(() => {
+    if (typeof window !== "undefined") {
+      const savedCargas = localStorage.getItem("erp_cargas");
+      if (savedCargas) {
+        try {
+          return JSON.parse(savedCargas);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    return cargasIniciais;
+  });
+
+  const [rotas, setRotas] = useState<RotaLogistica[]>(() => {
+    if (typeof window !== "undefined") {
+      const savedRotas = localStorage.getItem("erp_rotas");
+      if (savedRotas) {
+        try {
+          return JSON.parse(savedRotas);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    return rotasIniciais;
+  });
+
   const [activeSimulations, setActiveSimulations] = useState<Record<string, boolean>>({});
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Load state
-  useEffect(() => {
-    const savedCargas = localStorage.getItem("erp_cargas");
-    const savedRotas = localStorage.getItem("erp_rotas");
-    if (savedCargas) {
-      try { setCargas(JSON.parse(savedCargas)); } catch (e) { console.error(e); }
-    }
-    if (savedRotas) {
-      try { setRotas(JSON.parse(savedRotas)); } catch (e) { console.error(e); }
-    }
-    setIsLoaded(true);
-  }, []);
-
-  // Save changes
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("erp_cargas", JSON.stringify(cargas));
-    }
-  }, [cargas, isLoaded]);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("erp_rotas", JSON.stringify(rotas));
-    }
-  }, [rotas, isLoaded]);
+    localStorage.setItem("erp_cargas", JSON.stringify(cargas));
+  }, [cargas]);
+
+  useEffect(() => {
+    localStorage.setItem("erp_rotas", JSON.stringify(rotas));
+  }, [rotas]);
 
   // Sync tabs
   useEffect(() => {

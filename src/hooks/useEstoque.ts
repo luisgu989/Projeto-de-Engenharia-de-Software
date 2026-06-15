@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLogs } from "@/contexts/logs-context";
 import { useAuth } from "@/contexts/auth-context";
 
 export interface MovimentacaoEstoque {
-  tipo: "entrada" | "saida";
+  id?: string;
+  tipo: "entrada" | "saida" | "transferencia" | "ajuste";
   quantidade: number;
+  deposito?: string;
   motivo: string;
   data: string;
   usuario: string;
@@ -169,28 +171,23 @@ export function useEstoque() {
   const { addLog } = useLogs();
   const { user } = useAuth();
   
-  const [estoque, setEstoque] = useState<ItemEstoque[]>(mockEstoqueInicial);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("erp_estoque");
-    if (saved) {
-      try {
-        setEstoque(JSON.parse(saved));
-      } catch (e) {
-        console.error("Erro ao carregar estoque:", e);
+  const [estoque, setEstoque] = useState<ItemEstoque[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("erp_estoque");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Erro ao carregar estoque:", e);
+        }
       }
     }
-    setIsLoaded(true);
-  }, []);
+    return mockEstoqueInicial;
+  });
 
-  // Save to localStorage
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("erp_estoque", JSON.stringify(estoque));
-    }
-  }, [estoque, isLoaded]);
+    localStorage.setItem("erp_estoque", JSON.stringify(estoque));
+  }, [estoque]);
 
   // Sync state across storage events (tabs / simulation)
   useEffect(() => {
@@ -208,15 +205,15 @@ export function useEstoque() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const checkDuplicateSku = (sku: string, excludeId?: string) => {
+  const checkDuplicateSku = useCallback((sku: string, excludeId?: string) => {
     const cleanedSku = sku.trim().toUpperCase();
     if (!cleanedSku) return false;
     return estoque.some(
       (item) => item.status === "ativo" && item.id !== excludeId && item.sku.trim().toUpperCase() === cleanedSku
     );
-  };
+  }, [estoque]);
 
-  const adicionarItem = (
+  const adicionarItem = useCallback((
     novoItem: Omit<ItemEstoque, "id" | "status" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor" | "movimentacoes">
   ) => {
     setError(null);
@@ -250,9 +247,9 @@ export function useEstoque() {
       "estoque"
     );
     return true;
-  };
+  }, [estoque, user, addLog, checkDuplicateSku]);
 
-  const atualizarItem = (
+  const atualizarItem = useCallback((
     id: string,
     dadosAlterados: Omit<ItemEstoque, "id" | "status" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor" | "movimentacoes">
   ) => {
@@ -303,9 +300,9 @@ export function useEstoque() {
       );
     }
     return true;
-  };
+  }, [estoque, user, addLog, checkDuplicateSku]);
 
-  const registrarMovimentacao = (
+  const registrarMovimentacao = useCallback((
     id: string,
     tipo: "entrada" | "saida",
     quantidade: number,
@@ -336,8 +333,10 @@ export function useEstoque() {
           }
 
           const novaMov: MovimentacaoEstoque = {
+            id: `MOV-${Math.floor(100000 + Math.random() * 900000)}`,
             tipo,
             quantidade,
+            deposito: "Depósito Central",
             motivo: motivo.trim() || (tipo === "entrada" ? "Entrada de estoque" : "Saída de estoque"),
             data: dataAtual,
             usuario: user.name,
@@ -363,9 +362,79 @@ export function useEstoque() {
     }
 
     return sucesso;
-  };
+  }, [estoque, user, addLog]);
 
-  const ajustarEstoque = (id: string, novaQuantidade: number) => {
+  const registrarMovimentacaoEstoque = useCallback((
+    produtoId: string,
+    tipo: "entrada" | "saida" | "transferencia" | "ajuste",
+    quantidade: number,
+    deposito: string,
+    motivo: string
+  ) => {
+    setError(null);
+    if (quantidade <= 0) {
+      setError("A quantidade deve ser maior que zero.");
+      return false;
+    }
+
+    const item = estoque.find((i) => i.id === produtoId && i.status === "ativo");
+    if (!item) {
+      setError("Produto não encontrado.");
+      return false;
+    }
+
+    if ((tipo === "saida" || tipo === "transferencia") && item.quantidade < quantidade) {
+      setError(`Saldo insuficiente. O produto possui apenas ${item.quantidade} unidades.`);
+      return false;
+    }
+
+    const dataAtual = new Date().toISOString();
+    const movId = `MOV-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    setEstoque((prev) =>
+      prev.map((i) => {
+        if (i.id === produtoId) {
+          let novaQtd = i.quantidade;
+          if (tipo === "entrada") {
+            novaQtd += quantidade;
+          } else if (tipo === "saida") {
+            novaQtd -= quantidade;
+          } else if (tipo === "transferencia") {
+            // Transfer stays same total
+          } else if (tipo === "ajuste") {
+            novaQtd += quantidade;
+          }
+
+          const novaMov: MovimentacaoEstoque = {
+            id: movId,
+            tipo,
+            quantidade,
+            deposito,
+            motivo: motivo.trim() || `${tipo.toUpperCase()} de estoque`,
+            data: dataAtual,
+            usuario: user.name,
+          };
+
+          return {
+            ...i,
+            quantidade: novaQtd,
+            atualizadoEm: dataAtual,
+            atualizadoPor: user.name,
+            movimentacoes: [...(i.movimentacoes || []), novaMov],
+          };
+        }
+        return i;
+      })
+    );
+
+    addLog(
+      `Movimentação de estoque registrada (${tipo}): ${quantidade} un. do produto ${item.nome} no depósito ${deposito}. Motivo: ${motivo}`,
+      "estoque"
+    );
+    return true;
+  }, [estoque, user, addLog]);
+
+  const ajustarEstoque = useCallback((id: string, novaQuantidade: number) => {
     const dataAtual = new Date().toISOString();
     const item = estoque.find((i) => i.id === id);
     if (!item) return;
@@ -404,9 +473,9 @@ export function useEstoque() {
       `Ajustou o saldo do produto ${item.nome} de ${item.quantidade} un. para ${novaQuantidade} un.`,
       "estoque"
     );
-  };
+  }, [estoque, user, addLog]);
 
-  const removerItem = (id: string) => {
+  const removerItem = useCallback((id: string) => {
     setError(null);
     const item = estoque.find((item) => item.id === id && item.status === "ativo");
     if (!item) {
@@ -430,7 +499,7 @@ export function useEstoque() {
 
     addLog(`Excluiu o produto ${item.nome} (SKU: ${item.sku}) do catálogo de ativos`, "estoque");
     return true;
-  };
+  }, [estoque, user, addLog]);
 
   const [error, setError] = useState<string | null>(null);
   const [busca, setBusca] = useState("");
@@ -460,6 +529,7 @@ export function useEstoque() {
     atualizarItem,
     removerItem,
     registrarMovimentacao,
+    registrarMovimentacaoEstoque,
     ajustarEstoque,
     valorTotalEstoque,
     totalItens,

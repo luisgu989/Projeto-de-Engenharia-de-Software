@@ -16,11 +16,13 @@ export function ConfigSeguranca() {
   const [colaboradorSelecionado, setColaboradorSelecionado] = useState<any>(null);
   const [permissoesEditaveis, setPermissoesEditaveis] = useState<UserPermissions | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [incompatibilityError, setIncompatibilityError] = useState<string | null>(null);
 
   const handleSelectColaborador = (c: any) => {
     setColaboradorSelecionado(c);
     const perms = getUserPermissions(c.email, c.cargo.toLowerCase().includes("gerente") ? "admin" : "employee", c.cargo);
     setPermissoesEditaveis(perms);
+    setIncompatibilityError(null);
   };
 
   const handleTogglePermission = (key: keyof UserPermissions) => {
@@ -29,10 +31,20 @@ export function ConfigSeguranca() {
       ...permissoesEditaveis,
       [key]: !permissoesEditaveis[key],
     });
+    setIncompatibilityError(null);
   };
 
   const handleSalvarPermissoes = () => {
     if (!colaboradorSelecionado || !permissoesEditaveis) return;
+    setIncompatibilityError(null);
+
+    const cargoLower = colaboradorSelecionado.cargo.toLowerCase();
+    const isManager = cargoLower.includes("gerente") || cargoLower.includes("diretor") || colaboradorSelecionado.email === "admin@erppro.com";
+
+    if (!isManager && (permissoesEditaveis.gerenciarEquipe || permissoesEditaveis.verLogsAuditoria)) {
+      setIncompatibilityError("Incompatibilidade: Colaboradores operacionais não podem ter permissões de gerência de equipe ou visualização de logs de auditoria.");
+      return;
+    }
 
     updateUserPermissions(colaboradorSelecionado.email, permissoesEditaveis);
     addLog(
@@ -152,6 +164,13 @@ export function ConfigSeguranca() {
                 {colaboradorSelecionado.id}
               </span>
             </div>
+
+            {incompatibilityError && (
+              <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-xs font-medium flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 shrink-0" />
+                <span>{incompatibilityError}</span>
+              </div>
+            )}
 
             {/* Checkboxes List */}
             <div className="grid gap-4 sm:grid-cols-2">
