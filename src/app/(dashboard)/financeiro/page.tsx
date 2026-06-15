@@ -5,7 +5,8 @@ import { useFinanceiro } from "@/hooks/useFinanceiro";
 import { ResumoFinanceiro } from "@/components/financeiro/ResumoFinanceiro";
 import { TabelaFinanceiro } from "@/components/financeiro/TabelaFinanceiro";
 import { FaturamentoFiscal } from "@/components/financeiro/FaturamentoFiscal";
-import { DollarSign, FileText } from "lucide-react";
+import { IntegracoesFinanceiras } from "@/components/financeiro/IntegracoesFinanceiras";
+import { DollarSign, FileText, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function FinanceiroPage() {
@@ -22,7 +23,7 @@ export default function FinanceiroPage() {
     totalVencidos,
   } = useFinanceiro();
 
-  const [abaAtiva, setAbaAtiva] = useState<"caixa" | "fiscal">("caixa");
+  const [abaAtiva, setAbaAtiva] = useState<"caixa" | "fiscal" | "integracoes">("caixa");
 
   return (
     <div className="space-y-6">
@@ -31,7 +32,7 @@ export default function FinanceiroPage() {
           Módulo Financeiro
         </h2>
         <p className="text-sm text-muted-foreground">
-          Gerencie contas a pagar e a receber, acompanhe o fluxo de caixa e emita documentos fiscais eletrônicos.
+          Gerencie contas a pagar e a receber, acompanhe o fluxo de caixa e controle integrações e notas fiscais.
         </p>
       </div>
 
@@ -59,6 +60,18 @@ export default function FinanceiroPage() {
         >
           <FileText className="h-4 w-4" />
           Faturamento Fiscal
+        </button>
+        <button
+          onClick={() => setAbaAtiva("integracoes")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "integracoes"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Link2 className="h-4 w-4" />
+          Integrações Financeiras
         </button>
       </div>
 
@@ -88,6 +101,8 @@ export default function FinanceiroPage() {
       )}
 
       {abaAtiva === "fiscal" && <FaturamentoFiscal />}
+
+      {abaAtiva === "integracoes" && <IntegracoesFinanceiras />}
     </div>
   );
 }

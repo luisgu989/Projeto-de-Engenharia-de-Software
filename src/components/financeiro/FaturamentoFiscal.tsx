@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useFiscal } from "@/hooks/useFiscal";
+import { useFiscal, DocumentoFiscal } from "@/hooks/useFiscal";
 import { useClientes } from "@/hooks/useClientes";
 import {
   FileText,
@@ -20,6 +20,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
+function isWithin24Hours(dateStr: string): boolean {
+  const dateEmit = new Date(dateStr);
+  const diffTime = new Date().getTime() - dateEmit.getTime();
+  const diffHours = diffTime / (1000 * 60 * 60);
+  return diffHours <= 24;
+}
+
 export function FaturamentoFiscal() {
   const { documentos, errorMessage, limparErro, emitirDocumentoFiscal, cancelarDocumentoFiscal } = useFiscal();
   const { clientes } = useClientes();
@@ -34,6 +41,11 @@ export function FaturamentoFiscal() {
   const [tipoDoc, setTipoDoc] = useState<"NF-e" | "NFS-e" | "NFC-e">("NF-e");
   const [valor, setValor] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
+
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [cancelDoc, setCancelDoc] = useState<DocumentoFiscal | null>(null);
+  const [motivoCancel, setMotivoCancel] = useState("");
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const activeClientes = clientes.filter((c) => c.status === "ativo");
 
@@ -77,6 +89,25 @@ export function FaturamentoFiscal() {
       setValor("");
       setTipoDoc("NF-e");
       setModalOpen(false);
+    }
+  };
+
+  const handleCancelarSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCancelError(null);
+
+    if (!cancelDoc) return;
+
+    if (!motivoCancel || motivoCancel.trim().length < 15) {
+      setCancelError("O motivo do cancelamento deve conter pelo menos 15 caracteres.");
+      return;
+    }
+
+    const sucesso = cancelarDocumentoFiscal(cancelDoc.id, motivoCancel);
+    if (sucesso) {
+      setCancelDoc(null);
+      setMotivoCancel("");
+      setCancelModalOpen(false);
     }
   };
 
@@ -197,7 +228,7 @@ export function FaturamentoFiscal() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tipo</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Destinatário</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Data Emissão</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Chave de Acesso</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Chave de Acesso / Histórico</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor Total</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ações</th>
@@ -234,6 +265,19 @@ export function FaturamentoFiscal() {
                           <Loader2 className="h-3 w-3 animate-spin text-primary" />
                           Gerando chave...
                         </span>
+                      ) : doc.statusEmissao === "cancelada" && doc.motivoCancelamento ? (
+                        <div className="flex flex-col text-xs max-w-[240px]">
+                          <span className="font-semibold text-destructive flex items-center gap-1">
+                            <AlertTriangle className="h-3 w-3" />
+                            Nota Cancelada
+                          </span>
+                          <span className="text-muted-foreground text-[10px] truncate" title={doc.motivoCancelamento}>
+                            Motivo: {doc.motivoCancelamento}
+                          </span>
+                          <span className="text-[9px] text-muted-foreground">
+                            Por: {doc.usuarioResponsavel} em {formatDate(doc.dataCancelamento || "")}
+                          </span>
+                        </div>
                       ) : doc.chaveFiscal ? (
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs text-muted-foreground tracking-tight select-all">
@@ -281,7 +325,12 @@ export function FaturamentoFiscal() {
                         <Button
                           variant="ghost"
                           size="icon-sm"
-                          onClick={() => cancelarDocumentoFiscal(doc.id)}
+                          onClick={() => {
+                            setCancelDoc(doc);
+                            setMotivoCancel("");
+                            setCancelError(null);
+                            setCancelModalOpen(true);
+                          }}
                           className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors"
                           title="Cancelar documento fiscal"
                         >
@@ -386,6 +435,103 @@ export function FaturamentoFiscal() {
                 <Button type="submit" size="sm" className="gap-1.5">
                   <PlusCircle className="h-4 w-4" />
                   Emitir NF e Transmitir
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {cancelModalOpen && cancelDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-destructive/5">
+              <h3 className="text-base font-semibold text-destructive tracking-tight flex items-center gap-2">
+                <Ban className="h-5 w-5" />
+                Cancelar Nota Fiscal
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setCancelDoc(null);
+                  setCancelModalOpen(false);
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCancelarSubmit} className="px-5 py-4 space-y-4">
+              <div className="bg-accent/40 rounded-xl p-3 border border-border/50 text-xs space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Documento ID:</span>
+                  <span className="font-mono font-bold">{cancelDoc.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Destinatário:</span>
+                  <span className="font-semibold">{cancelDoc.destinatarioNome}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Valor:</span>
+                  <span className="font-bold">{formatCurrency(cancelDoc.valorTotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Emissão:</span>
+                  <span className="font-semibold">{formatDate(cancelDoc.dataEmissao)}</span>
+                </div>
+              </div>
+
+              {!isWithin24Hours(cancelDoc.dataEmissao) && (
+                <div className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-md p-3">
+                  <AlertTriangle className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Atenção:</strong> Este documento foi emitido há mais de 24 horas. O cancelamento extemporâneo está sujeito a sanções e penalidades pela SEFAZ.
+                  </span>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  Motivo do Cancelamento (Mínimo de 15 caracteres)
+                </label>
+                <textarea
+                  value={motivoCancel}
+                  onChange={(e) => setMotivoCancel(e.target.value)}
+                  required
+                  rows={3}
+                  placeholder="Justifique o cancelamento para fins de auditoria fiscal..."
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm resize-none"
+                />
+                {motivoCancel.trim().length > 0 && motivoCancel.trim().length < 15 && (
+                  <span className="text-[10px] text-destructive mt-1 block font-semibold">
+                    Faltam {15 - motivoCancel.trim().length} caracteres.
+                  </span>
+                )}
+              </div>
+
+              {cancelError && (
+                <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md px-3 py-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  {cancelError}
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setCancelDoc(null);
+                    setCancelModalOpen(false);
+                  }}
+                >
+                  Voltar
+                </Button>
+                <Button type="submit" variant="destructive" size="sm" className="gap-1.5">
+                  <Ban className="h-4 w-4" />
+                  Confirmar Cancelamento
                 </Button>
               </div>
             </form>

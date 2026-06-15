@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/auth-context";
 
 export interface DocumentoFiscal {
   id: string;
@@ -13,6 +14,9 @@ export interface DocumentoFiscal {
   statusEmissao: "processando" | "emitida" | "cancelada";
   dataEmissao: string;
   chaveFiscal: string;
+  motivoCancelamento?: string;
+  dataCancelamento?: string;
+  usuarioResponsavel?: string;
 }
 
 const documentosFiscaisIniciais: DocumentoFiscal[] = [
@@ -43,6 +47,7 @@ const documentosFiscaisIniciais: DocumentoFiscal[] = [
 ];
 
 export function useFiscal() {
+  const { user } = useAuth();
   const [documentos, setDocumentos] = useState<DocumentoFiscal[]>(documentosFiscaisIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -155,12 +160,28 @@ export function useFiscal() {
     return true;
   };
 
-  const cancelarDocumentoFiscal = (id: string) => {
+  const cancelarDocumentoFiscal = (id: string, motivo: string) => {
+    setErrorMessage(null);
+
+    if (!motivo || motivo.trim().length < 15) {
+      setErrorMessage("O motivo do cancelamento deve conter pelo menos 15 caracteres.");
+      return false;
+    }
+
     setDocumentos((prev) =>
       prev.map((doc) =>
-        doc.id === id ? { ...doc, statusEmissao: "cancelada" } : doc
+        doc.id === id
+          ? {
+              ...doc,
+              statusEmissao: "cancelada",
+              motivoCancelamento: motivo.trim(),
+              dataCancelamento: new Date().toISOString(),
+              usuarioResponsavel: user.name || "Contador Responsável"
+            }
+          : doc
       )
     );
+    return true;
   };
 
   return {
