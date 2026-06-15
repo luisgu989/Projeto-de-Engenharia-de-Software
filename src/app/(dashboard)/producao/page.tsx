@@ -5,6 +5,7 @@ import { useProducao, OrdemProducao } from "@/hooks/useProducao";
 import { useEstoque } from "@/hooks/useEstoque";
 import { useAuth } from "@/contexts/auth-context";
 import { OrdensServico } from "@/components/producao/OrdensServico";
+import { MonitorSensores } from "@/components/producao/MonitorSensores";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -23,6 +24,7 @@ import {
   ChevronRight,
   TrendingUp,
   Wrench,
+  Cpu,
 } from "lucide-react";
 
 export default function ProducaoPage() {
@@ -40,7 +42,7 @@ export default function ProducaoPage() {
   const cargo = user.cargo?.toLowerCase() || "";
   const isGerente = user.role === "admin" || cargo.includes("gerente") || cargo.includes("diretor");
 
-  const [secaoAtiva, setSecaoAtiva] = useState<"producao" | "servico">("producao");
+  const [secaoAtiva, setSecaoAtiva] = useState<"producao" | "servico" | "sensor">("producao");
   const [dataFiltroRecurso, setDataFiltroRecurso] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -198,6 +200,18 @@ export default function ProducaoPage() {
         >
           <Wrench className="h-4 w-4" />
           Ordens de Serviço e Manutenção
+        </button>
+        <button
+          onClick={() => setSecaoAtiva("sensor")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            secaoAtiva === "sensor"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Cpu className="h-4 w-4" />
+          Sensores IoT
         </button>
       </div>
 
@@ -599,6 +613,8 @@ export default function ProducaoPage() {
     )}
 
       {secaoAtiva === "servico" && <OrdensServico />}
+
+      {secaoAtiva === "sensor" && <MonitorSensores />}
 
       {/* Modal Planning Form (US075) */}
       {formOpen && (

@@ -17,6 +17,7 @@ import {
   Hammer,
   Truck,
   BarChart3,
+  Database,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,6 +88,12 @@ const menuItems: MenuItem[] = [
     title: "Relatórios",
     href: "/relatorios",
     icon: BarChart3,
+    category: "Módulos",
+  },
+  {
+    title: "Integrações",
+    href: "/integracoes",
+    icon: Database,
     category: "Módulos",
   },
   {

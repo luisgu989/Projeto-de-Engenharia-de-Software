@@ -6,12 +6,13 @@ import { ConfigUsuario } from "@/components/configuracoes/ConfigUsuario";
 import { ConfigSeguranca } from "@/components/configuracoes/ConfigSeguranca";
 import { ConfigLogs } from "@/components/configuracoes/ConfigLogs";
 import { ConfigFiliais } from "@/components/configuracoes/ConfigFiliais";
+import { ConfigBackup } from "@/components/configuracoes/ConfigBackup";
 import { useAuth } from "@/contexts/auth-context";
-import { UserCircle, Building2, ShieldCheck, History, Network } from "lucide-react";
+import { UserCircle, Building2, ShieldCheck, History, Network, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function ConfiguracoesPage() {
-  const [activeTab, setActiveTab] = useState<"perfil" | "empresa" | "seguranca" | "logs" | "filiais">("perfil");
+  const [activeTab, setActiveTab] = useState<"perfil" | "empresa" | "seguranca" | "logs" | "filiais" | "backup">("perfil");
   const { user } = useAuth();
 
   return (
@@ -97,6 +98,21 @@ export default function ConfiguracoesPage() {
             Auditoria do Sistema
           </button>
         )}
+
+        {user.role === "admin" && (
+          <button
+            onClick={() => setActiveTab("backup")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+              activeTab === "backup"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Database className="h-4 w-4" />
+            Backup & Restauração
+          </button>
+        )}
       </div>
 
       {/* Tabs Content */}
@@ -106,6 +122,7 @@ export default function ConfiguracoesPage() {
         {activeTab === "filiais" && <ConfigFiliais />}
         {activeTab === "seguranca" && user.role === "admin" && <ConfigSeguranca />}
         {activeTab === "logs" && user.permissions.verLogsAuditoria && <ConfigLogs />}
+        {activeTab === "backup" && user.role === "admin" && <ConfigBackup />}
       </div>
     </div>
   );

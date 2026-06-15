@@ -8,6 +8,7 @@ import { useProducao } from "@/hooks/useProducao";
 import { useLogistica } from "@/hooks/useLogistica";
 import { useFinanceiro } from "@/hooks/useFinanceiro";
 import { Button } from "@/components/ui/button";
+import { AnomaliasDetectadas } from "@/components/relatorios/AnomaliasDetectadas";
 import { cn } from "@/lib/utils";
 import {
   FileText,
@@ -23,7 +24,37 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-type TipoRelatorio = "giro" | "producao_demanda" | "margem_logistica";
+interface GiroRow {
+  id: string;
+  nome: string;
+  categoria: string;
+  estoqueAtual: number;
+  unidadesVendidas: number;
+  faturamento: number;
+  taxaGiro: number;
+}
+
+interface ProducaoDemandaRow {
+  nome: string;
+  categoria: string;
+  produzido: number;
+  demandado: number;
+  diferenca: number;
+}
+
+interface MargemLogisticaRow {
+  cargaId: string;
+  pedidoId: string;
+  cliente: string;
+  destino: string;
+  faturamentoVenda: number;
+  custoFrete: number;
+  receitaLiquida: number;
+  margemLiquida: number;
+  impactoPercentual: number;
+}
+
+type TipoRelatorio = "giro" | "producao_demanda" | "margem_logistica" | "anomalias";
 
 export default function RelatoriosPage() {
   const { user } = useAuth();
@@ -217,21 +248,21 @@ export default function RelatoriosPage() {
   // Aggregate totals
   const totalizadores = useMemo(() => {
     if (tipo === "giro") {
-      const list = dadosRelatorio as any[];
+      const list = dadosRelatorio as GiroRow[];
       const faturamentoTotal = list.reduce((acc, item) => acc + item.faturamento, 0);
       const mediaGiro = list.length > 0 ? Math.round(list.reduce((acc, item) => acc + item.taxaGiro, 0) / list.length) : 0;
       const totalVendidas = list.reduce((acc, item) => acc + item.unidadesVendidas, 0);
       return { faturamentoTotal, mediaGiro, totalVendidas };
     }
     if (tipo === "producao_demanda") {
-      const list = dadosRelatorio as any[];
+      const list = dadosRelatorio as ProducaoDemandaRow[];
       const totalProduzido = list.reduce((acc, item) => acc + item.produzido, 0);
       const totalDemandado = list.reduce((acc, item) => acc + item.demandado, 0);
       const diferencaGlobal = totalProduzido - totalDemandado;
       return { totalProduzido, totalDemandado, diferencaGlobal };
     }
     // margem_logistica
-    const list = dadosRelatorio as any[];
+    const list = dadosRelatorio as MargemLogisticaRow[];
     const totalVendas = list.reduce((acc, item) => acc + item.faturamentoVenda, 0);
     const totalFretes = list.reduce((acc, item) => acc + item.custoFrete, 0);
     const margemGlobal = totalVendas > 0 ? Math.round(((totalVendas - totalFretes) / totalVendas) * 100) : 0;
@@ -290,8 +321,12 @@ export default function RelatoriosPage() {
               <option value="giro">Estoque vs Vendas (Giro)</option>
               <option value="producao_demanda">Produção vs Demanda</option>
               <option value="margem_logistica">Margens vs Fretes</option>
+              <option value="anomalias">Anomalias Detectadas</option>
             </select>
           </div>
+
+          {tipo !== "anomalias" && (
+            <>
 
           {/* Date Picker Start */}
           <div className="space-y-1">
@@ -347,11 +382,13 @@ export default function RelatoriosPage() {
               className="w-full bg-accent/40 border border-border rounded-lg px-2.5 py-1.5 focus:outline-none"
             />
           </div>
+            </>
+          )}
         </div>
       </div>
 
       {/* SVG Analytical Chart Component (US080 Aesthetics) */}
-      {dadosRelatorio.length > 0 && (
+      {tipo !== "anomalias" && dadosRelatorio.length > 0 && (
         <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-4 no-print">
           <div className="flex items-center gap-2 border-b border-border pb-2.5">
             <BarChart3 className="h-4.5 w-4.5 text-primary" />
@@ -361,9 +398,8 @@ export default function RelatoriosPage() {
           <div className="flex justify-center bg-accent/10 rounded-xl p-4 border border-border/40 aspect-[3/1] max-h-[200px]">
             {tipo === "giro" && (
               <svg viewBox="0 0 500 120" className="w-full h-full text-xs">
-                {/* Bars for faturamento per item */}
-                {(dadosRelatorio as any[]).map((item, idx) => {
-                  const maxFat = Math.max(...(dadosRelatorio as any[]).map((i) => i.faturamento || 1));
+                {(dadosRelatorio as GiroRow[]).map((item, idx) => {
+                  const maxFat = Math.max(...(dadosRelatorio as GiroRow[]).map((i) => i.faturamento || 1));
                   const height = (item.faturamento / maxFat) * 80;
                   const x = 50 + idx * 75;
                   const y = 90 - height;
@@ -399,15 +435,13 @@ export default function RelatoriosPage() {
 
             {tipo === "producao_demanda" && (
               <svg viewBox="0 0 500 120" className="w-full h-full text-xs">
-                {/* Comparative double bars */}
-                {(dadosRelatorio as any[]).map((item, idx) => {
-                  const maxVal = Math.max(...(dadosRelatorio as any[]).map((i) => Math.max(i.produzido, i.demandado) || 1));
+                {(dadosRelatorio as ProducaoDemandaRow[]).map((item, idx) => {
+                  const maxVal = Math.max(...(dadosRelatorio as ProducaoDemandaRow[]).map((i) => Math.max(i.produzido, i.demandado) || 1));
                   const hProd = (item.produzido / maxVal) * 80;
                   const hDem = (item.demandado / maxVal) * 80;
                   const x = 50 + idx * 80;
                   return (
                     <g key={idx}>
-                      {/* Produzido (Blue) */}
                       <rect
                         x={x}
                         y={90 - hProd}
@@ -416,7 +450,6 @@ export default function RelatoriosPage() {
                         fill="#3b82f6"
                         rx="2"
                       />
-                      {/* Demandado (Amber) */}
                       <rect
                         x={x + 18}
                         y={90 - hDem}
@@ -437,8 +470,7 @@ export default function RelatoriosPage() {
 
             {tipo === "margem_logistica" && (
               <svg viewBox="0 0 500 120" className="w-full h-full text-xs">
-                {/* Line graph for impact percentage */}
-                {(dadosRelatorio as any[]).map((item, idx) => {
+                {(dadosRelatorio as MargemLogisticaRow[]).map((item, idx) => {
                   const x = 50 + idx * 80;
                   const y = 90 - (item.margemLiquida / 100) * 80;
                   return (
@@ -461,7 +493,8 @@ export default function RelatoriosPage() {
       )}
 
       {/* Compiled Report View (US080 Export Layout) */}
-      <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-6 print-container">
+      {tipo !== "anomalias" && (
+        <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-6 print-container">
         {/* Printable layout page header */}
         <div className="hidden print:block space-y-2 border-b border-slate-300 pb-4">
           <div className="flex justify-between items-center">
@@ -602,7 +635,7 @@ export default function RelatoriosPage() {
               </thead>
               <tbody className="divide-y divide-border/60 font-medium">
                 {tipo === "giro" &&
-                  (dadosRelatorio as any[]).map((row) => (
+                  (dadosRelatorio as GiroRow[]).map((row) => (
                     <tr key={row.id} className="hover:bg-accent/10 transition-colors">
                       <td className="p-3 font-bold text-foreground">{row.nome}</td>
                       <td className="p-3 text-muted-foreground">{row.categoria}</td>
@@ -629,7 +662,7 @@ export default function RelatoriosPage() {
                   ))}
 
                 {tipo === "producao_demanda" &&
-                  (dadosRelatorio as any[]).map((row, idx) => (
+                  (dadosRelatorio as ProducaoDemandaRow[]).map((row, idx) => (
                     <tr key={idx} className="hover:bg-accent/10 transition-colors">
                       <td className="p-3 font-bold text-foreground">{row.nome}</td>
                       <td className="p-3 text-muted-foreground">{row.categoria}</td>
@@ -651,7 +684,7 @@ export default function RelatoriosPage() {
                   ))}
 
                 {tipo === "margem_logistica" &&
-                  (dadosRelatorio as any[]).map((row) => (
+                  (dadosRelatorio as MargemLogisticaRow[]).map((row) => (
                     <tr key={row.cargaId} className="hover:bg-accent/10 transition-colors">
                       <td className="p-3 font-bold text-foreground">
                         {row.cargaId} <span className="text-[10px] text-muted-foreground">({row.pedidoId})</span>
@@ -691,7 +724,10 @@ export default function RelatoriosPage() {
           <span>Assinatura do Gerente Geral: ___________________________</span>
           <span>Emitido digitalmente via Módulo BI ERP Pro</span>
         </div>
-      </div>
+        </div>
+      )}
+
+      {tipo === "anomalias" && <AnomaliasDetectadas />}
 
       {/* Styled JSX for Print Overrides */}
       <style jsx global>{`

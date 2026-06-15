@@ -34,6 +34,7 @@ interface NotificationsContextType {
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   clearAll: () => void;
+  deleteNotification: (id: string) => void;
   addToast: (title: string, message: string, tipo: Toast["tipo"]) => void;
   dismissToast: (id: string) => void;
 }
@@ -191,6 +192,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     setNotifications([]);
   };
 
+  const deleteNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
   // Filter notifications by user roles/activities (US079)
   const cargo = user.cargo?.toLowerCase() || "";
   const isGerente = user.role === "admin" || cargo.includes("gerente") || cargo.includes("diretor");
@@ -216,6 +221,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         markAsRead,
         markAllAsRead,
         clearAll,
+        deleteNotification,
         addToast,
         dismissToast,
       }}

@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Bell, Search, Sun, Moon, Laptop, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck } from "lucide-react";
+import { Menu, Bell, Search, Sun, Moon, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
@@ -14,7 +15,7 @@ export interface NavbarProps {
   collapsed: boolean;
 }
 
-export function Navbar({ setMobileOpen, collapsed }: NavbarProps) {
+export function Navbar({ setMobileOpen, collapsed: _collapsed }: NavbarProps) {
   const pathname = usePathname();
   const { user, switchProfile, availableProfiles } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -187,6 +188,16 @@ export function Navbar({ setMobileOpen, collapsed }: NavbarProps) {
                       );
                     })
                   )}
+                </div>
+
+                <div className="p-2.5 bg-accent/20 text-center border-t border-border">
+                  <Link
+                    href="/notificacoes"
+                    onClick={() => setNotifsOpen(false)}
+                    className="text-xs font-bold text-primary hover:text-primary/80 transition-colors inline-block w-full"
+                  >
+                    Ver todas as notificações
+                  </Link>
                 </div>
               </div>
             </>
