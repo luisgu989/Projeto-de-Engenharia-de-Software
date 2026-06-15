@@ -69,19 +69,25 @@ export function useFuncionarios() {
     const saved = localStorage.getItem("erp_funcionarios");
     if (saved) {
       try {
-        setFuncionarios(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setTimeout(() => {
+          setFuncionarios(parsed);
+          setIsLoaded(true);
+        }, 0);
+        return;
       } catch (e) {
         console.error("Erro ao carregar funcionários:", e);
       }
     }
-    setIsLoaded(true);
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 0);
   }, []);
 
   // Save to localStorage
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem("erp_funcionarios", JSON.stringify(funcionarios));
-      // Dispatch storage event so AuthProvider can sync available profiles
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("storage"));
       }
@@ -94,7 +100,13 @@ export function useFuncionarios() {
       const saved = localStorage.getItem("erp_funcionarios");
       if (saved) {
         try {
-          setFuncionarios(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          setFuncionarios((current) => {
+            if (JSON.stringify(current) === saved) {
+              return current;
+            }
+            return parsed;
+          });
         } catch (e) {
           console.error(e);
         }

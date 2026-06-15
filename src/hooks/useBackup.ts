@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface RegistroBackup {
   id: string;
@@ -10,6 +11,12 @@ export interface RegistroBackup {
   status: "sucesso" | "falha" | "executando";
   caminhoArquivo: string;
   usuarioResponsavel: string;
+}
+
+export interface ConfiguracaoBackup {
+  tipo: "completo" | "incremental";
+  frequencia: "diario" | "semanal" | "mensal";
+  localArmazenamento: string;
 }
 
 const backupsIniciais: RegistroBackup[] = [
@@ -31,25 +38,39 @@ const backupsIniciais: RegistroBackup[] = [
   }
 ];
 
+const configuracaoInicial: ConfiguracaoBackup = {
+  tipo: "completo",
+  frequencia: "semanal",
+  localArmazenamento: "/var/backups/erp"
+};
+
 export function useBackup() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [backups, setBackups] = useState<RegistroBackup[]>(backupsIniciais);
+  const [config, setConfig] = useState<ConfiguracaoBackup>(configuracaoInicial);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("erp_backups");
-    if (saved) {
+    const savedBackups = localStorage.getItem("erp_backups");
+    if (savedBackups) {
       try {
-        const parsed = JSON.parse(saved);
-        setTimeout(() => {
-          setBackups(parsed);
-          setIsLoaded(true);
-        }, 0);
-        return;
-      } catch (exception) {
-        console.error(exception);
+        setBackups(JSON.parse(savedBackups));
+      } catch (e) {
+        console.error(e);
       }
     }
+
+    const savedConfig = localStorage.getItem("erp_backup_config");
+    if (savedConfig) {
+      try {
+        setConfig(JSON.parse(savedConfig));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     setTimeout(() => {
       setIsLoaded(true);
     }, 0);
@@ -62,13 +83,40 @@ export function useBackup() {
   }, [backups, isLoaded]);
 
   useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("erp_backup_config", JSON.stringify(config));
+    }
+  }, [config, isLoaded]);
+
+  useEffect(() => {
     const handleStorageChange = () => {
-      const saved = localStorage.getItem("erp_backups");
-      if (saved) {
+      const savedBackups = localStorage.getItem("erp_backups");
+      if (savedBackups) {
         try {
-          setBackups(JSON.parse(saved));
-        } catch (exception) {
-          console.error(exception);
+          const parsed = JSON.parse(savedBackups);
+          setBackups((current) => {
+            if (JSON.stringify(current) === savedBackups) {
+              return current;
+            }
+            return parsed;
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      const savedConfig = localStorage.getItem("erp_backup_config");
+      if (savedConfig) {
+        try {
+          const parsed = JSON.parse(savedConfig);
+          setConfig((current) => {
+            if (JSON.stringify(current) === savedConfig) {
+              return current;
+            }
+            return parsed;
+          });
+        } catch (e) {
+          console.error(e);
         }
       }
     };
@@ -79,7 +127,10 @@ export function useBackup() {
   const criarBackup = (tipo: "completo" | "incremental") => {
     const idGerado = `BKP-${String(backups.length + 1).padStart(3, "0")}`;
     const timestamp = new Date().toISOString();
-    const arquivoNome = `/backups/backup_${tipo}_${timestamp.replace(/[:.-]/g, "")}.sql`;
+    const pastaBase = config.localArmazenamento.endsWith("/")
+      ? config.localArmazenamento
+      : `${config.localArmazenamento}/`;
+    const arquivoNome = `${pastaBase}backup_${tipo}_${timestamp.replace(/[:.-]/g, "")}.sql`;
 
     const novoBackup: RegistroBackup = {
       id: idGerado,
@@ -91,6 +142,7 @@ export function useBackup() {
     };
 
     setBackups((prev) => [novoBackup, ...prev]);
+    addLog(`Disparou execução de backup manual (${tipo})`, "seguranca");
 
     setTimeout(() => {
       setBackups((prevList) =>
@@ -98,18 +150,55 @@ export function useBackup() {
           bkp.id === idGerado ? { ...bkp, status: "sucesso" as const } : bkp
         )
       );
+      addLog(`Backup ${idGerado} concluído com sucesso`, "seguranca");
     }, 3000);
 
     return true;
   };
 
-  const restaurarBackup = (_id: string) => {
+  const restaurarBackup = (id: string) => {
+    const alvo = backups.find((b) => b.id === id);
+    if (alvo) {
+      addLog(`Restaurou o sistema para o backup ${id} (${alvo.tipo})`, "seguranca");
+      return true;
+    }
+    return false;
+  };
+
+  const atualizarConfiguracaoBackup = (
+    tipo: ConfiguracaoBackup["tipo"],
+    frequencia: ConfiguracaoBackup["frequencia"],
+    localArmazenamento: string
+  ) => {
+    setError(null);
+    if (!localArmazenamento.trim()) {
+      setError("O local de armazenamento não pode estar vazio.");
+      return false;
+    }
+
+    const pathRegex = /^([a-zA-Z]:|\/|[a-zA-Z0-9_-]+)/;
+    if (!pathRegex.test(localArmazenamento.trim())) {
+      setError("Caminho de armazenamento inválido.");
+      return false;
+    }
+
+    setConfig({
+      tipo,
+      frequencia,
+      localArmazenamento: localArmazenamento.trim()
+    });
+
+    addLog(`Atualizou configuração da rotina automática de backup`, "seguranca");
     return true;
   };
 
   return {
     backups,
+    config,
     criarBackup,
-    restaurarBackup
+    restaurarBackup,
+    atualizarConfiguracaoBackup,
+    error,
+    setError
   };
 }
