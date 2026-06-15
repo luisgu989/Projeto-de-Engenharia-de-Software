@@ -18,6 +18,7 @@ import {
   Truck,
   BarChart3,
   Database,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,6 +101,12 @@ const menuItems: MenuItem[] = [
     title: "Funcionários",
     href: "/funcionarios",
     icon: Briefcase,
+    category: "Administração",
+  },
+  {
+    title: "Contratos",
+    href: "/contratos",
+    icon: FileText,
     category: "Administração",
   },
   {

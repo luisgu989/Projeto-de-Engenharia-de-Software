@@ -5,6 +5,8 @@ import { useLogistica, CargaLogistica, RotaLogistica } from "@/hooks/useLogistic
 import { useAuth } from "@/contexts/auth-context";
 import { useVendas } from "@/hooks/useVendas";
 import { OrdensCompra } from "@/components/logistica/OrdensCompra";
+import { CadastroFornecedores } from "@/components/logistica/CadastroFornecedores";
+import { AvaliacaoFornecedores } from "@/components/logistica/AvaliacaoFornecedores";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -23,6 +25,8 @@ import {
   User,
   Package,
   ShoppingCart,
+  Users,
+  Award,
 } from "lucide-react";
 
 export default function LogisticaPage() {
@@ -41,7 +45,7 @@ export default function LogisticaPage() {
   const cargoUser = user.cargo?.toLowerCase() || "";
   const canManage = user.role === "admin" || cargoUser.includes("logística") || cargoUser.includes("gerente") || cargoUser.includes("analista");
 
-  const [abaAtiva, setAbaAtiva] = useState<"cargas" | "rotas" | "compras">("cargas");
+  const [abaAtiva, setAbaAtiva] = useState<"cargas" | "rotas" | "compras" | "fornecedores" | "avaliacoes">("cargas");
   const [cargoSelecionadaId, setCargoSelecionadaId] = useState<string | null>(
     cargas.length > 0 ? cargas[0].id : null
   );
@@ -151,8 +155,7 @@ export default function LogisticaPage() {
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-border no-print">
+      <div className="flex border-b border-border no-print overflow-x-auto scrollbar-none">
         <button
           onClick={() => setAbaAtiva("cargas")}
           className={cn(
@@ -188,6 +191,30 @@ export default function LogisticaPage() {
         >
           <Route className="h-4 w-4" />
           Otimização de Rotas
+        </button>
+        <button
+          onClick={() => setAbaAtiva("fornecedores")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "fornecedores"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Users className="h-4 w-4" />
+          Cadastro de Fornecedores
+        </button>
+        <button
+          onClick={() => setAbaAtiva("avaliacoes")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "avaliacoes"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Award className="h-4 w-4" />
+          Avaliação de Desempenho
         </button>
       </div>
 
@@ -609,6 +636,10 @@ export default function LogisticaPage() {
       )}
 
       {abaAtiva === "compras" && <OrdensCompra />}
+
+      {abaAtiva === "fornecedores" && <CadastroFornecedores />}
+
+      {abaAtiva === "avaliacoes" && <AvaliacaoFornecedores />}
 
       {/* Register Cargo Modal */}
       {formOpen && (
