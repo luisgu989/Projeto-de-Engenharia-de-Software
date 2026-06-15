@@ -6,7 +6,9 @@ import { ResumoEstoque } from "@/components/estoque/ResumoEstoque";
 import { TabelaEstoque } from "@/components/estoque/TabelaEstoque";
 import { HistoricoMovimentacoes } from "@/components/estoque/HistoricoMovimentacoes";
 import { RelatoriosEstoque } from "@/components/estoque/RelatoriosEstoque";
-import { Package, CalendarDays, BarChart2 } from "lucide-react";
+import { ReposicaoEstoque } from "@/components/estoque/ReposicaoEstoque";
+import { LotesValidades } from "@/components/estoque/LotesValidades";
+import { Package, CalendarDays, BarChart2, RefreshCw, Barcode } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function EstoquePage() {
@@ -26,7 +28,7 @@ export default function EstoquePage() {
     alertasBaixoEstoque,
   } = useEstoque();
 
-  const [abaAtiva, setAbaAtiva] = useState<"inventario" | "movimentacoes" | "relatorios">("inventario");
+  const [abaAtiva, setAbaAtiva] = useState<"inventario" | "movimentacoes" | "relatorios" | "reposicao" | "lotes">("inventario");
   const totalProdutos = estoque.length;
 
   return (
@@ -44,7 +46,7 @@ export default function EstoquePage() {
         <button
           onClick={() => setAbaAtiva("inventario")}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer",
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
             abaAtiva === "inventario"
               ? "border-primary text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"
@@ -54,9 +56,33 @@ export default function EstoquePage() {
           Catálogo & Inventário
         </button>
         <button
+          onClick={() => setAbaAtiva("reposicao")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "reposicao"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <RefreshCw className="h-4 w-4" />
+          Reposição Automática
+        </button>
+        <button
+          onClick={() => setAbaAtiva("lotes")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "lotes"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Barcode className="h-4 w-4" />
+          Lotes & Validades
+        </button>
+        <button
           onClick={() => setAbaAtiva("movimentacoes")}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer",
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
             abaAtiva === "movimentacoes"
               ? "border-primary text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"
@@ -68,7 +94,7 @@ export default function EstoquePage() {
         <button
           onClick={() => setAbaAtiva("relatorios")}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer",
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
             abaAtiva === "relatorios"
               ? "border-primary text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"
@@ -110,6 +136,10 @@ export default function EstoquePage() {
             </div>
           </>
         )}
+
+        {abaAtiva === "reposicao" && <ReposicaoEstoque />}
+
+        {abaAtiva === "lotes" && <LotesValidades />}
 
         {abaAtiva === "movimentacoes" && (
           <div className="space-y-2">

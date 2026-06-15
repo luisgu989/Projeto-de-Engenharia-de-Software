@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useProducao, OrdemProducao } from "@/hooks/useProducao";
 import { useEstoque } from "@/hooks/useEstoque";
 import { useAuth } from "@/contexts/auth-context";
+import { OrdensServico } from "@/components/producao/OrdensServico";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -21,6 +22,7 @@ import {
   Sliders,
   ChevronRight,
   TrendingUp,
+  Wrench,
 } from "lucide-react";
 
 export default function ProducaoPage() {
@@ -38,7 +40,7 @@ export default function ProducaoPage() {
   const cargo = user.cargo?.toLowerCase() || "";
   const isGerente = user.role === "admin" || cargo.includes("gerente") || cargo.includes("diretor");
 
-  // State
+  const [secaoAtiva, setSecaoAtiva] = useState<"producao" | "servico">("producao");
   const [dataFiltroRecurso, setDataFiltroRecurso] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -46,13 +48,15 @@ export default function ProducaoPage() {
   const [abaAtiva, setAbaAtiva] = useState<"todas" | "planejado" | "em_producao" | "concluido">("todas");
 
   // Form Fields
-  const [produtoId, setProdutoId] = useState("");
+  const [selectedProdutoId, setSelectedProdutoId] = useState<string | null>(null);
+  const produtoId = selectedProdutoId || (estoque.length > 0 ? estoque[0].id : "");
   const [quantidade, setQuantidade] = useState(10);
-  const [dataInicio, setDataInicio] = useState(new Date().toISOString().split("T")[0]);
+  const [dataInicio, setDataInicio] = useState(() => new Date().toISOString().split("T")[0]);
   const [dataPrevisao, setDataPrevisao] = useState(
-    new Date(Date.now() + 86400000 * 2).toISOString().split("T")[0]
+    () => new Date(Date.now() + 86400000 * 2).toISOString().split("T")[0]
   );
-  const [recursoId, setRecursoId] = useState("");
+  const [selectedRecursoId, setSelectedRecursoId] = useState<string | null>(null);
+  const recursoId = selectedRecursoId || (recursos.length > 0 ? recursos[0].id : "");
   const [prioridade, setPrioridade] = useState<"baixa" | "media" | "alta">("media");
   const [errorForm, setErrorForm] = useState<string | null>(null);
 
@@ -70,20 +74,6 @@ export default function ProducaoPage() {
       setCargaPrevia(0);
     }
   }, [recursoId, dataInicio, quantidade, recursos, calcularCargaRecurso]);
-
-  // Set default resource in form
-  useEffect(() => {
-    if (recursos.length > 0 && !recursoId) {
-      setRecursoId(recursos[0].id);
-    }
-  }, [recursos, recursoId]);
-
-  // Set default product in form
-  useEffect(() => {
-    if (estoque.length > 0 && !produtoId) {
-      setProdutoId(estoque[0].id);
-    }
-  }, [estoque, produtoId]);
 
   // Calculations
   const ordensAtivas = ordens.filter(
@@ -143,18 +133,16 @@ export default function ProducaoPage() {
 
   const handleQuickSchedule = (prod: typeof estoque[0]) => {
     if (!isGerente) return;
-    setProdutoId(prod.id);
-    // suggest quantity to bring stock up to double minimum
+    setSelectedProdutoId(prod.id);
     const sugerido = Math.max(10, prod.estoqueMinimo * 2 - prod.quantidade);
     setQuantidade(sugerido);
     
-    // Auto select logical resource
-    let recId = "REC-001"; // default Linha A
+    let recId = "REC-001";
     if (prod.categoria.toLowerCase().includes("periférico")) recId = "REC-001";
     else if (prod.categoria.toLowerCase().includes("acessório")) recId = "REC-002";
     else if (prod.categoria.toLowerCase().includes("áudio")) recId = "REC-005";
     else if (prod.categoria.toLowerCase().includes("monitor")) recId = "REC-003";
-    setRecursoId(recId);
+    setSelectedRecursoId(recId);
     
     setFormOpen(true);
   };
@@ -186,7 +174,36 @@ export default function ProducaoPage() {
         )}
       </div>
 
-      {/* Role Notice Banner */}
+      <div className="flex border-b border-border no-print gap-1 overflow-x-auto scrollbar-none">
+        <button
+          onClick={() => setSecaoAtiva("producao")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            secaoAtiva === "producao"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Hammer className="h-4 w-4" />
+          Ordens de Produção
+        </button>
+        <button
+          onClick={() => setSecaoAtiva("servico")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            secaoAtiva === "servico"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Wrench className="h-4 w-4" />
+          Ordens de Serviço e Manutenção
+        </button>
+      </div>
+
+      {secaoAtiva === "producao" && (
+        <>
+          {/* Role Notice Banner */}
       {!isGerente && (
         <div className="flex items-center gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-600 dark:text-amber-400 no-print">
           <AlertTriangle className="h-5 w-5 shrink-0" />
@@ -578,6 +595,10 @@ export default function ProducaoPage() {
           </div>
         )}
       </div>
+      </>
+    )}
+
+      {secaoAtiva === "servico" && <OrdensServico />}
 
       {/* Modal Planning Form (US075) */}
       {formOpen && (
@@ -613,7 +634,7 @@ export default function ProducaoPage() {
                 </label>
                 <select
                   value={produtoId}
-                  onChange={(e) => setProdutoId(e.target.value)}
+                  onChange={(e) => setSelectedProdutoId(e.target.value)}
                   className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground cursor-pointer"
                 >
                   {estoque.map((item) => (
@@ -645,7 +666,7 @@ export default function ProducaoPage() {
                   </label>
                   <select
                     value={prioridade}
-                    onChange={(e) => setPrioridade(e.target.value as any)}
+                    onChange={(e) => setPrioridade(e.target.value as OrdemProducao["prioridade"])}
                     className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground cursor-pointer animate-in transition-all"
                   >
                     <option value="baixa">Baixa</option>
@@ -662,7 +683,7 @@ export default function ProducaoPage() {
                 </label>
                 <select
                   value={recursoId}
-                  onChange={(e) => setRecursoId(e.target.value)}
+                  onChange={(e) => setSelectedRecursoId(e.target.value)}
                   className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground cursor-pointer"
                 >
                   {recursos.map((rec) => (

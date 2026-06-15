@@ -5,12 +5,13 @@ import { ConfigEmpresa } from "@/components/configuracoes/ConfigEmpresa";
 import { ConfigUsuario } from "@/components/configuracoes/ConfigUsuario";
 import { ConfigSeguranca } from "@/components/configuracoes/ConfigSeguranca";
 import { ConfigLogs } from "@/components/configuracoes/ConfigLogs";
+import { ConfigFiliais } from "@/components/configuracoes/ConfigFiliais";
 import { useAuth } from "@/contexts/auth-context";
-import { UserCircle, Building2, ShieldCheck, History } from "lucide-react";
+import { UserCircle, Building2, ShieldCheck, History, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function ConfiguracoesPage() {
-  const [activeTab, setActiveTab] = useState<"perfil" | "empresa" | "seguranca" | "logs">("perfil");
+  const [activeTab, setActiveTab] = useState<"perfil" | "empresa" | "seguranca" | "logs" | "filiais">("perfil");
   const { user } = useAuth();
 
   return (
@@ -51,6 +52,19 @@ export default function ConfiguracoesPage() {
           <Building2 className="h-4 w-4" />
           Dados da Empresa
         </button>
+
+        <button
+          onClick={() => setActiveTab("filiais")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "filiais"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Network className="h-4 w-4" />
+          Filiais e Unidades
+        </button>
         
         {/* Only admins can configure permissions (US021) */}
         {user.role === "admin" && (
@@ -89,6 +103,7 @@ export default function ConfiguracoesPage() {
       <div className="space-y-6">
         {activeTab === "perfil" && <ConfigUsuario />}
         {activeTab === "empresa" && <ConfigEmpresa />}
+        {activeTab === "filiais" && <ConfigFiliais />}
         {activeTab === "seguranca" && user.role === "admin" && <ConfigSeguranca />}
         {activeTab === "logs" && user.permissions.verLogsAuditoria && <ConfigLogs />}
       </div>

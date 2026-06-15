@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useLogistica, CargaLogistica, RotaLogistica } from "@/hooks/useLogistica";
 import { useAuth } from "@/contexts/auth-context";
 import { useVendas } from "@/hooks/useVendas";
+import { OrdensCompra } from "@/components/logistica/OrdensCompra";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -21,6 +22,7 @@ import {
   ArrowRight,
   User,
   Package,
+  ShoppingCart,
 } from "lucide-react";
 
 export default function LogisticaPage() {
@@ -39,8 +41,7 @@ export default function LogisticaPage() {
   const cargoUser = user.cargo?.toLowerCase() || "";
   const canManage = user.role === "admin" || cargoUser.includes("logística") || cargoUser.includes("gerente") || cargoUser.includes("analista");
 
-  // State
-  const [abaAtiva, setAbaAtiva] = useState<"cargas" | "rotas">("cargas");
+  const [abaAtiva, setAbaAtiva] = useState<"cargas" | "rotas" | "compras">("cargas");
   const [cargoSelecionadaId, setCargoSelecionadaId] = useState<string | null>(
     cargas.length > 0 ? cargas[0].id : null
   );
@@ -155,7 +156,7 @@ export default function LogisticaPage() {
         <button
           onClick={() => setAbaAtiva("cargas")}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer",
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
             abaAtiva === "cargas"
               ? "border-primary text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"
@@ -165,9 +166,21 @@ export default function LogisticaPage() {
           Acompanhamento de Cargas (GPS)
         </button>
         <button
+          onClick={() => setAbaAtiva("compras")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "compras"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <ShoppingCart className="h-4 w-4" />
+          Ordens de Compra
+        </button>
+        <button
           onClick={() => setAbaAtiva("rotas")}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer",
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
             abaAtiva === "rotas"
               ? "border-primary text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground"
@@ -594,6 +607,8 @@ export default function LogisticaPage() {
           </div>
         </div>
       )}
+
+      {abaAtiva === "compras" && <OrdensCompra />}
 
       {/* Register Cargo Modal */}
       {formOpen && (
