@@ -19,6 +19,8 @@ import {
   BarChart3,
   Database,
   FileText,
+  TrendingUp,
+  GitMerge,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,6 +55,18 @@ const menuItems: MenuItem[] = [
     title: "Vendas",
     href: "/vendas",
     icon: ShoppingCart,
+    category: "Módulos",
+  },
+  {
+    title: "Oportunidades",
+    href: "/oportunidades",
+    icon: TrendingUp,
+    category: "Módulos",
+  },
+  {
+    title: "Pipeline",
+    href: "/pipeline",
+    icon: GitMerge,
     category: "Módulos",
   },
   {
