@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useMonitoramento } from "@/hooks/useMonitoramento";
 import { useServidores } from "@/hooks/useServidores";
+import { AuditoriaSeguranca } from "@/components/monitoramento/AuditoriaSeguranca";
+import { DeteccaoAcessos } from "@/components/monitoramento/DeteccaoAcessos";
 import {
   Activity,
   ShieldAlert,
@@ -21,7 +23,7 @@ import { cn } from "@/lib/utils";
 export default function MonitoramentoPage() {
   const { metricas, historicoDeMonitoramento } = useMonitoramento();
   const { servidores, historicoEventos } = useServidores();
-  const [activeTab, setActiveTab] = useState<"metricas" | "servidores">("metricas");
+  const [activeTab, setActiveTab] = useState<"metricas" | "servidores" | "auditoria" | "bloqueios">("metricas");
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString("pt-BR", {
@@ -78,6 +80,30 @@ export default function MonitoramentoPage() {
         >
           <Server className="h-4 w-4" />
           Servidores em Tempo Real (R061)
+        </button>
+        <button
+          onClick={() => setActiveTab("auditoria")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "auditoria"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <ShieldAlert className="h-4 w-4" />
+          Auditoria de Segurança (R085)
+        </button>
+        <button
+          onClick={() => setActiveTab("bloqueios")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "bloqueios"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Terminal className="h-4 w-4" />
+          Tentativas de Acesso (R086)
         </button>
       </div>
 
@@ -473,6 +499,10 @@ export default function MonitoramentoPage() {
           </div>
         </div>
       )}
+
+      {activeTab === "auditoria" && <AuditoriaSeguranca />}
+
+      {activeTab === "bloqueios" && <DeteccaoAcessos />}
     </div>
   );
 }

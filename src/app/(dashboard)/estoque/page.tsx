@@ -8,7 +8,8 @@ import { HistoricoMovimentacoes } from "@/components/estoque/HistoricoMovimentac
 import { RelatoriosEstoque } from "@/components/estoque/RelatoriosEstoque";
 import { ReposicaoEstoque } from "@/components/estoque/ReposicaoEstoque";
 import { LotesValidades } from "@/components/estoque/LotesValidades";
-import { Package, CalendarDays, BarChart2, RefreshCw, Barcode } from "lucide-react";
+import { InventarioAutomatizado } from "@/components/estoque/InventarioAutomatizado";
+import { Package, CalendarDays, BarChart2, RefreshCw, Barcode, ClipboardCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function EstoquePage() {
@@ -29,7 +30,7 @@ export default function EstoquePage() {
     alertasBaixoEstoque,
   } = useEstoque();
 
-  const [abaAtiva, setAbaAtiva] = useState<"inventario" | "movimentacoes" | "relatorios" | "reposicao" | "lotes">("inventario");
+  const [abaAtiva, setAbaAtiva] = useState<"inventario" | "movimentacoes" | "relatorios" | "reposicao" | "lotes" | "inventario_auto">("inventario");
   const totalProdutos = estoque.length;
 
   return (
@@ -55,6 +56,18 @@ export default function EstoquePage() {
         >
           <Package className="h-4 w-4" />
           Catálogo & Inventário
+        </button>
+        <button
+          onClick={() => setAbaAtiva("inventario_auto")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "inventario_auto"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <ClipboardCheck className="h-4 w-4" />
+          Inventário Automatizado
         </button>
         <button
           onClick={() => setAbaAtiva("reposicao")}
@@ -137,6 +150,8 @@ export default function EstoquePage() {
             </div>
           </>
         )}
+
+        {abaAtiva === "inventario_auto" && <InventarioAutomatizado />}
 
         {abaAtiva === "reposicao" && <ReposicaoEstoque />}
 

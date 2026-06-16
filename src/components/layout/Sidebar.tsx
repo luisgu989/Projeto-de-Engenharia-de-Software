@@ -27,6 +27,9 @@ import {
   MessagesSquare,
   LifeBuoy,
   Activity,
+  Layers,
+  GitBranch,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,6 +97,18 @@ const menuItems: MenuItem[] = [
     category: "Módulos",
   },
   {
+    title: "Ativos & Patrimônio",
+    href: "/ativos",
+    icon: Layers,
+    category: "Módulos",
+  },
+  {
+    title: "Workflows",
+    href: "/workflows",
+    icon: GitBranch,
+    category: "Módulos",
+  },
+  {
     title: "Financeiro",
     href: "/financeiro",
     icon: DollarSign,
@@ -133,6 +148,12 @@ const menuItems: MenuItem[] = [
     title: "Chamados Técnicos",
     href: "/chamados",
     icon: LifeBuoy,
+    category: "Módulos",
+  },
+  {
+    title: "Solicitações",
+    href: "/solicitacoes",
+    icon: ClipboardList,
     category: "Módulos",
   },
   {

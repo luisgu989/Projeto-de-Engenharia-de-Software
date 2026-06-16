@@ -6,7 +6,10 @@ import { ResumoFinanceiro } from "@/components/financeiro/ResumoFinanceiro";
 import { TabelaFinanceiro } from "@/components/financeiro/TabelaFinanceiro";
 import { FaturamentoFiscal } from "@/components/financeiro/FaturamentoFiscal";
 import { IntegracoesFinanceiras } from "@/components/financeiro/IntegracoesFinanceiras";
-import { DollarSign, FileText, Link2 } from "lucide-react";
+import { AutomacaoFinanceira } from "@/components/financeiro/AutomacaoFinanceira";
+import { CentrosCusto } from "@/components/financeiro/CentrosCusto";
+import { HistoricoAlteracoesFinanceiras } from "@/components/financeiro/HistoricoAlteracoesFinanceiras";
+import { DollarSign, FileText, Link2, Cpu, Briefcase, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function FinanceiroPage() {
@@ -23,7 +26,7 @@ export default function FinanceiroPage() {
     totalVencidos,
   } = useFinanceiro();
 
-  const [abaAtiva, setAbaAtiva] = useState<"caixa" | "fiscal" | "integracoes">("caixa");
+  const [abaAtiva, setAbaAtiva] = useState<"caixa" | "fiscal" | "integracoes" | "automacao" | "centroscusto" | "historicoalteracoes">("caixa");
 
   return (
     <div className="space-y-6">
@@ -73,6 +76,42 @@ export default function FinanceiroPage() {
           <Link2 className="h-4 w-4" />
           Integrações Financeiras
         </button>
+        <button
+          onClick={() => setAbaAtiva("automacao")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "automacao"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Cpu className="h-4 w-4" />
+          Automação Financeira (R082)
+        </button>
+        <button
+          onClick={() => setAbaAtiva("centroscusto")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "centroscusto"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Briefcase className="h-4 w-4" />
+          Centros de Custo (R088)
+        </button>
+        <button
+          onClick={() => setAbaAtiva("historicoalteracoes")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "historicoalteracoes"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <History className="h-4 w-4" />
+          Auditoria Financeira (R090)
+        </button>
       </div>
 
       {abaAtiva === "caixa" && (
@@ -103,6 +142,12 @@ export default function FinanceiroPage() {
       {abaAtiva === "fiscal" && <FaturamentoFiscal />}
 
       {abaAtiva === "integracoes" && <IntegracoesFinanceiras />}
+
+      {abaAtiva === "automacao" && <AutomacaoFinanceira />}
+
+      {abaAtiva === "centroscusto" && <CentrosCusto />}
+
+      {abaAtiva === "historicoalteracoes" && <HistoricoAlteracoesFinanceiras />}
     </div>
   );
 }

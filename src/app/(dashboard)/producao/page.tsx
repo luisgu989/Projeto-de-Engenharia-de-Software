@@ -6,6 +6,7 @@ import { useEstoque } from "@/hooks/useEstoque";
 import { useAuth } from "@/contexts/auth-context";
 import { OrdensServico } from "@/components/producao/OrdensServico";
 import { MonitorSensores } from "@/components/producao/MonitorSensores";
+import { ControleProducaoChao } from "@/components/producao/ControleProducaoChao";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -42,7 +43,7 @@ export default function ProducaoPage() {
   const cargo = user.cargo?.toLowerCase() || "";
   const isGerente = user.role === "admin" || cargo.includes("gerente") || cargo.includes("diretor");
 
-  const [secaoAtiva, setSecaoAtiva] = useState<"producao" | "servico" | "sensor">("producao");
+  const [secaoAtiva, setSecaoAtiva] = useState<"producao" | "servico" | "sensor" | "chao-fabrica">("producao");
   const [dataFiltroRecurso, setDataFiltroRecurso] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -188,6 +189,18 @@ export default function ProducaoPage() {
         >
           <Hammer className="h-4 w-4" />
           Ordens de Produção
+        </button>
+        <button
+          onClick={() => setSecaoAtiva("chao-fabrica")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            secaoAtiva === "chao-fabrica"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Sliders className="h-4 w-4" />
+          Chão de Fábrica
         </button>
         <button
           onClick={() => setSecaoAtiva("servico")}
@@ -611,6 +624,8 @@ export default function ProducaoPage() {
       </div>
       </>
     )}
+
+      {secaoAtiva === "chao-fabrica" && <ControleProducaoChao />}
 
       {secaoAtiva === "servico" && <OrdensServico />}
 

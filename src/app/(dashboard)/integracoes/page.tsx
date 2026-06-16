@@ -6,10 +6,12 @@ import { ConfigIntegracoesExternas } from "@/components/integracoes/ConfigIntegr
 import { ConfigAutomacoes } from "@/components/integracoes/ConfigAutomacoes";
 import { MonitorDesempenho } from "@/components/integracoes/MonitorDesempenho";
 import { SincronizadorDados } from "@/components/integracoes/SincronizadorDados";
-import { Database, Globe, Zap, Activity, RefreshCw } from "lucide-react";
+import { ValidacaoImportacao } from "@/components/integracoes/ValidacaoImportacao";
+import { ExportacaoDados } from "@/components/integracoes/ExportacaoDados";
+import { Database, Globe, Zap, Activity, RefreshCw, Upload, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type IntegracoesTab = "versionador" | "conexoes" | "sincronizacao" | "automacoes" | "desempenho";
+type IntegracoesTab = "versionador" | "conexoes" | "sincronizacao" | "automacoes" | "desempenho" | "importacao" | "exportacao";
 
 export default function IntegracoesPage() {
   const [activeTab, setActiveTab] = useState<IntegracoesTab>("versionador");
@@ -79,6 +81,32 @@ export default function IntegracoesPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab("importacao")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "importacao"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Upload className="h-4 w-4" />
+          Validação de Importações (R083)
+        </button>
+
+        <button
+          onClick={() => setActiveTab("exportacao")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "exportacao"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Download className="h-4 w-4" />
+          Exportação de Dados (R084)
+        </button>
+
+        <button
           onClick={() => setActiveTab("desempenho")}
           className={cn(
             "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
@@ -97,6 +125,8 @@ export default function IntegracoesPage() {
         {activeTab === "conexoes" && <ConfigIntegracoesExternas />}
         {activeTab === "sincronizacao" && <SincronizadorDados />}
         {activeTab === "automacoes" && <ConfigAutomacoes />}
+        {activeTab === "importacao" && <ValidacaoImportacao />}
+        {activeTab === "exportacao" && <ExportacaoDados />}
         {activeTab === "desempenho" && <MonitorDesempenho />}
       </div>
     </div>
