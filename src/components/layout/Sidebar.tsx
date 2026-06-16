@@ -21,6 +21,11 @@ import {
   FileText,
   TrendingUp,
   GitMerge,
+  Sparkles,
+  CalendarDays,
+  MessagesSquare,
+  LifeBuoy,
+  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,6 +108,36 @@ const menuItems: MenuItem[] = [
     title: "Relatórios",
     href: "/relatorios",
     icon: BarChart3,
+    category: "Módulos",
+  },
+  {
+    title: "BI & Analítico",
+    href: "/analitico",
+    icon: Sparkles,
+    category: "Módulos",
+  },
+  {
+    title: "Agenda Corporativa",
+    href: "/agenda",
+    icon: CalendarDays,
+    category: "Módulos",
+  },
+  {
+    title: "Chat Interno",
+    href: "/chat",
+    icon: MessagesSquare,
+    category: "Módulos",
+  },
+  {
+    title: "Chamados Técnicos",
+    href: "/chamados",
+    icon: LifeBuoy,
+    category: "Módulos",
+  },
+  {
+    title: "Desempenho TI",
+    href: "/monitoramento",
+    icon: Activity,
     category: "Módulos",
   },
   {
