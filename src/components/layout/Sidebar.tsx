@@ -19,6 +19,7 @@ import {
   BarChart3,
   Database,
   FileText,
+  Files,
   TrendingUp,
   GitMerge,
   Sparkles,
@@ -156,6 +157,12 @@ const menuItems: MenuItem[] = [
     title: "Contratos",
     href: "/contratos",
     icon: FileText,
+    category: "Administração",
+  },
+  {
+    title: "Documentos",
+    href: "/documentos",
+    icon: Files,
     category: "Administração",
   },
   {

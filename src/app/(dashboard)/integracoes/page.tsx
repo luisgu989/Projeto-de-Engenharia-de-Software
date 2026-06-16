@@ -5,11 +5,14 @@ import { VersionadorRegistros } from "@/components/integracoes/VersionadorRegist
 import { ConfigIntegracoesExternas } from "@/components/integracoes/ConfigIntegracoesExternas";
 import { ConfigAutomacoes } from "@/components/integracoes/ConfigAutomacoes";
 import { MonitorDesempenho } from "@/components/integracoes/MonitorDesempenho";
-import { Database, Globe, Zap, Activity } from "lucide-react";
+import { SincronizadorDados } from "@/components/integracoes/SincronizadorDados";
+import { Database, Globe, Zap, Activity, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type IntegracoesTab = "versionador" | "conexoes" | "sincronizacao" | "automacoes" | "desempenho";
+
 export default function IntegracoesPage() {
-  const [activeTab, setActiveTab] = useState<"versionador" | "conexoes" | "automacoes" | "desempenho">("versionador");
+  const [activeTab, setActiveTab] = useState<IntegracoesTab>("versionador");
 
   return (
     <div className="space-y-6">
@@ -50,6 +53,19 @@ export default function IntegracoesPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab("sincronizacao")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "sincronizacao"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <RefreshCw className="h-4 w-4" />
+          Sincronização em Tempo Real (R068)
+        </button>
+
+        <button
           onClick={() => setActiveTab("automacoes")}
           className={cn(
             "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
@@ -79,6 +95,7 @@ export default function IntegracoesPage() {
       <div className="space-y-6">
         {activeTab === "versionador" && <VersionadorRegistros />}
         {activeTab === "conexoes" && <ConfigIntegracoesExternas />}
+        {activeTab === "sincronizacao" && <SincronizadorDados />}
         {activeTab === "automacoes" && <ConfigAutomacoes />}
         {activeTab === "desempenho" && <MonitorDesempenho />}
       </div>
