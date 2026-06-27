@@ -76,7 +76,7 @@ export function ValidacaoImportacao() {
             </div>
             <div>
               <h3 className="font-semibold text-sm">Rastreabilidade de Importações</h3>
-              <p className="text-xs text-muted-foreground">Varreduras automáticas de integridade de dados (R083)</p>
+              <p className="text-xs text-muted-foreground">Varreduras automáticas de integridade de dados</p>
             </div>
           </div>
           

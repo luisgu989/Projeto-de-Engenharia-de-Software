@@ -102,7 +102,7 @@ export function AuditoriaSeguranca() {
             </div>
             <div>
               <h3 className="font-semibold text-sm">Histórico de Auditoria de TI</h3>
-              <p className="text-xs text-muted-foreground">Monitoramento de eventos, criptografia e permissões (R085)</p>
+              <p className="text-xs text-muted-foreground">Monitoramento de eventos, criptografia e permissões</p>
             </div>
           </div>
 

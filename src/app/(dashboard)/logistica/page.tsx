@@ -27,6 +27,7 @@ import {
   ShoppingCart,
   Users,
   Award,
+  Trash2,
 } from "lucide-react";
 
 export default function LogisticaPage() {
@@ -39,6 +40,8 @@ export default function LogisticaPage() {
     atualizarCargaStatus,
     simularMovimentoCargo,
     otimizarRota,
+    adicionarRota,
+    removerRota,
   } = useLogistica();
   const { vendas } = useVendas();
 
@@ -50,6 +53,15 @@ export default function LogisticaPage() {
     cargas.length > 0 ? cargas[0].id : null
   );
   const [formOpen, setFormOpen] = useState(false);
+  
+  // Route Form Fields
+  const [formRotaOpen, setFormRotaOpen] = useState(false);
+  const [novaRotaNome, setNovaRotaNome] = useState("");
+  const [novaRotaOrigem, setNovaRotaOrigem] = useState("CD Principal - São Paulo");
+  const [novaRotaParadas, setNovaRotaParadas] = useState("");
+  const [novaRotaDistancia, setNovaRotaDistancia] = useState(0);
+  const [novaRotaCusto, setNovaRotaCusto] = useState(0);
+  const [novaRotaTempo, setNovaRotaTempo] = useState("");
 
   // Form Fields
   const [pedidoId, setPedidoId] = useState("");
@@ -103,6 +115,34 @@ export default function LogisticaPage() {
       setMotorista("");
       setVeiculo("");
       setPesoKg(200);
+    }
+  };
+
+  const handleCreateRota = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novaRotaNome || !novaRotaOrigem || !novaRotaParadas) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+    const paradasArray = novaRotaParadas.split(",").map((p) => p.trim()).filter(Boolean);
+    const sucesso = adicionarRota({
+      nome: novaRotaNome,
+      origem: novaRotaOrigem,
+      paradas: paradasArray,
+      paradasOriginais: paradasArray,
+      distanciaKm: Number(novaRotaDistancia) || 0,
+      custoCombustivel: Number(novaRotaCusto) || 0,
+      tempoEstimado: novaRotaTempo || "0h",
+    });
+
+    if (sucesso) {
+      setFormRotaOpen(false);
+      setNovaRotaNome("");
+      setNovaRotaOrigem("CD Principal - São Paulo");
+      setNovaRotaParadas("");
+      setNovaRotaDistancia(0);
+      setNovaRotaCusto(0);
+      setNovaRotaTempo("");
     }
   };
 
@@ -497,14 +537,25 @@ export default function LogisticaPage() {
       {abaAtiva === "rotas" && (
         <div className="space-y-6">
           <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
-            <div className="border-b border-border pb-3">
-              <h3 className="font-bold text-base tracking-tight flex items-center gap-2">
-                <Route className="h-4.5 w-4.5 text-primary" />
-                Otimização de Trajetos de Carga
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Planeje trajetos reordenando pontos de paradas para economizar combustível e tempo (US077).
-              </p>
+            <div className="flex justify-between items-end border-b border-border pb-3">
+              <div>
+                <h3 className="font-bold text-base tracking-tight flex items-center gap-2">
+                  <Route className="h-4.5 w-4.5 text-primary" />
+                  Otimização de Trajetos de Carga
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Planeje trajetos reordenando pontos de paradas para economizar combustível e tempo (US077).
+                </p>
+              </div>
+              {canManage && (
+                <Button
+                  size="sm"
+                  onClick={() => setFormRotaOpen(true)}
+                  className="gap-2 font-semibold shadow-md shadow-primary/20"
+                >
+                  <Plus className="h-4 w-4" /> Nova Rota
+                </Button>
+              )}
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-border">
@@ -564,20 +615,33 @@ export default function LogisticaPage() {
                       </td>
                       {canManage && (
                         <td className="p-3 text-right">
-                          <Button
-                            size="xs"
-                            onClick={() => otimizarRota(r.id)}
-                            disabled={r.otimizada}
-                            className={cn(
-                              "h-7 text-[10px] font-bold flex items-center gap-1 ml-auto",
-                              r.otimizada
-                                ? "bg-accent text-muted-foreground border border-transparent"
-                                : "shadow-md shadow-primary/10"
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="xs"
+                              onClick={() => otimizarRota(r.id)}
+                              disabled={r.otimizada}
+                              className={cn(
+                                "h-7 text-[10px] font-bold flex items-center gap-1",
+                                r.otimizada
+                                  ? "bg-accent text-muted-foreground border border-transparent"
+                                  : "shadow-md shadow-primary/10"
+                              )}
+                            >
+                              <Zap className="h-3 w-3" />
+                              {r.otimizada ? "Otimizada" : "Otimizar Rota"}
+                            </Button>
+                            {r.otimizada && (
+                              <Button
+                                size="xs"
+                                variant="destructive"
+                                onClick={() => removerRota(r.id)}
+                                className="h-7 w-7 p-0 flex items-center justify-center shadow-md shadow-destructive/20"
+                                title="Remover Rota"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
                             )}
-                          >
-                            <Zap className="h-3 w-3" />
-                            {r.otimizada ? "Otimizada" : "Otimizar Rota"}
-                          </Button>
+                          </div>
                         </td>
                       )}
                     </tr>
@@ -791,6 +855,111 @@ export default function LogisticaPage() {
                   className="h-9 shadow-md shadow-primary/20 font-semibold"
                 >
                   Confirmar Carga
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal - Nova Rota */}
+      {formRotaOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-border flex items-center justify-between bg-accent/30 shrink-0">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <Route className="h-5 w-5 text-primary" />
+                Nova Rota Logística
+              </h3>
+              <button
+                onClick={() => setFormRotaOpen(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateRota} className="p-4 space-y-4 overflow-y-auto">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Nome da Rota</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: Rota Nordeste Rápida"
+                  value={novaRotaNome}
+                  onChange={(e) => setNovaRotaNome(e.target.value)}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Origem</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: CD Principal - São Paulo"
+                  value={novaRotaOrigem}
+                  onChange={(e) => setNovaRotaOrigem(e.target.value)}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Paradas (separadas por vírgula)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: Campinas, Ribeirão Preto, Uberaba"
+                  value={novaRotaParadas}
+                  onChange={(e) => setNovaRotaParadas(e.target.value)}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-muted-foreground uppercase">Distância (Km)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={novaRotaDistancia}
+                    onChange={(e) => setNovaRotaDistancia(parseInt(e.target.value) || 0)}
+                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-muted-foreground uppercase">Custo Combustível (R$)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    required
+                    value={novaRotaCusto}
+                    onChange={(e) => setNovaRotaCusto(parseFloat(e.target.value) || 0)}
+                    className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Tempo Estimado</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: 8h 30m"
+                  value={novaRotaTempo}
+                  onChange={(e) => setNovaRotaTempo(e.target.value)}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:outline-none rounded-lg px-3 py-2 text-sm text-foreground"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 border-t border-border pt-4 mt-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => setFormRotaOpen(false)} className="h-9 font-semibold">
+                  Cancelar
+                </Button>
+                <Button type="submit" size="sm" className="h-9 shadow-md shadow-primary/20 font-semibold">
+                  Salvar Rota
                 </Button>
               </div>
             </form>

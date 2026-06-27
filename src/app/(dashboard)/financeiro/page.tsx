@@ -86,7 +86,7 @@ export default function FinanceiroPage() {
           )}
         >
           <Cpu className="h-4 w-4" />
-          Automação Financeira (R082)
+          Automação Financeira
         </button>
         <button
           onClick={() => setAbaAtiva("centroscusto")}
@@ -98,7 +98,7 @@ export default function FinanceiroPage() {
           )}
         >
           <Briefcase className="h-4 w-4" />
-          Centros de Custo (R088)
+          Centros de Custo
         </button>
         <button
           onClick={() => setAbaAtiva("historicoalteracoes")}
@@ -110,7 +110,7 @@ export default function FinanceiroPage() {
           )}
         >
           <History className="h-4 w-4" />
-          Auditoria Financeira (R090)
+          Auditoria Financeira
         </button>
       </div>
 

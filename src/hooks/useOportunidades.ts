@@ -288,7 +288,7 @@ export function useOportunidades() {
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<StatusOportunidade | "todos">("todos");
 
-  // Adicionar nova oportunidade (R051)
+  // Adicionar nova oportunidade
   const adicionarOportunidade = (
     nova: Omit<Oportunidade, "id" | "dataAbertura" | "historico">
   ) => {
@@ -304,7 +304,7 @@ export function useOportunidades() {
   };
 
   /**
-   * Avança a etapa de uma oportunidade no pipeline (R052).
+   * Avança a etapa de uma oportunidade no pipeline.
    * Valida as regras de transição e registra a movimentação no histórico.
    */
   const avancarEtapa = (
@@ -346,7 +346,7 @@ export function useOportunidades() {
   };
 
   /**
-   * Edita campos de uma oportunidade (R052).
+   * Edita campos de uma oportunidade.
    * Os campos `id`, `cliente` e `dataAbertura` são protegidos e nunca serão alterados.
    */
   const editarOportunidade = (

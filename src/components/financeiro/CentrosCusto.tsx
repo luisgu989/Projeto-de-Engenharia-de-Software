@@ -246,7 +246,7 @@ export function CentrosCusto() {
             </table>
           </div>
 
-          {/* Despesas vinculadas ao Centro de Custo selecionado (R088) */}
+          {/* Despesas vinculadas ao Centro de Custo selecionado */}
           {activeCentro && (
             <div className="pt-4 border-t border-border/80 space-y-3">
               <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">

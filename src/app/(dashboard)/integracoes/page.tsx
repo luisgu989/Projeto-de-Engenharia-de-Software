@@ -64,7 +64,7 @@ export default function IntegracoesPage() {
           )}
         >
           <RefreshCw className="h-4 w-4" />
-          Sincronização em Tempo Real (R068)
+          Sincronização em Tempo Real
         </button>
 
         <button
@@ -90,7 +90,7 @@ export default function IntegracoesPage() {
           )}
         >
           <Upload className="h-4 w-4" />
-          Validação de Importações (R083)
+          Validação de Importações
         </button>
 
         <button
@@ -103,7 +103,7 @@ export default function IntegracoesPage() {
           )}
         >
           <Download className="h-4 w-4" />
-          Exportação de Dados (R084)
+          Exportação de Dados
         </button>
 
         <button

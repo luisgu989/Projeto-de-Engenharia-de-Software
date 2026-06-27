@@ -165,43 +165,40 @@ const coordenadasCidades: Record<string, { lat: number; lng: number }> = {
 export function useLogistica() {
   const { addNotification } = useNotifications();
 
-  const [cargas, setCargas] = useState<CargaLogistica[]>(() => {
-    if (typeof window !== "undefined") {
-      const savedCargas = localStorage.getItem("erp_cargas");
-      if (savedCargas) {
-        try {
-          return JSON.parse(savedCargas);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-    return cargasIniciais;
-  });
-
-  const [rotas, setRotas] = useState<RotaLogistica[]>(() => {
-    if (typeof window !== "undefined") {
-      const savedRotas = localStorage.getItem("erp_rotas");
-      if (savedRotas) {
-        try {
-          return JSON.parse(savedRotas);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-    return rotasIniciais;
-  });
-
+  const [cargas, setCargas] = useState<CargaLogistica[]>(cargasIniciais);
+  const [rotas, setRotas] = useState<RotaLogistica[]>(rotasIniciais);
   const [activeSimulations, setActiveSimulations] = useState<Record<string, boolean>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("erp_cargas", JSON.stringify(cargas));
-  }, [cargas]);
+    const savedCargas = localStorage.getItem("erp_cargas");
+    if (savedCargas) {
+      try {
+        setCargas(JSON.parse(savedCargas));
+      } catch (e) {}
+    }
+    
+    const savedRotas = localStorage.getItem("erp_rotas");
+    if (savedRotas) {
+      try {
+        setRotas(JSON.parse(savedRotas));
+      } catch (e) {}
+    }
+    
+    setIsLoaded(true);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem("erp_rotas", JSON.stringify(rotas));
-  }, [rotas]);
+    if (isLoaded) {
+      localStorage.setItem("erp_cargas", JSON.stringify(cargas));
+    }
+  }, [cargas, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("erp_rotas", JSON.stringify(rotas));
+    }
+  }, [rotas, isLoaded]);
 
   // Sync tabs
   useEffect(() => {
@@ -380,25 +377,26 @@ export function useLogistica() {
 
   // Route Optimization (US077)
   const otimizarRota = (rotaId: string) => {
+    const rotaAtual = rotas.find((r) => r.id === rotaId);
+    if (!rotaAtual) return;
+
+    const paradasOtimizadas = [...rotaAtual.paradas].reverse();
+    const kmOriginal = rotaAtual.distanciaKm;
+    const novoKm = Math.round(kmOriginal * 0.85); // 15% reduction
+    const custoOriginal = rotaAtual.custoCombustivel;
+    const novoCusto = Math.round(custoOriginal * 0.82); // 18% reduction
+    const economia = custoOriginal - novoCusto;
+
+    addNotification(
+      "Trajeto Otimizado",
+      `A rota "${rotaAtual.nome}" foi reordenada. Reduziu ${kmOriginal - novoKm}km e economizou R$ ${economia.toFixed(2)} em combustível.`,
+      "success",
+      "logistica"
+    );
+
     setRotas((prev) =>
       prev.map((r) => {
         if (r.id === rotaId) {
-          // Reorder stops for optimization (e.g. from furthest to closest, or optimized sequence)
-          // Simulating: [A, B, C] -> [C, B, A] which might represent a short path
-          const paradasOtimizadas = [...r.paradas].reverse();
-          const kmOriginal = r.distanciaKm;
-          const novoKm = Math.round(kmOriginal * 0.85); // 15% reduction
-          const custoOriginal = r.custoCombustivel;
-          const novoCusto = Math.round(custoOriginal * 0.82); // 18% reduction
-          const economia = custoOriginal - novoCusto;
-
-          addNotification(
-            "Trajeto Otimizado",
-            `A rota "${r.nome}" foi reordenada. Reduziu ${kmOriginal - novoKm}km e economizou R$ ${economia.toFixed(2)} em combustível.`,
-            "success",
-            "logistica"
-          );
-
           return {
             ...r,
             paradas: paradasOtimizadas,
@@ -417,6 +415,46 @@ export function useLogistica() {
     }, 100);
   };
 
+  const adicionarRota = (novaRota: Omit<RotaLogistica, "id" | "otimizada">) => {
+    const id = `ROT-${String(rotas.length + 1).padStart(3, "0")}`;
+    const rotaCompleta: RotaLogistica = {
+      ...novaRota,
+      id,
+      otimizada: false,
+    };
+
+    setRotas((prev) => [...prev, rotaCompleta]);
+    addNotification(
+      "Nova Rota",
+      `A rota "${rotaCompleta.nome}" foi cadastrada com sucesso.`,
+      "success",
+      "logistica"
+    );
+
+    setTimeout(() => {
+      window.dispatchEvent(new Event("storage"));
+    }, 100);
+    return true;
+  };
+
+  const removerRota = (rotaId: string) => {
+    const rota = rotas.find(r => r.id === rotaId);
+    if (!rota) return false;
+
+    setRotas(prev => prev.filter(r => r.id !== rotaId));
+    addNotification(
+      "Rota Removida",
+      `A rota "${rota.nome}" foi removida com sucesso.`,
+      "info",
+      "logistica"
+    );
+
+    setTimeout(() => {
+      window.dispatchEvent(new Event("storage"));
+    }, 100);
+    return true;
+  };
+
   return {
     cargas,
     rotas,
@@ -425,5 +463,7 @@ export function useLogistica() {
     atualizarCargaStatus,
     simularMovimentoCargo,
     otimizarRota,
+    adicionarRota,
+    removerRota,
   };
 }

@@ -337,7 +337,7 @@ export function GerenciadorContratos() {
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <h3 className="font-bold text-sm flex items-center gap-2">
                 <PenTool className="h-4.5 w-4.5 text-primary" />
-                Assinatura Digital Criptográfica (R044)
+                Assinatura Digital Criptográfica
               </h3>
               <button
                 onClick={() => {

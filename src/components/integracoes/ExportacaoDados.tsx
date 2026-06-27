@@ -150,7 +150,7 @@ export function ExportacaoDados() {
             </div>
             <div>
               <h3 className="font-semibold text-sm">Rotinas de Exportação Ativas</h3>
-              <p className="text-xs text-muted-foreground">Configurações e extrações periódicas programadas (R084)</p>
+              <p className="text-xs text-muted-foreground">Configurações e extrações periódicas programadas</p>
             </div>
           </div>
 

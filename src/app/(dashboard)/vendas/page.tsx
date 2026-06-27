@@ -57,7 +57,7 @@ export default function VendasPage() {
           )}
         >
           <Tag className="h-4 w-4" />
-          Tabelas de Preços (R089)
+          Tabelas de Preços
         </button>
       </div>
 

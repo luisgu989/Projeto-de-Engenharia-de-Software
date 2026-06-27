@@ -51,13 +51,13 @@ export function TabelaEstoque({
   // Confirm delete modal state
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  // Stock Inbound modal states (R015)
+  // Stock Inbound modal states
   const [inboundOpen, setInboundOpen] = useState(false);
   const [inboundQtd, setInboundQtd] = useState<number | "">("");
   const [inboundMotivo, setInboundMotivo] = useState("");
   const [inboundError, setInboundError] = useState<string | null>(null);
 
-  // Filters state (R007)
+  // Filters state
   const [statusFiltro, setStatusFiltro] = useState<"todos" | "baixo" | "normal">("todos");
   const [categoriaFiltro, setCategoriaFiltro] = useState("todas");
 
@@ -415,7 +415,7 @@ export function TabelaEstoque({
         )}
       </div>
 
-      {/* Advanced Filter Toolbar (R007) */}
+      {/* Advanced Filter Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         {/* Status Tabs */}
         <div className="flex items-center gap-1.5 bg-accent/20 p-1 rounded-lg self-start">
@@ -617,7 +617,7 @@ export function TabelaEstoque({
                           {/* Ações restritas a quem pode Gerenciar Estoque */}
                           {user.permissions.gerenciarEstoque && (
                             <>
-                              {/* Editar Cadastro Completo (R012) */}
+                              {/* Editar Cadastro Completo */}
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -638,7 +638,7 @@ export function TabelaEstoque({
                                 <Edit2 className="h-4 w-4" />
                               </Button>
 
-                              {/* Excluir Produto (R013) */}
+                              {/* Excluir Produto */}
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -889,7 +889,7 @@ export function TabelaEstoque({
         </div>
       )}
 
-      {/* Modal: Confirm deletion (R013) */}
+      {/* Modal: Confirm deletion */}
       {deleteOpen && selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">

@@ -79,7 +79,7 @@ export default function MonitoramentoPage() {
           )}
         >
           <Server className="h-4 w-4" />
-          Servidores em Tempo Real (R061)
+          Servidores em Tempo Real
         </button>
         <button
           onClick={() => setActiveTab("auditoria")}
@@ -91,7 +91,7 @@ export default function MonitoramentoPage() {
           )}
         >
           <ShieldAlert className="h-4 w-4" />
-          Auditoria de Segurança (R085)
+          Auditoria de Segurança
         </button>
         <button
           onClick={() => setActiveTab("bloqueios")}
@@ -103,7 +103,7 @@ export default function MonitoramentoPage() {
           )}
         >
           <Terminal className="h-4 w-4" />
-          Tentativas de Acesso (R086)
+          Tentativas de Acesso
         </button>
       </div>
 
@@ -300,7 +300,7 @@ export default function MonitoramentoPage() {
         </div>
       )}
 
-      {/* Tab 2: Servers Real Time Telemetry (R061) */}
+      {/* Tab 2: Servers Real Time Telemetry */}
       {activeTab === "servidores" && (
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">

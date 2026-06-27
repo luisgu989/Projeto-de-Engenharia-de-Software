@@ -95,7 +95,7 @@ export function DeteccaoAcessos() {
               </div>
               <div>
                 <h3 className="font-semibold text-sm">Controle de IP e Endereços Bloqueados</h3>
-                <p className="text-xs text-muted-foreground">Terminais em quarentena ou bloqueio definitivo por força bruta (R086)</p>
+                <p className="text-xs text-muted-foreground">Terminais em quarentena ou bloqueio definitivo por força bruta</p>
               </div>
             </div>
           </div>

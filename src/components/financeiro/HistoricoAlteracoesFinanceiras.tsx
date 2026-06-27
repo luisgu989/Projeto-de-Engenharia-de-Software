@@ -66,7 +66,7 @@ export function HistoricoAlteracoesFinanceiras() {
               <Terminal className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm">Histórico de Alterações Contábeis (R090)</h3>
+              <h3 className="font-semibold text-sm">Histórico de Alterações Contábeis</h3>
               <p className="text-xs text-muted-foreground">Monitoramento auditável de modificações de valores e status de lançamentos no ERP</p>
             </div>
           </div>

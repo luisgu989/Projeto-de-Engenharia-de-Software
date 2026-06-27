@@ -12,7 +12,7 @@ export default function SolicitacoesPage() {
         <div className="absolute top-0 right-0 h-40 w-40 bg-primary/5 rounded-full blur-3xl" />
         <div className="space-y-1 relative z-10 flex-1">
           <h2 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-primary" /> Solicitações Administrativas Internas (R087)
+            <ClipboardList className="h-6 w-6 text-primary" /> Solicitações Administrativas Internas
           </h2>
           <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
             Gerencie solicitações administrativas entre setores da organização. Registre novos pedidos, encaminhe para aprovadores e consulte o histórico do fluxo operacional.

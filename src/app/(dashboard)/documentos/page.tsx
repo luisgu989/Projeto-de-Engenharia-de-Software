@@ -373,7 +373,7 @@ export default function DocumentosPage() {
                 </div>
               )}
 
-              {/* Version History Timeline (R070) */}
+              {/* Version History Timeline */}
               <div className="space-y-3 pt-2">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
                   <History className="h-4 w-4 text-primary" /> Histórico de Versões
@@ -412,7 +412,7 @@ export default function DocumentosPage() {
                           <span>{formatDate(v.dataAlteracao)}</span>
                         </div>
 
-                        {/* Restore actions for previous versions (R070) */}
+                        {/* Restore actions for previous versions */}
                         {!v.ativa && (
                           <button
                             onClick={() => handleRestaurar(v.id, v.numeroVersao)}
@@ -427,7 +427,7 @@ export default function DocumentosPage() {
                 </div>
               </div>
 
-              {/* Document Modifications Logs (R069) */}
+              {/* Document Modifications Logs */}
               <div className="space-y-2 pt-2 border-t border-border/60">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
                   <GitCommit className="h-4 w-4 text-primary" /> Logs de Auditoria
