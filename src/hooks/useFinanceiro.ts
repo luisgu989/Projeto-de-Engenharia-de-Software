@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export type StatusLancamento = "pago" | "pendente" | "vencido";
 export type TipoLancamento = "receber" | "pagar";
@@ -83,11 +83,39 @@ export function useFinanceiro() {
   const [lancamentos, setLancamentos] = useState<Lancamento[]>(mockLancamentos);
   const [busca, setBusca] = useState("");
   const [filtroTipo, setFiltroTipo] = useState<TipoLancamento | "todos">("todos");
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Carregar do localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("erp_lancamentos_financeiros");
+    if (saved) {
+      try {
+        setLancamentos(JSON.parse(saved));
+      } catch (e) {
+        console.error("Erro ao carregar lancamentos:", e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Salvar no localStorage
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("erp_lancamentos_financeiros", JSON.stringify(lancamentos));
+    }
+  }, [lancamentos, isLoaded]);
 
   const adicionarLancamento = (novoLancamento: Omit<Lancamento, "id">) => {
     const idGerado = `FIN-${String(lancamentos.length + 1).padStart(3, "0")}`;
     const lancamentoCompleto: Lancamento = { ...novoLancamento, id: idGerado };
     setLancamentos((prev) => [lancamentoCompleto, ...prev]);
+    return true;
+  };
+
+  const quitarLancamento = (id: string) => {
+    setLancamentos((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, status: "pago" } : l))
+    );
   };
 
   const lancamentosFiltrados = lancamentos.filter((l) => {
@@ -119,11 +147,13 @@ export function useFinanceiro() {
 
   return {
     lancamentos: lancamentosFiltrados,
+    todosLancamentos: lancamentos, // expor todos para filtros internos
     busca,
     setBusca,
     filtroTipo,
     setFiltroTipo,
     adicionarLancamento,
+    quitarLancamento,
     totalReceber,
     totalPagar,
     saldoProjetado,

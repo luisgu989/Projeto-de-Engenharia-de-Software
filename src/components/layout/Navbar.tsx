@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Bell, Search, Sun, Moon, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck } from "lucide-react";
+import { Menu, Bell, Search, Sun, Moon, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
@@ -17,7 +17,7 @@ export interface NavbarProps {
 
 export function Navbar({ setMobileOpen, collapsed: _collapsed }: NavbarProps) {
   const pathname = usePathname();
-  const { user, switchProfile, availableProfiles } = useAuth();
+  const { user, switchProfile, availableProfiles, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { filteredNotifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
   const [notifsOpen, setNotifsOpen] = React.useState(false);
@@ -251,6 +251,17 @@ export function Navbar({ setMobileOpen, collapsed: _collapsed }: NavbarProps) {
             {user.role === "admin" ? "Admin" : "Colaborador"}
           </span>
         </div>
+
+        {/* Logout Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={logout}
+          title="Sair do Sistema"
+          className="hover:bg-destructive/10 text-muted-foreground hover:text-destructive shrink-0 no-print"
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
       </div>
     </header>
   );

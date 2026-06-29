@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { LogsProvider } from "@/contexts/logs-context";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { NotificationsProvider } from "@/contexts/notifications-context";
+import { AuthGuard } from "./AuthGuard";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -21,7 +22,9 @@ export function Providers({ children }: ProvidersProps) {
       <AuthProvider>
         <NotificationsProvider>
           <LogsProvider>
-            <TooltipProvider delay={300}>{children}</TooltipProvider>
+            <TooltipProvider delay={300}>
+              <AuthGuard>{children}</AuthGuard>
+            </TooltipProvider>
           </LogsProvider>
         </NotificationsProvider>
       </AuthProvider>

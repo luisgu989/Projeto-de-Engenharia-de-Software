@@ -49,6 +49,12 @@ export function GerenciadorAtivos() {
   // Filtros/Busca
   const [busca, setBusca] = useState("");
 
+  // Obter endereços já cadastrados para autocompletar
+  const localizacoesExistentes = React.useMemo(() => {
+    if (!ativos) return [];
+    return Array.from(new Set(ativos.map((a) => a.localizacaoAtual).filter(Boolean)));
+  }, [ativos]);
+
   const handleCadastrar = (e: React.FormEvent) => {
     e.preventDefault();
     if (!codigoPatrimonial || !descricao || !localizacaoAtual) {
@@ -357,8 +363,14 @@ export function GerenciadorAtivos() {
                     placeholder="Ex: Galpão A - Ala Norte"
                     value={localizacaoAtual}
                     onChange={(e) => setLocalizacaoAtual(e.target.value)}
+                    list="ativos-localizacoes-list"
                     className="h-9 text-xs"
                   />
+                  <datalist id="ativos-localizacoes-list">
+                    {localizacoesExistentes.map((loc) => (
+                      <option key={loc} value={loc} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
@@ -461,8 +473,14 @@ export function GerenciadorAtivos() {
                     required
                     value={editLocalizacao}
                     onChange={(e) => setEditLocalizacao(e.target.value)}
+                    list="ativos-localizacoes-list-edit"
                     className="h-9 text-xs"
                   />
+                  <datalist id="ativos-localizacoes-list-edit">
+                    {localizacoesExistentes.map((loc) => (
+                      <option key={loc} value={loc} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 

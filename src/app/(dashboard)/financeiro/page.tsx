@@ -9,8 +9,11 @@ import { IntegracoesFinanceiras } from "@/components/financeiro/IntegracoesFinan
 import { AutomacaoFinanceira } from "@/components/financeiro/AutomacaoFinanceira";
 import { CentrosCusto } from "@/components/financeiro/CentrosCusto";
 import { HistoricoAlteracoesFinanceiras } from "@/components/financeiro/HistoricoAlteracoesFinanceiras";
-import { DollarSign, FileText, Link2, Cpu, Briefcase, History } from "lucide-react";
+import { DollarSign, FileText, Link2, Cpu, Briefcase, History, TrendingDown, TrendingUp, Percent } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ContasAPagar } from "@/components/financeiro/ContasAPagar";
+import { ContasAReceber } from "@/components/financeiro/ContasAReceber";
+import { GestaoImpostos } from "@/components/financeiro/GestaoImpostos";
 
 export default function FinanceiroPage() {
   const {
@@ -26,7 +29,9 @@ export default function FinanceiroPage() {
     totalVencidos,
   } = useFinanceiro();
 
-  const [abaAtiva, setAbaAtiva] = useState<"caixa" | "fiscal" | "integracoes" | "automacao" | "centroscusto" | "historicoalteracoes">("caixa");
+  const [abaAtiva, setAbaAtiva] = useState<
+    "caixa" | "pagar" | "receber" | "impostos" | "fiscal" | "integracoes" | "automacao" | "centroscusto" | "historicoalteracoes"
+  >("caixa");
 
   return (
     <div className="space-y-6">
@@ -51,6 +56,42 @@ export default function FinanceiroPage() {
         >
           <DollarSign className="h-4 w-4" />
           Fluxo de Caixa
+        </button>
+        <button
+          onClick={() => setAbaAtiva("pagar")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "pagar"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <TrendingDown className="h-4 w-4" />
+          Contas a Pagar
+        </button>
+        <button
+          onClick={() => setAbaAtiva("receber")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "receber"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <TrendingUp className="h-4 w-4" />
+          Contas a Receber
+        </button>
+        <button
+          onClick={() => setAbaAtiva("impostos")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap",
+            abaAtiva === "impostos"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Percent className="h-4 w-4" />
+          Gestão de Impostos
         </button>
         <button
           onClick={() => setAbaAtiva("fiscal")}
@@ -138,6 +179,12 @@ export default function FinanceiroPage() {
           </div>
         </>
       )}
+
+      {abaAtiva === "pagar" && <ContasAPagar />}
+
+      {abaAtiva === "receber" && <ContasAReceber />}
+
+      {abaAtiva === "impostos" && <GestaoImpostos />}
 
       {abaAtiva === "fiscal" && <FaturamentoFiscal />}
 

@@ -22,6 +22,9 @@ export interface UserProfile {
 
 interface AuthContextType {
   user: UserProfile;
+  isLoggedIn: boolean;
+  login: (email: string, password: string) => { success: boolean; message?: string };
+  logout: () => void;
   setRole: (role: "admin" | "employee") => void;
   updateUser: (name: string, email: string) => void;
   switchProfile: (email: string) => void;
@@ -92,6 +95,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const [availableProfiles, setAvailableProfiles] = useState(staticProfiles);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Sync available profiles with localStorage employees
   useEffect(() => {
@@ -148,8 +153,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return defaultPermissionsEmployee(cargo);
   };
 
-  // Load active simulated user from localStorage
+  // Load active simulated user and login status from localStorage
   useEffect(() => {
+    const logged = localStorage.getItem("erp_logged_in") === "true";
+    setIsLoggedIn(logged);
+
     const savedEmail = localStorage.getItem("erp_simulated_email") || "admin@erppro.com";
     const profile = availableProfiles.find((p) => p.email === savedEmail) || availableProfiles[0];
     
@@ -162,7 +170,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cargo: profile.cargo,
       permissions,
     });
+    setIsInitialized(true);
   }, [availableProfiles]);
+
+  const login = (email: string, password: string): { success: boolean; message?: string } => {
+    const profile = availableProfiles.find((p) => p.email.toLowerCase() === email.trim().toLowerCase());
+    if (!profile) {
+      return { success: false, message: "E-mail de colaborador não cadastrado no sistema." };
+    }
+
+    const expectedPassword = profile.email.toLowerCase() === "admin@erppro.com" ? "admin123" : "senha123";
+    if (password !== expectedPassword) {
+      return { success: false, message: "Senha inválida para este colaborador. Tente novamente." };
+    }
+
+    localStorage.setItem("erp_logged_in", "true");
+    localStorage.setItem("erp_simulated_email", profile.email);
+    localStorage.setItem("erp_simulated_role", profile.role);
+    localStorage.setItem("erp_simulated_name", profile.name);
+
+    const permissions = getUserPermissions(profile.email, profile.role, profile.cargo);
+    setUser({
+      id: profile.id,
+      name: profile.name,
+      email: profile.email,
+      role: profile.role,
+      cargo: profile.cargo,
+      permissions,
+    });
+    setIsLoggedIn(true);
+    return { success: true };
+  };
+
+  const logout = () => {
+    localStorage.removeItem("erp_logged_in");
+    setIsLoggedIn(false);
+  };
 
   const switchProfile = (email: string) => {
     const profile = availableProfiles.find((p) => p.email === email) || availableProfiles[0];
@@ -180,7 +223,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       permissions,
     });
 
-    // Fire storage event to notify other components
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("storage"));
     }
@@ -205,7 +247,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     localStorage.setItem("erp_custom_permissions", JSON.stringify(customDict));
 
-    // If updating currently logged in user, refresh their state
     if (user.email === email) {
       setUser((prev) => ({
         ...prev,
@@ -246,10 +287,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser((prev) => ({ ...prev, name, email }));
   };
 
+  if (!isInitialized) {
+    return null; // prevent hydration mismatch
+  }
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        isLoggedIn,
+        login,
+        logout,
         setRole,
         updateUser,
         switchProfile,

@@ -17,6 +17,9 @@ import {
   RefreshCw,
   GitCommit,
   CheckCircle2,
+  UploadCloud,
+  Trash2,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -47,6 +50,42 @@ export default function DocumentosPage() {
   const [docSetor, setDocSetor] = useState("TI / Tecnologia");
   const [docStatus, setDocStatus] = useState<"Em Rascunho" | "Em Revisão" | "Aprovado">("Em Rascunho");
 
+  // State for PDF Upload in Register Modal (Requirement R069 follow-up)
+  const [abaModal, setAbaModal] = useState<"dados" | "arquivo">("dados");
+  const [pdfFile, setPdfFile] = useState<{ name: string; size: string } | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handlePdfSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      alert("Por favor, selecione apenas arquivos PDF.");
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsUploading(false);
+          const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+          setPdfFile({ name: file.name, size: sizeMB });
+          // Autofill document name if empty or default
+          if (!docNome.trim()) {
+            setDocNome(file.name.replace(/\.[^/.]+$/, ""));
+          }
+          return 100;
+        }
+        return prev + 25;
+      });
+    }, 120);
+  };
+
   // State for Version Modal
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [versionDesc, setVersionDesc] = useState("");
@@ -64,6 +103,10 @@ export default function DocumentosPage() {
     setDocSetor(setoresValidados[0]);
     setDocStatus("Em Rascunho");
     setModalMode("cadastrar");
+    setAbaModal("dados");
+    setPdfFile(null);
+    setIsUploading(false);
+    setUploadProgress(0);
     setIsModalOpen(true);
   };
 
@@ -469,71 +512,160 @@ export default function DocumentosPage() {
               </button>
             </div>
 
+            {modalMode === "cadastrar" && (
+              <div className="flex border-b border-border bg-accent/10">
+                <button
+                  type="button"
+                  onClick={() => setAbaModal("dados")}
+                  className={cn(
+                    "flex-1 py-2.5 text-xs font-bold text-center border-b-2 cursor-pointer transition-all",
+                    abaModal === "dados" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Informações
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAbaModal("arquivo")}
+                  className={cn(
+                    "flex-1 py-2.5 text-xs font-bold text-center border-b-2 cursor-pointer transition-all",
+                    abaModal === "arquivo" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Subir PDF
+                </button>
+              </div>
+            )}
+
             <form onSubmit={handleSalvar} className="p-6 space-y-4">
               {errorMsg && (
-                <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-xs font-semibold flex items-center gap-2">
+                <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
-              {/* Name (Editable) */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-muted-foreground uppercase">Nome do Documento</label>
-                <input
-                  type="text"
-                  value={docNome}
-                  onChange={(e) => setDocNome(e.target.value)}
-                  className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-medium transition-all text-foreground"
-                  placeholder="Ex: Política de Segurança de TI"
-                />
-              </div>
+              {modalMode === "cadastrar" && abaModal === "arquivo" ? (
+                /* PDF Upload Area (Requirement R069 follow-up) */
+                <div className="space-y-4 py-2 animate-in fade-in duration-200">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Arquivo do Documento (PDF)</label>
+                    
+                    {!pdfFile ? (
+                      <div className="border border-dashed border-border rounded-xl p-6 bg-accent/5 hover:bg-accent/15 transition-all text-center flex flex-col items-center justify-center relative min-h-[140px]">
+                        <UploadCloud className="h-8 w-8 text-muted-foreground/80 mb-1.5" />
+                        <p className="text-xs font-bold">Arraste ou selecione o PDF do documento</p>
+                        <p className="text-[9px] text-muted-foreground mt-0.5">Apenas arquivos no formato .pdf</p>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          onChange={handlePdfSelection}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          disabled={isUploading}
+                        />
+                        
+                        {isUploading && (
+                          <div className="absolute inset-0 bg-background/95 flex flex-col items-center justify-center p-3 rounded-xl">
+                            <Loader2 className="h-5 w-5 animate-spin text-primary mb-1.5" />
+                            <div className="w-full bg-accent rounded-full h-1.5 max-w-[120px] overflow-hidden">
+                              <div className="bg-primary h-1.5 transition-all duration-150" style={{ width: `${uploadProgress}%` }} />
+                            </div>
+                            <span className="text-[9px] text-muted-foreground mt-1">Carregando arquivo...</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between p-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.02] text-xs">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <FileText className="h-8 w-8 text-red-500 shrink-0" />
+                          <div className="min-w-0 leading-tight">
+                            <p className="font-bold text-foreground truncate max-w-[180px]">{pdfFile.name}</p>
+                            <p className="text-[9px] text-muted-foreground">{pdfFile.size} • PDF Carregado</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => { setPdfFile(null); }}
+                          className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
+                          title="Remover arquivo"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-3 bg-accent/20 border border-border/40 rounded-lg text-[10px] text-muted-foreground leading-normal">
+                    * Ao selecionar um PDF, o nome do arquivo será sugerido como o nome do documento. Você pode ajustá-lo a qualquer momento na aba <strong>Informações</strong>.
+                  </div>
+                </div>
+              ) : (
+                /* Standard Information Form */
+                <>
+                  {/* Name (Editable) */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-muted-foreground uppercase">Nome do Documento</label>
+                    <input
+                      type="text"
+                      value={docNome}
+                      onChange={(e) => setDocNome(e.target.value)}
+                      className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-medium transition-all text-foreground"
+                      placeholder="Ex: Política de Segurança de TI"
+                    />
+                    {pdfFile && (
+                      <p className="text-[9.5px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 mt-1">
+                        <ShieldCheck className="h-3.5 w-3.5" /> PDF Vinculado: {pdfFile.name}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Category (Editable) */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-muted-foreground uppercase">Categoria</label>
-                <select
-                  value={docCategoria}
-                  onChange={(e) => setDocCategoria(e.target.value)}
-                  className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-semibold transition-all text-foreground"
-                >
-                  {categoriasValidadas.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {/* Category (Editable) */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-muted-foreground uppercase">Categoria</label>
+                    <select
+                      value={docCategoria}
+                      onChange={(e) => setDocCategoria(e.target.value)}
+                      className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-semibold transition-all text-foreground cursor-pointer"
+                    >
+                      {categoriasValidadas.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Sector (Editable) */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-muted-foreground uppercase">Setor Destinado</label>
-                <select
-                  value={docSetor}
-                  onChange={(e) => setDocSetor(e.target.value)}
-                  className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-semibold transition-all text-foreground"
-                >
-                  {setoresValidados.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {/* Sector (Editable) */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-muted-foreground uppercase">Setor Destinado</label>
+                    <select
+                      value={docSetor}
+                      onChange={(e) => setDocSetor(e.target.value)}
+                      className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-semibold transition-all text-foreground cursor-pointer"
+                    >
+                      {setoresValidados.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Status (Editable, recommended to lock editing after approval) */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-muted-foreground uppercase">Status</label>
-                <select
-                  value={docStatus}
-                  onChange={(e) => setDocStatus(e.target.value as any)}
-                  className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-semibold transition-all text-foreground"
-                >
-                  <option value="Em Rascunho">Em Rascunho</option>
-                  <option value="Em Revisão">Em Revisão</option>
-                  <option value="Aprovado">Aprovado</option>
-                </select>
-              </div>
+                  {/* Status */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-muted-foreground uppercase">Status</label>
+                    <select
+                      value={docStatus}
+                      onChange={(e) => setDocStatus(e.target.value as any)}
+                      className="w-full bg-accent/20 hover:bg-accent/40 focus:bg-background border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-xs font-semibold transition-all text-foreground cursor-pointer"
+                    >
+                      <option value="Em Rascunho">Em Rascunho</option>
+                      <option value="Em Revisão">Em Revisão</option>
+                      <option value="Aprovado">Aprovado</option>
+                    </select>
+                  </div>
+                </>
+              )}
 
               <div className="pt-2 border-t border-border flex justify-end gap-2">
                 <button

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Venda, ProdutoVenda } from "@/hooks/useVendas";
 import { useEstoque } from "@/hooks/useEstoque";
+import { useClientes } from "@/hooks/useClientes";
 import { Search, Plus, Calendar, CreditCard, ShoppingBag, User, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,11 @@ export function TabelaVendas({
   const [metodoPagamento, setMetodoPagamento] = useState("Pix");
 
   const { estoque } = useEstoque();
+  const { clientes } = useClientes();
+  const clientesAtivos = React.useMemo(() => {
+    if (!clientes) return [];
+    return clientes.filter((c) => c.status === "ativo").map((c) => c.nome);
+  }, [clientes]);
   const produtosAtivos = estoque.filter((p) => p.status === "ativo");
   const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoVenda[]>([]);
   const [erroEstoque, setErroEstoque] = useState<string | null>(null);
@@ -260,8 +266,14 @@ export function TabelaVendas({
                   placeholder="Nome do cliente"
                   value={cliente}
                   onChange={(e) => setCliente(e.target.value)}
+                  list="vendas-clientes-sugestoes"
                   className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
                 />
+                <datalist id="vendas-clientes-sugestoes">
+                  {clientesAtivos.map((nome) => (
+                    <option key={nome} value={nome} />
+                  ))}
+                </datalist>
               </div>
 
               <div className="space-y-3 border border-border p-3 rounded-md bg-accent/10">
