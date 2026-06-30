@@ -100,13 +100,13 @@ export function ConfigSessoes() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">ID da Sessão (ERP)</th>
-                <th className="p-4">Usuário Vinculado</th>
-                <th className="p-4">Origem / Dispositivo</th>
-                <th className="p-4">Início da Conexão</th>
-                <th className="p-4">Fim da Conexão</th>
+                <th className="p-4 text-center">ID da Sessão (ERP)</th>
+                <th className="p-4 text-left">Usuário Vinculado</th>
+                <th className="p-4 text-center">Origem / Dispositivo</th>
+                <th className="p-4 text-center">Início da Conexão</th>
+                <th className="p-4 text-center">Fim da Conexão</th>
                 <th className="p-4 text-center">Status</th>
-                <th className="p-4 text-right">Ação</th>
+                <th className="p-4 text-center">Ação</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
@@ -119,14 +119,14 @@ export function ConfigSessoes() {
               ) : (
                 filteredSessoes.map((sessao) => (
                   <tr key={sessao.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-4 font-mono font-bold text-foreground">{sessao.id}</td>
-                    <td className="p-4">
+                    <td className="p-4 font-mono font-bold text-foreground text-center">{sessao.id}</td>
+                    <td className="p-4 text-left">
                       <div className="font-semibold text-foreground">{sessao.usuario}</div>
                       <div className="text-[10px] text-muted-foreground font-mono">{sessao.email}</div>
                     </td>
-                    <td className="p-4 text-muted-foreground">{sessao.dispositivo}</td>
-                    <td className="p-4 font-mono text-muted-foreground">{formatDate(sessao.dataConexao)}</td>
-                    <td className="p-4 font-mono text-muted-foreground">{formatDate(sessao.dataEncerramento)}</td>
+                    <td className="p-4 text-muted-foreground text-center">{sessao.dispositivo}</td>
+                    <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(sessao.dataConexao)}</td>
+                    <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(sessao.dataEncerramento)}</td>
                     <td className="p-4 text-center">
                       <span className={cn(
                         "inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold border",
@@ -137,7 +137,7 @@ export function ConfigSessoes() {
                         {sessao.status}
                       </span>
                     </td>
-                    <td className="p-4 text-right">
+                    <td className="p-4 text-center">
                       {sessao.status === "Ativa" ? (
                         <button
                           onClick={() => {
@@ -177,10 +177,10 @@ export function ConfigSessoes() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">timestamp</th>
-                <th className="p-4">Usuário</th>
-                <th className="p-4">Evento de Acesso</th>
-                <th className="p-4">Dispositivo</th>
+                <th className="p-4 text-center">timestamp</th>
+                <th className="p-4 text-left">Usuário</th>
+                <th className="p-4 text-center">Evento de Acesso</th>
+                <th className="p-4 text-center">Dispositivo</th>
                 <th className="p-4 text-center">Método MFA</th>
                 <th className="p-4 text-center">Validação</th>
               </tr>
@@ -195,12 +195,12 @@ export function ConfigSessoes() {
               ) : (
                 historicoAcessos.map((log) => (
                   <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-4 font-mono text-muted-foreground">{formatDate(log.timestamp)}</td>
-                    <td className="p-4">
+                    <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(log.timestamp)}</td>
+                    <td className="p-4 text-left">
                       <div className="font-semibold text-foreground">{log.usuario}</div>
                       <div className="text-[10px] text-muted-foreground font-mono">{log.email}</div>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span className={cn(
                         "font-semibold text-xs",
                         log.tipo === "MFA_VALIDACAO" ? "text-primary" : log.tipo === "CONEXAO" ? "text-emerald-500" : "text-destructive"
@@ -212,8 +212,8 @@ export function ConfigSessoes() {
                           : "Encerramento Forçado de Sessão"}
                       </span>
                     </td>
-                    <td className="p-4 text-muted-foreground">{log.dispositivo}</td>
-                    <td className="p-4 text-center font-mono font-bold uppercase text-foreground">{log.metodo}</td>
+                    <td className="p-4 text-muted-foreground text-center">{log.dispositivo}</td>
+                    <td className="p-4 font-mono font-bold uppercase text-foreground text-center">{log.metodo}</td>
                     <td className="p-4 text-center">
                       <span className={cn(
                         "inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border",

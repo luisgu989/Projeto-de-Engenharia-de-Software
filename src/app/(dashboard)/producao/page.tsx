@@ -177,7 +177,7 @@ export default function ProducaoPage() {
         )}
       </div>
 
-      <div className="flex border-b border-border no-print gap-1 overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border no-print gap-1 overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setSecaoAtiva("producao")}
           className={cn(
@@ -455,15 +455,15 @@ export default function ProducaoPage() {
             <table className="w-full text-left border-collapse hidden md:table">
               <thead>
                 <tr className="bg-accent/40 border-b border-border text-xs font-bold text-muted-foreground">
-                  <th className="p-3">Cód OP</th>
-                  <th className="p-3">Produto</th>
-                  <th className="p-3 text-right">Qtd</th>
-                  <th className="p-3">Recurso Alocado</th>
-                  <th className="p-3">Início</th>
-                  <th className="p-3">Previsão</th>
-                  <th className="p-3">Prioridade</th>
-                  <th className="p-3">Status</th>
-                  {isGerente && <th className="p-3 text-right">Ações</th>}
+                  <th className="p-3 text-center">Cód OP</th>
+                  <th className="p-3 text-left">Produto</th>
+                  <th className="p-3 text-center">Qtd</th>
+                  <th className="p-3 text-center">Recurso Alocado</th>
+                  <th className="p-3 text-center">Início</th>
+                  <th className="p-3 text-center">Previsão</th>
+                  <th className="p-3 text-center">Prioridade</th>
+                  <th className="p-3 text-center">Status</th>
+                  {isGerente && <th className="p-3 text-center">Ações</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60 text-xs">
@@ -477,18 +477,18 @@ export default function ProducaoPage() {
                         op.status === "concluido" && "bg-emerald-500/5 dark:bg-emerald-500/[0.02]"
                       )}
                     >
-                      <td className="p-3 font-bold">{op.id}</td>
-                      <td className="p-3 font-medium">
+                      <td className="p-3 font-bold text-center">{op.id}</td>
+                      <td className="p-3 font-medium text-left">
                         <div className="flex flex-col">
                           <span>{op.produtoNome}</span>
                           <span className="text-[10px] text-muted-foreground font-mono">ID: {op.produtoId}</span>
                         </div>
                       </td>
-                      <td className="p-3 text-right font-extrabold">{op.quantidade}</td>
-                      <td className="p-3 font-medium text-muted-foreground">{recursoNome}</td>
-                      <td className="p-3 font-medium">{op.dataInicio}</td>
-                      <td className="p-3 font-medium">{op.dataPrevisao}</td>
-                      <td className="p-3">
+                      <td className="p-3 font-extrabold text-center">{op.quantidade}</td>
+                      <td className="p-3 font-medium text-muted-foreground text-center">{recursoNome}</td>
+                      <td className="p-3 font-medium text-center">{op.dataInicio}</td>
+                      <td className="p-3 font-medium text-center">{op.dataPrevisao}</td>
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
@@ -502,7 +502,7 @@ export default function ProducaoPage() {
                           {op.prioridade}
                         </span>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         {isGerente && op.status !== "concluido" ? (
                           <select
                             value={op.status}
@@ -534,7 +534,7 @@ export default function ProducaoPage() {
                         )}
                       </td>
                       {isGerente && (
-                        <td className="p-3 text-right">
+                        <td className="p-3 text-center">
                           <Button
                             variant="ghost"
                             size="icon-xs"

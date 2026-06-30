@@ -154,46 +154,46 @@ export function AuditoriaSeguranca() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/30 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Data / Hora</th>
-                  <th className="p-3">ID Log</th>
-                  <th className="p-3">Evento Técnico</th>
-                  <th className="p-3">Módulo</th>
-                  <th className="p-3">IP Origem</th>
-                  <th className="p-3">Cód. Registro</th>
-                  <th className="p-3">Usuário</th>
-                  <th className="p-3">Nível</th>
+                  <th className="p-3 text-center">Data / Hora</th>
+                  <th className="p-3 text-center">ID Log</th>
+                  <th className="p-3 text-center">Evento Técnico</th>
+                  <th className="p-3 text-center">Módulo</th>
+                  <th className="p-3 text-center">IP Origem</th>
+                  <th className="p-3 text-center">Cód. Registro</th>
+                  <th className="p-3 text-left">Usuário</th>
+                  <th className="p-3 text-center">Nível</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60 font-mono">
                 {filteredLogs.map((log) => {
                   return (
                     <tr key={log.id} className="hover:bg-accent/5 transition-colors">
-                      <td className="p-3 text-muted-foreground text-[11px] whitespace-nowrap">
+                      <td className="p-3 text-muted-foreground text-[11px] whitespace-nowrap text-center">
                         {new Date(log.dataOcorrencia).toLocaleString("pt-BR")}
                       </td>
-                      <td className="p-3 font-semibold text-foreground/70">
+                      <td className="p-3 font-semibold text-foreground/70 text-center">
                         {log.id}
                       </td>
-                      <td className="p-3 text-foreground font-sans font-medium">
+                      <td className="p-3 text-foreground font-sans font-medium text-center">
                         {log.tipoEvento}
                       </td>
-                      <td className="p-3 whitespace-nowrap text-foreground/90 font-sans">
+                      <td className="p-3 whitespace-nowrap text-foreground/90 font-sans text-center">
                         <span className="px-2 py-0.5 rounded border bg-accent text-[10px]">
                           {log.moduloAfetado}
                         </span>
                       </td>
-                      <td className="p-3 text-muted-foreground flex items-center gap-1">
+                      <td className="p-3 text-muted-foreground flex items-center gap-1 text-center">
                         <Globe className="h-3 w-3 text-primary shrink-0" />
                         <span>{log.enderecoAcesso}</span>
                       </td>
-                      <td className="p-3 font-semibold text-primary/80">
+                      <td className="p-3 font-semibold text-primary/80 text-center">
                         {log.codigoRegistro}
                       </td>
-                      <td className="p-3 text-foreground/80 font-sans flex items-center gap-1.5">
+                      <td className="p-3 text-foreground/80 font-sans flex items-center gap-1.5 text-left">
                         <UserCheck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         <span>{log.usuarioResponsavel}</span>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded text-[9px] font-bold uppercase border",

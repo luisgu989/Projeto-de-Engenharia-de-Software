@@ -142,7 +142,7 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#0B0F19] relative overflow-hidden font-sans">
+    <div className="dark min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden font-sans">
       {/* Premium Backdrop Glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gradient-to-br from-cyan-500/10 to-emerald-500/10 rounded-full blur-3xl" />
@@ -151,16 +151,16 @@ export function LoginScreen() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="w-full max-w-md p-2">
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-8 space-y-6 relative overflow-hidden">
+        <div className="bg-card/60 backdrop-blur-xl border border-border rounded-3xl shadow-2xl p-8 space-y-6 relative overflow-hidden">
           {/* Logo Header */}
           <div className="text-center space-y-1.5">
-            <div className="inline-flex items-center justify-center p-2.5 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2">
+            <div className="inline-flex items-center justify-center p-2.5 rounded-2xl bg-primary/10 text-primary border border-primary/20 mb-2">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-black text-white tracking-tight uppercase">ERP PRO</h2>
-            <p className="text-xs text-slate-400 font-medium">Plataforma Avançada de Gestão Operacional</p>
+            <h2 className="text-2xl font-black text-foreground tracking-tight uppercase">ERP PRO</h2>
+            <p className="text-xs text-muted-foreground font-medium">Plataforma Avançada de Gestão Operacional</p>
           </div>
 
           {viewState === "login" && (
@@ -171,12 +171,12 @@ export function LoginScreen() {
                 
                 {matchedProfile ? (
                   <div className="text-center animate-in fade-in duration-300">
-                    <p className="text-sm font-extrabold text-white">{matchedProfile.name}</p>
-                    <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">{matchedProfile.cargo}</p>
+                    <p className="text-sm font-extrabold text-foreground">{matchedProfile.name}</p>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{matchedProfile.cargo}</p>
                   </div>
                 ) : (
                   <div className="text-center">
-                    <p className="text-xs text-slate-400">Identificação do Colaborador</p>
+                    <p className="text-xs text-muted-foreground">Identificação do Colaborador</p>
                   </div>
                 )}
               </div>
@@ -191,9 +191,9 @@ export function LoginScreen() {
                 )}
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">E-mail Corporativo</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">E-mail Corporativo</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
                       required
@@ -203,27 +203,27 @@ export function LoginScreen() {
                         setEmail(e.target.value);
                         setErrorMsg(null);
                       }}
-                      className="pl-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-indigo-500/20 text-xs"
+                      className="pl-10 h-11 bg-background/50 border-input text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 text-xs"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Senha de Acesso</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Senha de Acesso</label>
                     <button
                       type="button"
                       onClick={() => {
                         setErrorMsg(null);
                         setViewState("recover");
                       }}
-                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold transition-all focus:outline-none"
+                      className="text-[10px] text-primary hover:text-primary/80 font-bold transition-all focus:outline-none"
                     >
                       Esqueceu a senha?
                     </button>
                   </div>
                   <div className="relative">
-                    <KeyRound className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                    <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="password"
                       required
@@ -233,7 +233,7 @@ export function LoginScreen() {
                         setPassword(e.target.value);
                         setErrorMsg(null);
                       }}
-                      className="pl-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-indigo-500/20 text-xs"
+                      className="pl-10 h-11 bg-background/50 border-input text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 text-xs"
                     />
                   </div>
                 </div>
@@ -241,7 +241,7 @@ export function LoginScreen() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-11 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer mt-6"
+                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 cursor-pointer mt-6"
                 >
                   {isLoading ? (
                     <>
@@ -258,24 +258,24 @@ export function LoginScreen() {
               </form>
 
               {/* Demo Accounts Panel */}
-              <div className="border-t border-slate-800/80 pt-4 mt-2">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest text-center mb-2.5">
+              <div className="border-t border-border pt-4 mt-2">
+                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-2.5">
                   Atalhos Rápidos de Acesso (Desenvolvimento)
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-[10px]">
                   <button
                     onClick={() => fillCredentials("admin@erppro.com", "admin123")}
-                    className="p-2 border border-slate-800 hover:border-slate-700 bg-slate-950/20 rounded-lg text-slate-300 text-left transition-all hover:bg-slate-950/40"
+                    className="p-2 border border-border hover:border-muted-foreground/30 bg-accent/20 rounded-lg text-muted-foreground text-left transition-all hover:bg-accent/40"
                   >
-                    <p className="font-extrabold text-white">Suporte Admin</p>
-                    <p className="text-[9px] text-slate-500">Pass: admin123</p>
+                    <p className="font-extrabold text-foreground">Suporte Admin</p>
+                    <p className="text-[9px] text-muted-foreground/70">Pass: admin123</p>
                   </button>
                   <button
                     onClick={() => fillCredentials("maria.santos@erppro.com", "senha123")}
-                    className="p-2 border border-slate-800 hover:border-slate-700 bg-slate-950/20 rounded-lg text-slate-300 text-left transition-all hover:bg-slate-950/40"
+                    className="p-2 border border-border hover:border-muted-foreground/30 bg-accent/20 rounded-lg text-muted-foreground text-left transition-all hover:bg-accent/40"
                   >
-                    <p className="font-extrabold text-white">Maria Santos</p>
-                    <p className="text-[9px] text-slate-500">Pass: senha123</p>
+                    <p className="font-extrabold text-foreground">Maria Santos</p>
+                    <p className="text-[9px] text-muted-foreground/70">Pass: senha123</p>
                   </button>
                 </div>
               </div>
@@ -285,24 +285,24 @@ export function LoginScreen() {
           {viewState === "recover" && (
             <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
               <div className="space-y-1 text-center">
-                <h3 className="font-extrabold text-white text-base">Recuperação de Acesso</h3>
-                <p className="text-xs text-slate-400">
+                <h3 className="font-extrabold text-foreground text-base">Recuperação de Acesso</h3>
+                <p className="text-xs text-muted-foreground">
                   Informe o seu e-mail cadastrado. Nós enviaremos um link criptográfico para redefinição da sua senha.
                 </p>
               </div>
 
               <form onSubmit={handleRecoverySubmit} className="space-y-4 pt-2">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">E-mail Cadastrado</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">E-mail Cadastrado</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
                       required
                       placeholder="seu.nome@erppro.com"
                       value={recoveryEmail}
                       onChange={(e) => setRecoveryEmail(e.target.value)}
-                      className="pl-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-indigo-500/20 text-xs"
+                      className="pl-10 h-11 bg-background/50 border-input text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 text-xs"
                     />
                   </div>
                 </div>
@@ -310,7 +310,7 @@ export function LoginScreen() {
                 <Button
                   type="submit"
                   disabled={isRecovering}
-                  className="w-full h-11 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isRecovering ? (
                     <>
@@ -328,7 +328,7 @@ export function LoginScreen() {
                 <button
                   type="button"
                   onClick={() => setViewState("login")}
-                  className="w-full text-center text-xs text-slate-400 hover:text-white font-semibold transition-all pt-2 block"
+                  className="w-full text-center text-xs text-muted-foreground hover:text-foreground font-semibold transition-all pt-2 block"
                 >
                   Voltar ao Login
                 </button>
@@ -345,9 +345,9 @@ export function LoginScreen() {
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-extrabold text-white text-base">E-mail Enviado!</h3>
-                <p className="text-xs text-slate-400 max-w-[280px] mx-auto">
-                  Enviamos instruções detalhadas e o link de recuperação para o e-mail: <strong className="text-white">{recoveryEmail || "colaborador@erppro.com"}</strong>
+                <h3 className="font-extrabold text-foreground text-base">E-mail Enviado!</h3>
+                <p className="text-xs text-muted-foreground max-w-[280px] mx-auto">
+                  Enviamos instruções detalhadas e o link de recuperação para o e-mail: <strong className="text-foreground">{recoveryEmail || "colaborador@erppro.com"}</strong>
                 </p>
               </div>
 
@@ -357,7 +357,7 @@ export function LoginScreen() {
                   setViewState("login");
                   setRecoveryEmail("");
                 }}
-                className="w-full h-10 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all"
+                className="w-full h-10 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-bold text-xs rounded-xl transition-all"
               >
                 Voltar à Tela Principal
               </Button>

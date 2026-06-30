@@ -195,7 +195,7 @@ export default function LogisticaPage() {
         )}
       </div>
 
-      <div className="flex border-b border-border no-print overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border no-print overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setAbaAtiva("cargas")}
           className={cn(
@@ -374,7 +374,7 @@ export default function LogisticaPage() {
                   {/* SVG Canvas Map */}
                   <div className="relative bg-slate-950 rounded-xl overflow-hidden aspect-video max-h-[300px] flex items-center justify-center border border-border/80">
                     {/* Stylized background Grid */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:24px_24px] opacity-20" />
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:24px_24px] opacity-20" />
 
                     <svg
                       viewBox="0 0 400 300"
@@ -384,21 +384,21 @@ export default function LogisticaPage() {
                       <path
                         d={`M ${cityCoords["CD Principal - São Paulo"].x} ${cityCoords["CD Principal - São Paulo"].y} L ${cityCoords["Campinas - SP"].x} ${cityCoords["Campinas - SP"].y}`}
                         fill="none"
-                        stroke="#334155"
+                        className="stroke-border"
                         strokeWidth="3"
                         strokeDasharray="4"
                       />
                       <path
                         d={`M ${cityCoords["CD Principal - São Paulo"].x} ${cityCoords["CD Principal - São Paulo"].y} L ${cityCoords["Rio de Janeiro - RJ"].x} ${cityCoords["Rio de Janeiro - RJ"].y}`}
                         fill="none"
-                        stroke="#334155"
+                        className="stroke-border"
                         strokeWidth="3"
                         strokeDasharray="4"
                       />
                       <path
                         d={`M ${cityCoords["CD Principal - São Paulo"].x} ${cityCoords["CD Principal - São Paulo"].y} L ${cityCoords["Curitiba - PR"].x} ${cityCoords["Curitiba - PR"].y}`}
                         fill="none"
-                        stroke="#334155"
+                        className="stroke-border"
                         strokeWidth="3"
                         strokeDasharray="4"
                       />
@@ -406,15 +406,14 @@ export default function LogisticaPage() {
                       {/* City Pins */}
                       {Object.entries(cityCoords).map(([name, coords]) => (
                         <g key={name} transform={`translate(${coords.x}, ${coords.y})`}>
-                          <circle r="6" fill="#1e293b" stroke="#64748b" strokeWidth="2" />
-                          <circle r="3" fill="#3b82f6" />
+                          <circle r="6" className="fill-card stroke-muted-foreground" strokeWidth="2" />
+                          <circle r="3" className="fill-primary" />
                           <text
                             y="-10"
                             textAnchor="middle"
-                            fill="#94a3b8"
+                            className="fill-muted-foreground select-none pointer-events-none"
                             fontSize="8"
                             fontWeight="bold"
-                            className="select-none pointer-events-none"
                           >
                             {name.split(" - ")[0]}
                           </text>
@@ -429,18 +428,19 @@ export default function LogisticaPage() {
                         >
                           <circle
                             r="12"
-                            fill="#3b82f6"
-                            className="opacity-30 animate-ping"
+                            className="fill-primary opacity-30 animate-ping"
                           />
                           <circle
                             r="8"
-                            fill={selectedCargo.status === "entregue" ? "#10b981" : "#3b82f6"}
-                            stroke="#ffffff"
+                            className={cn(
+                              "stroke-background",
+                              selectedCargo.status === "entregue" ? "fill-emerald-500" : "fill-primary"
+                            )}
                             strokeWidth="1.5"
                           />
                           <path
                             d="M-3-3 L3 3 M3-3 L-3 3"
-                            stroke="#ffffff"
+                            className="stroke-background"
                             strokeWidth="1"
                           />
                         </g>
@@ -562,23 +562,23 @@ export default function LogisticaPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border text-xs font-bold text-muted-foreground">
-                    <th className="p-3">Identificador</th>
-                    <th className="p-3">Nome da Rota</th>
-                    <th className="p-3">Origem</th>
-                    <th className="p-3">Sequência de Paradas</th>
-                    <th className="p-3 text-right">Distância</th>
-                    <th className="p-3 text-right">Combustível</th>
-                    <th className="p-3">Status</th>
-                    {canManage && <th className="p-3 text-right">Ação</th>}
+                    <th className="p-3 text-center">Identificador</th>
+                    <th className="p-3 text-left">Nome da Rota</th>
+                    <th className="p-3 text-center">Origem</th>
+                    <th className="p-3 text-center">Sequência de Paradas</th>
+                    <th className="p-3 text-center">Distância</th>
+                    <th className="p-3 text-center">Combustível</th>
+                    <th className="p-3 text-center">Status</th>
+                    {canManage && <th className="p-3 text-center">Ação</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {rotas.map((r) => (
                     <tr key={r.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3 font-bold">{r.id}</td>
-                      <td className="p-3 font-medium">{r.nome}</td>
-                      <td className="p-3 text-muted-foreground font-medium">{r.origem}</td>
-                      <td className="p-3 font-medium max-w-[280px]">
+                      <td className="p-3 font-bold text-center">{r.id}</td>
+                      <td className="p-3 font-medium text-left">{r.nome}</td>
+                      <td className="p-3 text-muted-foreground font-medium text-center">{r.origem}</td>
+                      <td className="p-3 font-medium max-w-[280px] text-center">
                         <div className="flex flex-wrap items-center gap-1">
                           {r.paradas.map((p, idx) => (
                             <React.Fragment key={idx}>
@@ -592,9 +592,9 @@ export default function LogisticaPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="p-3 text-right font-extrabold">{r.distanciaKm} Km</td>
-                      <td className="p-3 text-right font-extrabold">R$ {r.custoCombustivel.toFixed(2)}</td>
-                      <td className="p-3">
+                      <td className="p-3 font-extrabold text-center">{r.distanciaKm} Km</td>
+                      <td className="p-3 font-extrabold text-center">R$ {r.custoCombustivel.toFixed(2)}</td>
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase flex items-center gap-1 w-fit",
@@ -614,7 +614,7 @@ export default function LogisticaPage() {
                         </span>
                       </td>
                       {canManage && (
-                        <td className="p-3 text-right">
+                        <td className="p-3 text-center">
                           <div className="flex items-center justify-end gap-2">
                             <Button
                               size="xs"

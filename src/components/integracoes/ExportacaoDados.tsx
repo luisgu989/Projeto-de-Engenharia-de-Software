@@ -170,11 +170,11 @@ export function ExportacaoDados() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                    <th className="p-3">Código / Nome</th>
-                    <th className="p-3">Formato</th>
-                    <th className="p-3">Diretório de Destino</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3 text-right">Ações</th>
+                    <th className="p-3 text-left">Código / Nome</th>
+                    <th className="p-3 text-center">Formato</th>
+                    <th className="p-3 text-center">Diretório de Destino</th>
+                    <th className="p-3 text-center">Status</th>
+                    <th className="p-3 text-center">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -184,7 +184,7 @@ export function ExportacaoDados() {
 
                     return (
                       <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                        <td className="p-3">
+                        <td className="p-3 text-left">
                           <div className="flex flex-col space-y-1">
                             <span className="font-semibold text-foreground leading-snug">{item.rotinaProgramada}</span>
                             <span className="text-[9px] font-mono text-muted-foreground">
@@ -192,15 +192,15 @@ export function ExportacaoDados() {
                             </span>
                           </div>
                         </td>
-                        <td className="p-3">
+                        <td className="p-3 text-center">
                           <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border bg-accent text-accent-foreground font-mono">
                             {item.tipoArquivo}
                           </span>
                         </td>
-                        <td className="p-3 text-muted-foreground font-mono text-[10px]">
+                        <td className="p-3 text-muted-foreground font-mono text-[10px] text-center">
                           {item.diretorioDestino}
                         </td>
-                        <td className="p-3">
+                        <td className="p-3 text-center">
                           <span
                             className={cn(
                               "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase",
@@ -214,7 +214,7 @@ export function ExportacaoDados() {
                             {item.status}
                           </span>
                         </td>
-                        <td className="p-3 text-right">
+                        <td className="p-3 text-center">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => handleExecute(item)}
@@ -276,29 +276,29 @@ export function ExportacaoDados() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/20 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                    <th className="p-3">Código</th>
-                    <th className="p-3">Rotina</th>
-                    <th className="p-3">Destino</th>
-                    <th className="p-3">Executado Em</th>
-                    <th className="p-3">Responsável</th>
+                    <th className="p-3 text-center">Código</th>
+                    <th className="p-3 text-center">Rotina</th>
+                    <th className="p-3 text-center">Destino</th>
+                    <th className="p-3 text-center">Executado Em</th>
+                    <th className="p-3 text-left">Responsável</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {historicoExportacoes.map((item) => (
                     <tr key={item.id} className="hover:bg-accent/5 transition-colors">
-                      <td className="p-3 font-mono font-bold text-primary">
+                      <td className="p-3 font-mono font-bold text-primary text-center">
                         {item.codigoRotina}
                       </td>
-                      <td className="p-3 text-foreground font-medium">
+                      <td className="p-3 text-foreground font-medium text-center">
                         {item.rotinaProgramada} ({item.tipoArquivo.toUpperCase()})
                       </td>
-                      <td className="p-3 font-mono text-muted-foreground text-[10px]">
+                      <td className="p-3 font-mono text-muted-foreground text-[10px] text-center">
                         {item.diretorioDestino}
                       </td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 text-muted-foreground text-center">
                         {new Date(item.dataExecucao).toLocaleString("pt-BR")}
                       </td>
-                      <td className="p-3 text-foreground/85">
+                      <td className="p-3 text-foreground/85 text-left">
                         {item.responsavel}
                       </td>
                     </tr>

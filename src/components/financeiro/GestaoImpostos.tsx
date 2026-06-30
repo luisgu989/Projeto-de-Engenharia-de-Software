@@ -299,12 +299,12 @@ export function GestaoImpostos() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-border bg-accent/20 text-muted-foreground font-bold uppercase tracking-wider">
-                  <th className="p-4">Cód. Guia</th>
-                  <th className="p-4">Imposto / Contribuição</th>
-                  <th className="p-4">Cód. Receita</th>
-                  <th className="p-4">Período de Ref.</th>
-                  <th className="p-4">Vencimento</th>
-                  <th className="p-4 text-right">Valor do Tributo</th>
+                  <th className="p-4 text-center">Cód. Guia</th>
+                  <th className="p-4 text-center">Imposto / Contribuição</th>
+                  <th className="p-4 text-center">Cód. Receita</th>
+                  <th className="p-4 text-center">Período de Ref.</th>
+                  <th className="p-4 text-center">Vencimento</th>
+                  <th className="p-4 text-center">Valor do Tributo</th>
                   <th className="p-4 text-center">Status Sefaz</th>
                   <th className="p-4 text-center">Ações</th>
                 </tr>
@@ -314,8 +314,8 @@ export function GestaoImpostos() {
                   const isPendente = imp.status === "pendente";
                   return (
                     <tr key={imp.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-4 font-mono font-bold text-muted-foreground">{imp.id}</td>
-                      <td className="p-4">
+                      <td className="p-4 font-mono font-bold text-muted-foreground text-center">{imp.id}</td>
+                      <td className="p-4 text-right">
                         <div className="flex items-center gap-2">
                           <span className="font-black px-1.5 py-0.5 rounded bg-muted text-foreground border border-border text-[9px] shrink-0 font-mono">
                             {imp.sigla}
@@ -323,10 +323,10 @@ export function GestaoImpostos() {
                           <span className="font-bold text-foreground">{imp.nome}</span>
                         </div>
                       </td>
-                      <td className="p-4 font-mono font-semibold text-foreground/80">{imp.codigoReceita}</td>
-                      <td className="p-4 text-muted-foreground font-semibold">{imp.periodoRef}</td>
-                      <td className="p-4 font-semibold text-muted-foreground">{formatDate(imp.vencimento)}</td>
-                      <td className="p-4 text-right font-black text-foreground">{formatCurrency(imp.valor)}</td>
+                      <td className="p-4 font-mono font-semibold text-foreground/80 text-center">{imp.codigoReceita}</td>
+                      <td className="p-4 text-muted-foreground font-semibold text-center">{imp.periodoRef}</td>
+                      <td className="p-4 font-semibold text-muted-foreground text-center" suppressHydrationWarning>{formatDate(imp.vencimento)}</td>
+                      <td className="p-4 font-black text-foreground text-right">{formatCurrency(imp.valor)}</td>
                       <td className="p-4 text-center">
                         <span className={cn(
                           "px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase border",
@@ -438,7 +438,7 @@ export function GestaoImpostos() {
                   </div>
                   <div className="bg-white p-2">
                     <span className="block font-bold text-slate-500 uppercase text-[7px]">05. Data de Vencimento</span>
-                    <span className="font-bold text-slate-800 text-[10px] font-mono">{formatDate(selectedImpostoGuia.vencimento)}</span>
+                    <span className="font-bold text-slate-800 text-[10px] font-mono" suppressHydrationWarning>{formatDate(selectedImpostoGuia.vencimento)}</span>
                   </div>
                   <div className="bg-white p-2">
                     <span className="block font-bold text-slate-500 uppercase text-[7px]">06. Valor Principal</span>

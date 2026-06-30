@@ -211,12 +211,12 @@ export function GerenciadorContratos() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Código</th>
-                  <th className="p-3">Tipo</th>
-                  <th className="p-3">Empresa Vinculada</th>
-                  <th className="p-3">Vencimento</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">Código</th>
+                  <th className="p-3 text-center">Tipo</th>
+                  <th className="p-3 text-center">Empresa Vinculada</th>
+                  <th className="p-3 text-center">Vencimento</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -227,10 +227,10 @@ export function GerenciadorContratos() {
 
                   return (
                     <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3 font-mono font-semibold">{item.id}</td>
-                      <td className="p-3 font-bold text-foreground capitalize">{item.tipoContrato}</td>
-                      <td className="p-3 font-semibold">{item.empresaVinculada}</td>
-                      <td className="p-3">
+                      <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                      <td className="p-3 font-bold text-foreground capitalize text-center">{item.tipoContrato}</td>
+                      <td className="p-3 font-semibold text-center">{item.empresaVinculada}</td>
+                      <td className="p-3 text-center">
                         <div className="flex items-center gap-1.5">
                           <span className={cn(isSoon ? "text-amber-500 font-bold" : "text-muted-foreground")}>
                             {new Date(item.dataVencimento).toLocaleDateString("pt-BR")}
@@ -242,7 +242,7 @@ export function GerenciadorContratos() {
                           )}
                         </div>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase cursor-pointer inline-flex items-center gap-1",
@@ -260,7 +260,7 @@ export function GerenciadorContratos() {
                           {item.status}
                         </span>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <div className="flex justify-end gap-1.5">
                           {isPendente && (
                             <>
@@ -453,7 +453,7 @@ export function GerenciadorContratos() {
                         <strong>Cláusula 1ª (Objeto):</strong> O presente visa reger o fornecimento de licenças de software, integração e consultoria de negócios conforme os anexos fiscais.
                       </p>
                       <p>
-                        <strong>Cláusula 2ª (Validade):</strong> Este contrato possui vencimento pactuado formalmente para a data de <strong>{new Date(signingContrato.dataVencimento).toLocaleDateString("pt-BR")}</strong>, devendo as obrigações ser concluídas e avaliadas previamente por ambas as partes.
+                        <strong>Cláusula 2ª (Validade):</strong> Este contrato possui vencimento pactuado formalmente para a data de <strong suppressHydrationWarning>{new Date(signingContrato.dataVencimento).toLocaleDateString("pt-BR")}</strong>, devendo as obrigações ser concluídas e avaliadas previamente por ambas as partes.
                       </p>
                       <p className="text-[9px] italic text-slate-400">
                         * Documento eletrônico simulado anexado pelo módulo de upload: {signingContrato.documentoNome}.
@@ -599,7 +599,7 @@ export function GerenciadorContratos() {
                         <strong>Cláusula 1ª (Objeto):</strong> O presente visa reger o fornecimento de licenças de software, integração e consultoria de negócios conforme os anexos fiscais.
                       </p>
                       <p>
-                        <strong>Cláusula 2ª (Validade):</strong> Este contrato possui vencimento pactuado formalmente para a data de <strong>{new Date(viewingSignature.dataVencimento).toLocaleDateString("pt-BR")}</strong>, devendo as obrigações ser concluídas e avaliadas previamente por ambas as partes.
+                        <strong>Cláusula 2ª (Validade):</strong> Este contrato possui vencimento pactuado formalmente para a data de <strong suppressHydrationWarning>{new Date(viewingSignature.dataVencimento).toLocaleDateString("pt-BR")}</strong>, devendo as obrigações ser concluídas e avaliadas previamente por ambas as partes.
                       </p>
                       <p className="text-[9px] italic text-slate-400">
                         * Documento eletrônico assinado digitalmente: {viewingSignature.documentoNome}.

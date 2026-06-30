@@ -185,15 +185,15 @@ export function MetasOrganizacionaisComponent() {
                 </div>
 
                 <div className="flex justify-between items-center text-[11px] text-muted-foreground font-semibold">
-                  <span>Atual: <strong>{m.indicadorVinculado === "Faturamento Mensal" ? `R$ ${m.valorAtual.toLocaleString("pt-BR")}` : `${m.valorAtual} un.`}</strong></span>
-                  <span>Meta: <strong>{m.indicadorVinculado === "Faturamento Mensal" ? `R$ ${m.valorDefinido.toLocaleString("pt-BR")}` : `${m.valorDefinido} un.`}</strong></span>
+                  <span>Atual: <strong suppressHydrationWarning>{m.indicadorVinculado === "Faturamento Mensal" ? `R$ ${m.valorAtual.toLocaleString("pt-BR")}` : `${m.valorAtual} un.`}</strong></span>
+                  <span>Meta: <strong suppressHydrationWarning>{m.indicadorVinculado === "Faturamento Mensal" ? `R$ ${m.valorDefinido.toLocaleString("pt-BR")}` : `${m.valorDefinido} un.`}</strong></span>
                 </div>
               </div>
 
               {/* Auditing Fields / Immutability notification */}
               <div className="pt-3 border-t border-border flex justify-between items-center text-[9px] text-muted-foreground font-bold font-mono">
                 <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> CONTROLE OCULTO</span>
-                <span>{new Date(m.dataCadastro).toLocaleDateString("pt-BR")}</span>
+                <span suppressHydrationWarning>{new Date(m.dataCadastro).toLocaleDateString("pt-BR")}</span>
               </div>
             </div>
           ))

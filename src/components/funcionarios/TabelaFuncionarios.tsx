@@ -197,9 +197,9 @@ export function TabelaFuncionarios({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">ID</th>
-                <th className="p-4">NOME / E-MAIL</th>
-                <th className="p-4">CARGO / DEPARTAMENTO</th>
+                <th className="p-4 text-center">ID</th>
+                <th className="p-4 text-left">NOME / E-MAIL</th>
+                <th className="p-4 text-left">CARGO / DEPARTAMENTO</th>
                 <th className="p-4 text-center">ADMISSÃO</th>
                 <th className="p-4 text-center">STATUS</th>
                 <th className="p-4 text-center">AÇÕES</th>
@@ -215,16 +215,16 @@ export function TabelaFuncionarios({
               ) : (
                 funcionarios.map((func) => (
                   <tr key={func.id} className="hover:bg-accent/20 transition-colors">
-                    <td className="p-4 font-mono font-semibold text-foreground/80">{func.id}</td>
-                    <td className="p-4">
+                    <td className="p-4 font-mono font-semibold text-foreground/80 text-center">{func.id}</td>
+                    <td className="p-4 text-left">
                       <div className="font-medium text-foreground">{func.nome}</div>
                       <div className="text-xs text-muted-foreground font-mono">{func.email}</div>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-left">
                       <div className="font-medium text-foreground">{func.cargo}</div>
                       <div className="text-xs text-muted-foreground">{func.departamento}</div>
                     </td>
-                    <td className="p-4 text-center text-muted-foreground">
+                    <td className="p-4 text-muted-foreground text-center">
                       {formatDate(func.dataAdmissao)}
                     </td>
                     <td className="p-4 text-center">

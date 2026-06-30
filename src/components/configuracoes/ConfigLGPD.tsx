@@ -109,11 +109,11 @@ export function ConfigLGPD() {
                 <div className="pt-2 border-t border-border/50 grid grid-cols-2 gap-2 text-[10px] text-muted-foreground">
                   <div className="space-y-0.5">
                     <span className="font-semibold block uppercase tracking-wider text-[8px]">Data da Concessão</span>
-                    <span className="font-mono text-foreground">{formatDate(cons.dataConcessao)}</span>
+                    <span className="font-mono text-foreground" suppressHydrationWarning>{formatDate(cons.dataConcessao)}</span>
                   </div>
                   <div className="space-y-0.5">
                     <span className="font-semibold block uppercase tracking-wider text-[8px]">Data da Revogação</span>
-                    <span className="font-mono text-foreground">{formatDate(cons.dataRevogacao)}</span>
+                    <span className="font-mono text-foreground" suppressHydrationWarning>{formatDate(cons.dataRevogacao)}</span>
                   </div>
                 </div>
 
@@ -158,12 +158,12 @@ export function ConfigLGPD() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Carimbo de Hora</th>
-                <th className="p-4">Titular dos Dados</th>
-                <th className="p-4">Consent ID</th>
-                <th className="p-4">Categoria / Finalidade</th>
+                <th className="p-4 text-center">Carimbo de Hora</th>
+                <th className="p-4 text-center">Titular dos Dados</th>
+                <th className="p-4 text-center">Consent ID</th>
+                <th className="p-4 text-left">Categoria / Finalidade</th>
                 <th className="p-4 text-center">Transição de Estado</th>
-                <th className="p-4">Operação de Conformidade</th>
+                <th className="p-4 text-center">Operação de Conformidade</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
@@ -176,13 +176,13 @@ export function ConfigLGPD() {
               ) : (
                 historicoAlteracoes.map((log) => (
                   <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-4 font-mono text-muted-foreground">{formatDate(log.timestamp)}</td>
-                    <td className="p-4">
+                    <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(log.timestamp)}</td>
+                    <td className="p-4 text-center">
                       <div className="font-semibold text-foreground">{log.usuario}</div>
                       <div className="text-[10px] text-muted-foreground font-mono">{log.email}</div>
                     </td>
-                    <td className="p-4 font-mono font-bold text-foreground">{log.consentimentoId}</td>
-                    <td className="p-4 text-muted-foreground">{log.tipoConsentimento}</td>
+                    <td className="p-4 font-mono font-bold text-foreground text-center">{log.consentimentoId}</td>
+                    <td className="p-4 text-muted-foreground text-left">{log.tipoConsentimento}</td>
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         <span className="bg-muted px-1.5 py-0.5 rounded text-[9px] uppercase font-bold text-muted-foreground border border-border">
@@ -199,7 +199,7 @@ export function ConfigLGPD() {
                         </span>
                       </div>
                     </td>
-                    <td className="p-4 font-bold text-primary">{log.acao}</td>
+                    <td className="p-4 font-bold text-primary text-center">{log.acao}</td>
                   </tr>
                 ))
               )}

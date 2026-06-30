@@ -34,7 +34,7 @@ export default function VendasPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border no-print overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border no-print overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setAbaAtiva("vendas")}
           className={cn(

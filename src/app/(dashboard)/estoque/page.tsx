@@ -44,7 +44,7 @@ export default function EstoquePage() {
       </div>
 
       {/* Tabs Header Navigation */}
-      <div className="flex border-b border-border no-print">
+      <div className="flex border-b border-border no-print overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setAbaAtiva("inventario")}
           className={cn(

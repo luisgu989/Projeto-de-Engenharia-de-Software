@@ -146,25 +146,25 @@ export function CadastroFornecedores() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Razão Social</th>
-                  <th className="p-3">CNPJ</th>
-                  <th className="p-3">Contato</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Responsável</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">Razão Social</th>
+                  <th className="p-3 text-center">CNPJ</th>
+                  <th className="p-3 text-center">Contato</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-left">Responsável</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {fornecedoresFiltrados.map((item) => (
                   <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-3 font-bold text-foreground">
+                    <td className="p-3 font-bold text-foreground text-center">
                       <div className="flex flex-col">
                         <span>{item.razaoSocial}</span>
                         <span className="text-[9px] text-muted-foreground font-mono">{item.id}</span>
                       </div>
                     </td>
-                    <td className="p-3 font-mono">{item.cnpj}</td>
-                    <td className="p-3">
+                    <td className="p-3 font-mono text-center">{item.cnpj}</td>
+                    <td className="p-3 text-center">
                       <span className="flex items-center gap-1">
                         {item.contato.includes("@") ? (
                           <Mail className="h-3 w-3 text-muted-foreground" />
@@ -174,7 +174,7 @@ export function CadastroFornecedores() {
                         {item.contato}
                       </span>
                     </td>
-                    <td className="p-3">
+                    <td className="p-3 text-center">
                       <select
                         value={item.status}
                         onChange={(e) =>
@@ -191,8 +191,8 @@ export function CadastroFornecedores() {
                         <option value="inativo">Inativo</option>
                       </select>
                     </td>
-                    <td className="p-3 text-muted-foreground">{item.usuarioResponsavel}</td>
-                    <td className="p-3 text-right">
+                    <td className="p-3 text-muted-foreground text-left">{item.usuarioResponsavel}</td>
+                    <td className="p-3 text-center">
                       <button
                         onClick={() => removerFornecedor(item.id)}
                         className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer transition-colors"

@@ -27,7 +27,7 @@ export default function IntegracoesPage() {
         </p>
       </div>
 
-      <div className="flex border-b border-border gap-1 overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border gap-1 overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setActiveTab("versionador")}
           className={cn(

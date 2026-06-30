@@ -50,22 +50,22 @@ export function ConfigFiliais() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID</th>
-                  <th className="p-3">Nome da Unidade</th>
-                  <th className="p-3">Centro de Custo</th>
-                  <th className="p-3">Vinculação (CNPJ)</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">ID</th>
+                  <th className="p-3 text-left">Nome da Unidade</th>
+                  <th className="p-3 text-center">Centro de Custo</th>
+                  <th className="p-3 text-center">Vinculação (CNPJ)</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {filiais.map((item) => (
                   <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-3 font-mono font-semibold">{item.id}</td>
-                    <td className="p-3 font-medium text-foreground">{item.nome}</td>
-                    <td className="p-3 text-muted-foreground font-medium">{item.centroCusto}</td>
-                    <td className="p-3 text-muted-foreground font-mono">{item.vinculacaoOrganizacional}</td>
-                    <td className="p-3">
+                    <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                    <td className="p-3 font-medium text-foreground text-left">{item.nome}</td>
+                    <td className="p-3 text-muted-foreground font-medium text-right">{item.centroCusto}</td>
+                    <td className="p-3 text-muted-foreground font-mono text-center">{item.vinculacaoOrganizacional}</td>
+                    <td className="p-3 text-center">
                       <span
                         className={cn(
                           "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase",
@@ -77,7 +77,7 @@ export function ConfigFiliais() {
                         {item.status}
                       </span>
                     </td>
-                    <td className="p-3 text-right space-x-2">
+                    <td className="p-3 space-x-2 text-center">
                       <Button
                         variant="ghost"
                         size="xs"

@@ -116,12 +116,12 @@ export function ValidacaoImportacao() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                    <th className="p-3">ID / Arquivo</th>
-                    <th className="p-3">Data / Hora</th>
-                    <th className="p-3">Responsável</th>
+                    <th className="p-3 text-center">ID / Arquivo</th>
+                    <th className="p-3 text-center">Data / Hora</th>
+                    <th className="p-3 text-left">Responsável</th>
                     <th className="p-3 text-center">Formato</th>
                     <th className="p-3 text-center">Inconsistências</th>
-                    <th className="p-3">Status</th>
+                    <th className="p-3 text-center">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -129,7 +129,7 @@ export function ValidacaoImportacao() {
                     const isSuccess = item.statusValida === "Aprovado";
                     return (
                       <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                        <td className="p-3">
+                        <td className="p-3 text-center">
                           <div className="flex flex-col space-y-1">
                             <span className="font-semibold text-foreground leading-snug">
                               {item.arquivoImportado}
@@ -139,10 +139,10 @@ export function ValidacaoImportacao() {
                             </span>
                           </div>
                         </td>
-                        <td className="p-3 text-muted-foreground">
+                        <td className="p-3 text-muted-foreground text-center">
                           {new Date(item.dataValida).toLocaleString("pt-BR")}
                         </td>
-                        <td className="p-3 text-foreground/80">
+                        <td className="p-3 text-foreground/80 text-left">
                           {item.responsavel}
                         </td>
                         <td className="p-3 text-center">
@@ -163,7 +163,7 @@ export function ValidacaoImportacao() {
                             {item.quantidadeInconsistencias}
                           </span>
                         </td>
-                        <td className="p-3">
+                        <td className="p-3 text-center">
                           <div className="flex flex-col space-y-1">
                             <span className={cn(
                               "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase w-fit",

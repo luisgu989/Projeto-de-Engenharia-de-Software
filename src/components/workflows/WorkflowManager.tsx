@@ -154,7 +154,7 @@ export function WorkflowManager() {
                       </span>
                       <span
                         className={cn(
-                          "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase",
+                          "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase whitespace-nowrap",
                           w.statusExecucao === "concluido"
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                             : w.statusExecucao === "em_andamento"
@@ -202,7 +202,7 @@ export function WorkflowManager() {
                       <span className="flex items-center gap-0.5">
                         <User className="h-3 w-3" /> {w.responsavelEtapa}
                       </span>
-                      <span className="flex items-center gap-0.5">
+                      <span className="flex items-center gap-0.5" suppressHydrationWarning>
                         <Calendar className="h-3 w-3" /> {new Date(w.dataExecucao).toLocaleDateString("pt-BR")}
                       </span>
                     </div>

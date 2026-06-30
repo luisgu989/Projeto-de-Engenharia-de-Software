@@ -110,7 +110,7 @@ export function PrevisaoDemandaComponent() {
                         </div>
                         <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
                           <span>Volume: <strong>{p.resultadoVolumeProjetado} un.</strong></span>
-                          <span>Faturamento: <strong>R$ {p.resultadoFaturamentoProjetado.toLocaleString("pt-BR")}</strong></span>
+                          <span>Faturamento: <strong suppressHydrationWarning>R$ {p.resultadoFaturamentoProjetado.toLocaleString("pt-BR")}</strong></span>
                           <span className="flex items-center gap-1"><User className="h-3 w-3" /> {p.usuarioResponsavel}</span>
                         </div>
                       </div>
@@ -193,21 +193,21 @@ export function PrevisaoDemandaComponent() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase tracking-wide">
-                    <th className="p-3">Produto</th>
-                    <th className="p-3">Categoria</th>
-                    <th className="p-3 text-right">Média Histórica Mensal</th>
-                    <th className="p-3 text-right">Demanda Projetada</th>
+                    <th className="p-3 text-left">Produto</th>
+                    <th className="p-3 text-left">Categoria</th>
+                    <th className="p-3 text-center">Média Histórica Mensal</th>
+                    <th className="p-3 text-center">Demanda Projetada</th>
                     <th className="p-3 text-center">Tendência</th>
-                    <th className="p-3 text-right">Confiança</th>
+                    <th className="p-3 text-center">Confiança</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60 font-medium">
                   {selectedPrevisao.itensPrevisao.map((item, idx) => (
                     <tr key={idx} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3 font-bold text-foreground">{item.produtoNome}</td>
-                      <td className="p-3 text-muted-foreground">{item.categoria}</td>
-                      <td className="p-3 text-right">{item.mediaHistoricaMensal} un.</td>
-                      <td className="p-3 text-right font-extrabold text-foreground">{item.demandaProjetada} un.</td>
+                      <td className="p-3 font-bold text-foreground text-left">{item.produtoNome}</td>
+                      <td className="p-3 text-muted-foreground text-left">{item.categoria}</td>
+                      <td className="p-3 text-center">{item.mediaHistoricaMensal} un.</td>
+                      <td className="p-3 font-extrabold text-foreground text-center">{item.demandaProjetada} un.</td>
                       <td className="p-3 text-center">
                         <span className={cn(
                           "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
@@ -220,7 +220,7 @@ export function PrevisaoDemandaComponent() {
                           {item.tendencia}
                         </span>
                       </td>
-                      <td className="p-3 text-right font-mono text-[11px] font-bold text-primary">
+                      <td className="p-3 font-mono text-[11px] font-bold text-primary text-center">
                         {item.taxaConfianca}%
                       </td>
                     </tr>
@@ -251,8 +251,7 @@ export function PrevisaoDemandaComponent() {
                         y={90 - hHist}
                         width="15"
                         height={hHist}
-                        fill="#64748b"
-                        className="opacity-60"
+                        className="fill-muted-foreground opacity-60"
                         rx="1"
                       />
                       {/* Projetado Bar */}
@@ -265,13 +264,13 @@ export function PrevisaoDemandaComponent() {
                         rx="1.5"
                       />
                       {/* Text */}
-                      <text x={x + 16} y="105" textAnchor="middle" fill="#94a3b8" fontSize="6.5" fontWeight="bold">
+                      <text x={x + 16} y="105" textAnchor="middle" className="fill-muted-foreground" fontSize="6.5" fontWeight="bold">
                         {item.produtoNome.split(" ")[0]}
                       </text>
-                      <text x={x + 7} y={90 - hHist - 4} textAnchor="middle" fill="#64748b" fontSize="6">
+                      <text x={x + 7} y={90 - hHist - 4} textAnchor="middle" className="fill-muted-foreground" fontSize="6">
                         {item.mediaHistoricaMensal}
                       </text>
-                      <text x={x + 25} y={90 - hProj - 4} textAnchor="middle" fill="#3b82f6" fontSize="6" fontWeight="bold">
+                      <text x={x + 25} y={90 - hProj - 4} textAnchor="middle" className="fill-primary" fontSize="6" fontWeight="bold">
                         {item.demandaProjetada}
                       </text>
                     </g>
@@ -279,11 +278,11 @@ export function PrevisaoDemandaComponent() {
                 })}
                 <defs>
                   <linearGradient id="projGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#2563eb" />
+                    <stop offset="0%" stopColor="var(--primary)" />
+                    <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.8" />
                   </linearGradient>
                 </defs>
-                <line x1="30" y1="90" x2="480" y2="90" stroke="#cbd5e1" strokeWidth="1" />
+                <line x1="30" y1="90" x2="480" y2="90" className="stroke-border" strokeWidth="1" />
               </svg>
             </div>
             <div className="flex justify-center gap-6 text-[10px] font-bold text-muted-foreground">

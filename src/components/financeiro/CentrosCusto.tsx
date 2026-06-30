@@ -178,12 +178,12 @@ export function CentrosCusto() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Código</th>
-                  <th className="p-3">Nome / Categoria</th>
-                  <th className="p-3">Setor</th>
-                  <th className="p-3">Responsável</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right font-bold">Ações</th>
+                  <th className="p-3 text-center">Código</th>
+                  <th className="p-3 text-left">Nome / Categoria</th>
+                  <th className="p-3 text-left">Setor</th>
+                  <th className="p-3 text-left">Responsável</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 font-bold text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -205,17 +205,17 @@ export function CentrosCusto() {
                           isSelected && "bg-primary/5 hover:bg-primary/5 border-l-2 border-l-primary"
                         )}
                       >
-                        <td className="p-3 font-mono font-bold text-foreground">
+                        <td className="p-3 font-mono font-bold text-foreground text-center">
                           {c.codigoCentro}
                           <span className="block text-[8px] text-muted-foreground font-normal">ID: {c.id}</span>
                         </td>
-                        <td className="p-3 font-medium text-foreground">
+                        <td className="p-3 font-medium text-foreground text-left">
                           {c.nomeCentro}
                           <span className="block text-[9px] text-muted-foreground font-mono">{c.categoriaFinanceira}</span>
                         </td>
-                        <td className="p-3 text-foreground/80 font-semibold">{c.departamentoVinculado}</td>
-                        <td className="p-3 text-muted-foreground font-medium">{c.responsavelFinanceiro}</td>
-                        <td className="p-3">
+                        <td className="p-3 text-foreground/80 font-semibold text-left">{c.departamentoVinculado}</td>
+                        <td className="p-3 text-muted-foreground font-medium text-left">{c.responsavelFinanceiro}</td>
+                        <td className="p-3 text-center">
                           <span
                             className={cn(
                               "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border",
@@ -227,7 +227,7 @@ export function CentrosCusto() {
                             {c.statusCentro}
                           </span>
                         </td>
-                        <td className="p-3 text-right" onClick={(e) => e.stopPropagation()}>
+                        <td className="p-3 text-center" onClick={(e) => e.stopPropagation()}>
                           <Button
                             variant="ghost"
                             size="icon-xs"
@@ -258,10 +258,10 @@ export function CentrosCusto() {
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-accent/20 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                      <th className="p-2.5">Código</th>
-                      <th className="p-2.5">Descrição da Despesa</th>
-                      <th className="p-2.5">Data Lançamento</th>
-                      <th className="p-2.5 text-right">Valor Operacional</th>
+                      <th className="p-2.5 text-center">Código</th>
+                      <th className="p-2.5 text-left">Descrição da Despesa</th>
+                      <th className="p-2.5 text-center">Data Lançamento</th>
+                      <th className="p-2.5 text-center">Valor Operacional</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60 font-mono text-muted-foreground">
@@ -274,10 +274,10 @@ export function CentrosCusto() {
                     ) : (
                       despesasDoCentro.map((d) => (
                         <tr key={d.id} className="hover:bg-accent/5">
-                          <td className="p-2.5 font-bold text-foreground">{d.id}</td>
-                          <td className="p-2.5 font-sans text-foreground/80">{d.descricao}</td>
-                          <td className="p-2.5">{new Date(d.data).toLocaleDateString("pt-BR")}</td>
-                          <td className="p-2.5 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                          <td className="p-2.5 font-bold text-foreground text-center">{d.id}</td>
+                          <td className="p-2.5 font-sans text-foreground/80 text-left">{d.descricao}</td>
+                          <td className="p-2.5 text-center" suppressHydrationWarning>{new Date(d.data).toLocaleDateString("pt-BR")}</td>
+                          <td className="p-2.5 font-bold text-emerald-600 dark:text-emerald-400 text-right">
                             R$ {d.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                           </td>
                         </tr>

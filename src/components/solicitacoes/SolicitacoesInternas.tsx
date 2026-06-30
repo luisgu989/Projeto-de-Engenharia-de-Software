@@ -172,7 +172,7 @@ export function SolicitacoesInternas() {
                       </span>
                       <span
                         className={cn(
-                          "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase",
+                          "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase whitespace-nowrap",
                           s.statusSolicitacao === "aprovada"
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                             : s.statusSolicitacao === "rejeitada"
@@ -209,14 +209,14 @@ export function SolicitacoesInternas() {
                         {s.dataAprovacao && (
                           <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                             <span>Conclusão:</span>
-                            <span className="font-mono">{new Date(s.dataAprovacao).toLocaleDateString("pt-BR")}</span>
+                            <span className="font-mono" suppressHydrationWarning>{new Date(s.dataAprovacao).toLocaleDateString("pt-BR")}</span>
                           </div>
                         )}
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-[9px] text-muted-foreground pt-2 border-t border-border/40">
-                      <span className="flex items-center gap-0.5">
+                      <span className="flex items-center gap-0.5" suppressHydrationWarning>
                         <Calendar className="h-3 w-3" /> {new Date(s.dataSolicitacao).toLocaleDateString("pt-BR")}
                       </span>
                     </div>

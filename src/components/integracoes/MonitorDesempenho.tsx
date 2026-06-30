@@ -201,32 +201,32 @@ export function MonitorDesempenho() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                    <th className="p-3">Carimbo</th>
-                    <th className="p-3">Monitoramento ID</th>
-                    <th className="p-3">CPU</th>
-                    <th className="p-3">RAM</th>
-                    <th className="p-3">Disco</th>
-                    <th className="p-3">Latência</th>
-                    <th className="p-3">Conexões DB</th>
+                    <th className="p-3 text-center">Carimbo</th>
+                    <th className="p-3 text-center">Monitoramento ID</th>
+                    <th className="p-3 text-center">CPU</th>
+                    <th className="p-3 text-center">RAM</th>
+                    <th className="p-3 text-center">Disco</th>
+                    <th className="p-3 text-center">Latência</th>
+                    <th className="p-3 text-center">Conexões DB</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60 font-mono text-[11px]">
                   {historico.map((item) => (
                     <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3 text-muted-foreground flex items-center gap-1 font-sans">
+                      <td className="p-3 text-muted-foreground flex items-center gap-1 font-sans text-center">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
                         {new Date(item.timestamp).toLocaleTimeString("pt-BR")}
                       </td>
-                      <td className="p-3 text-muted-foreground font-semibold">{item.id}</td>
-                      <td className={cn("p-3 font-bold", item.cpu > 80 ? "text-destructive" : "text-foreground")}>
+                      <td className="p-3 text-muted-foreground font-semibold text-center">{item.id}</td>
+                      <td className="text-center" className={cn("p-3 font-bold", item.cpu > 80 ? "text-destructive" : "text-foreground")}>
                         {item.cpu}%
                       </td>
-                      <td className={cn("p-3 font-bold", item.memoria > 80 ? "text-destructive" : "text-foreground")}>
+                      <td className="text-center" className={cn("p-3 font-bold", item.memoria > 80 ? "text-destructive" : "text-foreground")}>
                         {item.memoria}%
                       </td>
-                      <td className="p-3 text-foreground">{item.disco}%</td>
-                      <td className="p-3 text-foreground">{item.latencia}ms</td>
-                      <td className="p-3 text-foreground">{item.conexoesDb}</td>
+                      <td className="p-3 text-foreground text-center">{item.disco}%</td>
+                      <td className="p-3 text-foreground text-center">{item.latencia}ms</td>
+                      <td className="p-3 text-foreground text-center">{item.conexoesDb}</td>
                     </tr>
                   ))}
                 </tbody>

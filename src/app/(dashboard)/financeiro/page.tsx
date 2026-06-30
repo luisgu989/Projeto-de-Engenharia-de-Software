@@ -44,7 +44,7 @@ export default function FinanceiroPage() {
         </p>
       </div>
 
-      <div className="flex border-b border-border no-print overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border no-print overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setAbaAtiva("caixa")}
           className={cn(

@@ -437,7 +437,7 @@ export default function RelatoriosPage() {
                         </div>
                         <div className="text-[9px] text-muted-foreground flex justify-between items-center mt-1">
                           <span>Solicitante: {rep.usuarioSolicitante}</span>
-                          <span>{new Date(rep.dataGeracao).toLocaleTimeString("pt-BR")}</span>
+                          <span suppressHydrationWarning>{new Date(rep.dataGeracao).toLocaleTimeString("pt-BR")}</span>
                         </div>
                       </div>
                       <div className="shrink-0">
@@ -514,10 +514,10 @@ export default function RelatoriosPage() {
                             rx="3"
                             className="transition-all hover:opacity-80"
                           />
-                          <text x={x + 15} y={y - 5} textAnchor="middle" fill="#10b981" fontSize="7" fontWeight="bold">
+                          <text x={x + 15} y={y - 5} textAnchor="middle" fill="var(--chart-1)" fontSize="7" fontWeight="bold">
                             R$ {Math.round(item.faturamento)}
                           </text>
-                          <text x={x + 15} y="105" textAnchor="middle" fill="#94a3b8" fontSize="6" fontWeight="bold">
+                          <text x={x + 15} y="105" textAnchor="middle" className="fill-muted-foreground" fontSize="6" fontWeight="bold">
                             {item.nome.split(" ")[0]}
                           </text>
                         </g>
@@ -525,11 +525,11 @@ export default function RelatoriosPage() {
                     })}
                     <defs>
                       <linearGradient id="fatGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10b981" />
-                        <stop offset="100%" stopColor="#059669" />
+                        <stop offset="0%" stopColor="var(--chart-1)" />
+                        <stop offset="100%" stopColor="var(--chart-1)" stopOpacity="0.8" />
                       </linearGradient>
                     </defs>
-                    <line x1="30" y1="90" x2="480" y2="90" stroke="#475569" strokeWidth="1.5" />
+                    <line x1="30" y1="90" x2="480" y2="90" className="stroke-border" strokeWidth="1.5" />
                   </svg>
                 )}
 
@@ -547,7 +547,7 @@ export default function RelatoriosPage() {
                             y={90 - hProd}
                             width="14"
                             height={hProd}
-                            fill="#3b82f6"
+                            fill="var(--chart-2)"
                             rx="2"
                           />
                           <rect
@@ -555,16 +555,16 @@ export default function RelatoriosPage() {
                             y={90 - hDem}
                             width="14"
                             height={hDem}
-                            fill="#f59e0b"
+                            fill="var(--chart-3)"
                             rx="2"
                           />
-                          <text x={x + 16} y="105" textAnchor="middle" fill="#94a3b8" fontSize="6" fontWeight="bold">
+                          <text x={x + 16} y="105" textAnchor="middle" className="fill-muted-foreground" fontSize="6" fontWeight="bold">
                             {item.nome.split(" ")[0]}
                           </text>
                         </g>
                       );
                     })}
-                    <line x1="30" y1="90" x2="480" y2="90" stroke="#475569" strokeWidth="1.5" />
+                    <line x1="30" y1="90" x2="480" y2="90" className="stroke-border" strokeWidth="1.5" />
                   </svg>
                 )}
 
@@ -575,17 +575,17 @@ export default function RelatoriosPage() {
                       const y = 90 - (item.margemLiquida / 100) * 80;
                       return (
                         <g key={idx}>
-                          <circle cx={x} cy={y} r="4" fill="#8b5cf6" stroke="#ffffff" strokeWidth="1.5" />
-                          <text x={x} y={y - 8} textAnchor="middle" fill="#8b5cf6" fontSize="7" fontWeight="bold">
+                          <circle cx={x} cy={y} r="4" fill="var(--chart-4)" className="stroke-background" strokeWidth="1.5" />
+                          <text x={x} y={y - 8} textAnchor="middle" fill="var(--chart-4)" fontSize="7" fontWeight="bold">
                             {item.margemLiquida}%
                           </text>
-                          <text x={x} y="105" textAnchor="middle" fill="#94a3b8" fontSize="6" fontWeight="bold">
+                          <text x={x} y="105" textAnchor="middle" className="fill-muted-foreground" fontSize="6" fontWeight="bold">
                             {item.cargaId}
                           </text>
                         </g>
                       );
                     })}
-                    <line x1="30" y1="90" x2="480" y2="90" stroke="#475569" strokeWidth="1.5" />
+                    <line x1="30" y1="90" x2="480" y2="90" className="stroke-border" strokeWidth="1.5" />
                   </svg>
                 )}
               </div>
@@ -708,32 +708,32 @@ export default function RelatoriosPage() {
                       <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase tracking-wide">
                         {activeTipo === "giro" && (
                           <>
-                            <th className="p-3">Produto</th>
-                            <th className="p-3">Categoria</th>
-                            <th className="p-3 text-right">Estoque Atual</th>
-                            <th className="p-3 text-right">Qtd Vendida</th>
-                            <th className="p-3 text-right">Faturamento Bruto</th>
-                            <th className="p-3 text-right">Giro de Estoque</th>
+                            <th className="p-3 text-left">Produto</th>
+                            <th className="p-3 text-left">Categoria</th>
+                            <th className="p-3 text-center">Estoque Atual</th>
+                            <th className="p-3 text-center">Qtd Vendida</th>
+                            <th className="p-3 text-center">Faturamento Bruto</th>
+                            <th className="p-3 text-center">Giro de Estoque</th>
                           </>
                         )}
                         {activeTipo === "producao_demanda" && (
                           <>
-                            <th className="p-3">Produto</th>
-                            <th className="p-3">Categoria</th>
-                            <th className="p-3 text-right">Qtd Fabricada (OPs)</th>
-                            <th className="p-3 text-right">Qtd Vendida (Vendas)</th>
-                            <th className="p-3 text-right">Diferença Operacional</th>
+                            <th className="p-3 text-left">Produto</th>
+                            <th className="p-3 text-left">Categoria</th>
+                            <th className="p-3 text-center">Qtd Fabricada (OPs)</th>
+                            <th className="p-3 text-center">Qtd Vendida (Vendas)</th>
+                            <th className="p-3 text-center">Diferença Operacional</th>
                           </>
                         )}
                         {activeTipo === "margem_logistica" && (
                           <>
-                            <th className="p-3">Carga / Pedido</th>
-                            <th className="p-3">Destinatário</th>
-                            <th className="p-3">Destino</th>
-                            <th className="p-3 text-right">Valor Venda</th>
-                            <th className="p-3 text-right">Custo de Frete</th>
-                            <th className="p-3 text-right">Receita Líquida</th>
-                            <th className="p-3 text-right">Margem Net</th>
+                            <th className="p-3 text-center">Carga / Pedido</th>
+                            <th className="p-3 text-center">Destinatário</th>
+                            <th className="p-3 text-center">Destino</th>
+                            <th className="p-3 text-center">Valor Venda</th>
+                            <th className="p-3 text-center">Custo de Frete</th>
+                            <th className="p-3 text-center">Receita Líquida</th>
+                            <th className="p-3 text-center">Margem Net</th>
                           </>
                         )}
                       </tr>
@@ -742,14 +742,14 @@ export default function RelatoriosPage() {
                       {activeTipo === "giro" &&
                         (dadosRelatorio as GiroRow[]).map((row) => (
                           <tr key={row.id} className="hover:bg-accent/10 transition-colors">
-                            <td className="p-3 font-bold text-foreground">{row.nome}</td>
-                            <td className="p-3 text-muted-foreground">{row.categoria}</td>
-                            <td className="p-3 text-right">{row.estoqueAtual} un.</td>
-                            <td className="p-3 text-right">{row.unidadesVendidas} un.</td>
-                            <td className="p-3 text-right font-extrabold text-foreground">
+                            <td className="p-3 font-bold text-foreground text-left">{row.nome}</td>
+                            <td className="p-3 text-muted-foreground text-left">{row.categoria}</td>
+                            <td className="p-3 text-center">{row.estoqueAtual} un.</td>
+                            <td className="p-3 text-center">{row.unidadesVendidas} un.</td>
+                            <td className="p-3 font-extrabold text-foreground text-right">
                               R$ {row.faturamento?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </td>
-                            <td className="p-3 text-right">
+                            <td className="p-3 text-center">
                               <span
                                 className={cn(
                                   "px-2 py-0.5 rounded font-bold text-[10px]",
@@ -769,11 +769,11 @@ export default function RelatoriosPage() {
                       {activeTipo === "producao_demanda" &&
                         (dadosRelatorio as ProducaoDemandaRow[]).map((row, idx) => (
                           <tr key={idx} className="hover:bg-accent/10 transition-colors">
-                            <td className="p-3 font-bold text-foreground">{row.nome}</td>
-                            <td className="p-3 text-muted-foreground">{row.categoria}</td>
-                            <td className="p-3 text-right font-extrabold">{row.produzido} un.</td>
-                            <td className="p-3 text-right font-extrabold">{row.demandado} un.</td>
-                            <td className="p-3 text-right font-extrabold">
+                            <td className="p-3 font-bold text-foreground text-left">{row.nome}</td>
+                            <td className="p-3 text-muted-foreground text-left">{row.categoria}</td>
+                            <td className="p-3 font-extrabold text-center">{row.produzido} un.</td>
+                            <td className="p-3 font-extrabold text-center">{row.demandado} un.</td>
+                            <td className="p-3 font-extrabold text-center">
                               <span
                                 className={cn(
                                   row.diferenca >= 0
@@ -791,21 +791,21 @@ export default function RelatoriosPage() {
                       {activeTipo === "margem_logistica" &&
                         (dadosRelatorio as MargemLogisticaRow[]).map((row) => (
                           <tr key={row.cargaId} className="hover:bg-accent/10 transition-colors">
-                            <td className="p-3 font-bold text-foreground">
+                            <td className="p-3 font-bold text-foreground text-center">
                               {row.cargaId} <span className="text-[10px] text-muted-foreground">({row.pedidoId})</span>
                             </td>
-                            <td className="p-3">{row.cliente}</td>
-                            <td className="p-3 text-muted-foreground">{row.destino}</td>
-                            <td className="p-3 text-right font-bold text-foreground">
+                            <td className="p-3 text-center">{row.cliente}</td>
+                            <td className="p-3 text-muted-foreground text-center">{row.destino}</td>
+                            <td className="p-3 font-bold text-foreground text-right">
                               R$ {row.faturamentoVenda?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </td>
-                            <td className="p-3 text-right font-bold text-destructive">
+                            <td className="p-3 font-bold text-destructive text-right">
                               R$ {row.custoFrete?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </td>
-                            <td className="p-3 text-right font-bold text-emerald-600">
+                            <td className="p-3 font-bold text-emerald-600 text-center">
                               R$ {row.receitaLiquida?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </td>
-                            <td className="p-3 text-right font-extrabold">
+                            <td className="p-3 font-extrabold text-center">
                               <span
                                 className={cn(
                                   "px-2 py-0.5 rounded text-[10px] font-bold",

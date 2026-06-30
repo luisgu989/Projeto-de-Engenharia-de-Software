@@ -294,12 +294,12 @@ export default function DocumentosPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  <th className="p-4">Código</th>
-                  <th className="p-4">Nome do Documento</th>
-                  <th className="p-4">Categoria / Setor</th>
+                  <th className="p-4 text-center">Código</th>
+                  <th className="p-4 text-left">Nome do Documento</th>
+                  <th className="p-4 text-left">Categoria / Setor</th>
                   <th className="p-4 text-center">Versão Ativa</th>
                   <th className="p-4 text-center">Status</th>
-                  <th className="p-4 text-right">Ações</th>
+                  <th className="p-4 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs">
@@ -322,18 +322,18 @@ export default function DocumentosPage() {
                           isSelected && "bg-primary/5 border-l-2 border-l-primary"
                         )}
                       >
-                        <td className="p-4 font-mono font-bold text-foreground">{doc.id}</td>
-                        <td className="p-4">
+                        <td className="p-4 font-mono font-bold text-foreground text-center">{doc.id}</td>
+                        <td className="p-4 text-left">
                           <div className="font-bold text-foreground hover:underline">{doc.nome}</div>
                           <div className="text-[9px] text-muted-foreground flex items-center gap-1 mt-0.5">
                             <User className="h-3 w-3" /> {doc.usuarioResponsavel}
                           </div>
                         </td>
-                        <td className="p-4 text-muted-foreground font-semibold">
+                        <td className="p-4 text-muted-foreground font-semibold text-left">
                           <div>{doc.categoria}</div>
                           <div className="text-[10px] font-medium leading-none text-muted-foreground/85">{doc.setor}</div>
                         </td>
-                        <td className="p-4 text-center font-mono font-bold text-foreground">
+                        <td className="p-4 font-mono font-bold text-foreground text-center">
                           v{doc.versao}
                         </td>
                         <td className="p-4 text-center">
@@ -348,7 +348,7 @@ export default function DocumentosPage() {
                             {doc.status}
                           </span>
                         </td>
-                        <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
+                        <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => handleOpenEditar(doc)}
                             disabled={isAprovado}
@@ -452,7 +452,7 @@ export default function DocumentosPage() {
                         
                         <div className="flex justify-between items-center text-[9px] text-muted-foreground font-mono">
                           <span>{v.usuarioResponsavel}</span>
-                          <span>{formatDate(v.dataAlteracao)}</span>
+                          <span suppressHydrationWarning>{formatDate(v.dataAlteracao)}</span>
                         </div>
 
                         {/* Restore actions for previous versions */}

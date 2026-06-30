@@ -257,7 +257,7 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
           Configuração de Relatório
         </h3>
 
-        <form onSubmit={handleGerarRelatorio} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end">
+        <form onSubmit={handleGerarRelatorio} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 items-end">
           {/* Report Type Selector */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-muted-foreground uppercase">Tipo de Relatório</label>
@@ -295,7 +295,7 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
           </div>
 
           {/* Period selector */}
-          <div className="space-y-1.5 sm:col-span-1">
+          <div className="space-y-1.5 sm:col-span-2 lg:col-span-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase">Período de Análise</label>
             <div className="flex items-center gap-2">
               <input
@@ -322,7 +322,7 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
             </div>
           </div>
 
-          <Button type="submit" className="w-full text-xs font-semibold shadow shadow-primary/20 cursor-pointer h-9">
+          <Button type="submit" className="w-full text-xs font-semibold shadow shadow-primary/20 cursor-pointer h-9 sm:col-span-2 lg:col-span-1">
             Gerar Relatório
           </Button>
         </form>
@@ -345,7 +345,7 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
               <div className="text-xs text-muted-foreground">
                 Filtros: Categoria <strong>{categoriaFiltro === "todas" ? "Todas" : categoriaFiltro}</strong>
                 {dataInicio || dataFim ? (
-                  <span> &bull; Período de <strong>{dataInicio ? formatDate(dataInicio) : "início"}</strong> a <strong>{dataFim ? formatDate(dataFim) : "hoje"}</strong></span>
+                  <span> &bull; Período de <strong>{dataInicio ? formatDate(dataInicio) : "início"}</strong> a <strong suppressHydrationWarning>{dataFim ? formatDate(dataFim) : "hoje"}</strong></span>
                 ) : (
                   <span> &bull; Histórico Completo</span>
                 )}
@@ -453,12 +453,12 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-border bg-accent/20 text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
-                      <th className="p-3">SKU</th>
-                      <th className="p-3">Nome</th>
+                      <th className="p-3 text-center">SKU</th>
+                      <th className="p-3 text-left">Nome</th>
                       <th className="p-3 text-center">Saldo Físico</th>
-                      <th className="p-3 text-right">Preço Custo</th>
-                      <th className="p-3 text-right">Preço Venda</th>
-                      <th className="p-3 text-right font-bold">Valor Imobilizado</th>
+                      <th className="p-3 text-center">Preço Custo</th>
+                      <th className="p-3 text-center">Preço Venda</th>
+                      <th className="p-3 font-bold text-center">Valor Imobilizado</th>
                       <th className="p-3 text-center">Giro no Período</th>
                     </tr>
                   </thead>
@@ -472,17 +472,17 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
                     ) : (
                       gerencial.items.map((item) => (
                         <tr key={item.id} className="hover:bg-accent/5">
-                          <td className="p-3 font-mono text-[11px]">{item.sku}</td>
-                          <td className="p-3 font-medium">{item.nome}</td>
-                          <td className="p-3 text-center">
+                          <td className="p-3 font-mono text-[11px] text-center">{item.sku}</td>
+                          <td className="p-3 font-medium text-left">{item.nome}</td>
+                          <td className="p-3 text-right">
                             {item.quantidade} un 
                             {item.quantidade <= item.estoqueMinimo && (
                               <span className="text-[9px] text-amber-600 bg-amber-500/10 px-1 ml-1.5 rounded">Abaixo</span>
                             )}
                           </td>
-                          <td className="p-3 text-right font-mono">{formatCurrency(item.precoCusto)}</td>
-                          <td className="p-3 text-right font-mono">{formatCurrency(item.precoVenda)}</td>
-                          <td className="p-3 text-right font-bold font-mono">{formatCurrency(item.valorImobilizado)}</td>
+                          <td className="p-3 font-mono text-right">{formatCurrency(item.precoCusto)}</td>
+                          <td className="p-3 font-mono text-right">{formatCurrency(item.precoVenda)}</td>
+                          <td className="p-3 font-bold font-mono text-right">{formatCurrency(item.valorImobilizado)}</td>
                           <td className="p-3 text-center">
                             <span className={cn(
                               "px-2 py-0.5 rounded text-[10px] font-bold font-mono",
@@ -552,14 +552,14 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-border bg-accent/20 text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
-                      <th className="p-3">Data</th>
-                      <th className="p-3">SKU</th>
-                      <th className="p-3">Produto</th>
+                      <th className="p-3 text-center">Data</th>
+                      <th className="p-3 text-center">SKU</th>
+                      <th className="p-3 text-left">Produto</th>
                       <th className="p-3 text-center">Tipo</th>
                       <th className="p-3 text-center">Quantidade</th>
-                      <th className="p-3">Motivo / Justificativa</th>
-                      <th className="p-3 text-right">Valor Unitário</th>
-                      <th className="p-3">Operador</th>
+                      <th className="p-3 text-left">Motivo / Justificativa</th>
+                      <th className="p-3 text-center">Valor Unitário</th>
+                      <th className="p-3 text-center">Operador</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border text-xs">
@@ -575,9 +575,9 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
                         const valUnit = isEntry ? mov.itemPrecoCusto : mov.itemPrecoVenda;
                         return (
                           <tr key={idx} className="hover:bg-accent/5">
-                            <td className="p-3 font-mono text-[11px] text-muted-foreground">{formatDate(mov.data)}</td>
-                            <td className="p-3 font-mono text-[11px]">{mov.itemSku}</td>
-                            <td className="p-3 font-medium">{mov.itemNome}</td>
+                            <td className="p-3 font-mono text-[11px] text-muted-foreground text-center" suppressHydrationWarning>{formatDate(mov.data)}</td>
+                            <td className="p-3 font-mono text-[11px] text-center">{mov.itemSku}</td>
+                            <td className="p-3 font-medium text-left">{mov.itemNome}</td>
                             <td className="p-3 text-center">
                               <span className={cn(
                                 "px-1.5 py-0.2 rounded text-[9px] font-bold uppercase",
@@ -586,15 +586,15 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
                                 {isEntry ? "Entrada" : "Saída"}
                               </span>
                             </td>
-                            <td className={cn(
+                            <td className="text-center" className={cn(
                               "p-3 text-center font-bold font-mono",
                               isEntry ? "text-emerald-600" : "text-rose-600"
                             )}>
                               {isEntry ? "+" : "-"}{mov.quantidade}
                             </td>
-                            <td className="p-3 font-medium text-foreground/80">{mov.motivo}</td>
-                            <td className="p-3 text-right font-mono">{formatCurrency(valUnit)}</td>
-                            <td className="p-3 text-muted-foreground">{mov.usuario}</td>
+                            <td className="p-3 font-medium text-foreground/80 text-left">{mov.motivo}</td>
+                            <td className="p-3 font-mono text-right">{formatCurrency(valUnit)}</td>
+                            <td className="p-3 text-muted-foreground text-center">{mov.usuario}</td>
                           </tr>
                         );
                       })
@@ -608,7 +608,7 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
           {/* Printed By Footer metadata (for physical print layout audit) */}
           <div className="visible-print-only hidden print:flex justify-between items-center border-t border-border mt-12 pt-4 text-[10px] text-muted-foreground">
             <span>Relatório gerado por: <strong>{user.name}</strong> ({user.email})</span>
-            <span>Data de emissão: <strong>{new Date().toLocaleString("pt-BR")}</strong></span>
+            <span>Data de emissão: <strong suppressHydrationWarning>{new Date().toLocaleString("pt-BR")}</strong></span>
           </div>
         </div>
       )}

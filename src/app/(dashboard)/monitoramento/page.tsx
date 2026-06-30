@@ -56,7 +56,7 @@ export default function MonitoramentoPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-border gap-1 overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border gap-1 overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setActiveTab("metricas")}
           className={cn(
@@ -142,7 +142,7 @@ export default function MonitoramentoPage() {
                       </div>
                       <div>
                         <h3 className="font-bold text-xs text-muted-foreground uppercase">{m.tipoRecurso}</h3>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono">
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono" suppressHydrationWarning>
                           Coleta: {new Date(m.dataColeta).toLocaleTimeString("pt-BR")}
                         </span>
                       </div>
@@ -226,9 +226,9 @@ export default function MonitoramentoPage() {
                 </h4>
                 <div className="flex justify-center p-3 bg-background border border-border/50 rounded-xl aspect-[4/1] max-h-[140px]">
                   <svg viewBox="0 0 400 100" className="w-full h-full text-[8px] font-mono">
-                    <line x1="20" y1="20" x2="380" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                    <line x1="20" y1="50" x2="380" y2="50" stroke="#f1f5f9" strokeWidth="1" />
-                    <line x1="20" y1="80" x2="380" y2="80" stroke="#cbd5e1" strokeWidth="1" />
+                    <line x1="20" y1="20" x2="380" y2="20" className="stroke-muted" strokeWidth="1" />
+                    <line x1="20" y1="50" x2="380" y2="50" className="stroke-muted" strokeWidth="1" />
+                    <line x1="20" y1="80" x2="380" y2="80" className="stroke-border" strokeWidth="1" />
 
                     <path
                       d={`M ${historicoDeMonitoramento.CPU.map((val, idx) => {
@@ -237,7 +237,7 @@ export default function MonitoramentoPage() {
                         return `${x} ${y}`;
                       }).join(" L ")}`}
                       fill="none"
-                      stroke="#3b82f6"
+                      className="stroke-primary"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                     />
@@ -247,8 +247,8 @@ export default function MonitoramentoPage() {
                       const y = 80 - (val / 100) * 70;
                       return (
                         <g key={idx}>
-                          <circle cx={x} cy={y} r="3" fill="#3b82f6" stroke="#ffffff" strokeWidth="1" />
-                          <text x={x} y={y - 6} textAnchor="middle" fill="#1e3a8a" fontSize="6.5" fontWeight="bold">
+                          <circle cx={x} cy={y} r="3" className="fill-primary stroke-background" strokeWidth="1" />
+                          <text x={x} y={y - 6} textAnchor="middle" className="fill-foreground" fontSize="6.5" fontWeight="bold">
                             {val}%
                           </text>
                         </g>
@@ -264,9 +264,9 @@ export default function MonitoramentoPage() {
                 </h4>
                 <div className="flex justify-center p-3 bg-background border border-border/50 rounded-xl aspect-[4/1] max-h-[140px]">
                   <svg viewBox="0 0 400 100" className="w-full h-full text-[8px] font-mono">
-                    <line x1="20" y1="20" x2="380" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                    <line x1="20" y1="50" x2="380" y2="50" stroke="#f1f5f9" strokeWidth="1" />
-                    <line x1="20" y1="80" x2="380" y2="80" stroke="#cbd5e1" strokeWidth="1" />
+                    <line x1="20" y1="20" x2="380" y2="20" className="stroke-muted" strokeWidth="1" />
+                    <line x1="20" y1="50" x2="380" y2="50" className="stroke-muted" strokeWidth="1" />
+                    <line x1="20" y1="80" x2="380" y2="80" className="stroke-border" strokeWidth="1" />
 
                     <path
                       d={`M ${historicoDeMonitoramento["Latência API"].map((val, idx) => {
@@ -275,7 +275,7 @@ export default function MonitoramentoPage() {
                         return `${x} ${y}`;
                       }).join(" L ")}`}
                       fill="none"
-                      stroke="#ec4899"
+                      className="stroke-chart-2"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                     />
@@ -285,8 +285,8 @@ export default function MonitoramentoPage() {
                       const y = 80 - (val / 400) * 70;
                       return (
                         <g key={idx}>
-                          <circle cx={x} cy={y} r="3" fill="#ec4899" stroke="#ffffff" strokeWidth="1" />
-                          <text x={x} y={y - 6} textAnchor="middle" fill="#9d174d" fontSize="6.5" fontWeight="bold">
+                          <circle cx={x} cy={y} r="3" className="fill-chart-2 stroke-background" strokeWidth="1" />
+                          <text x={x} y={y - 6} textAnchor="middle" className="fill-foreground" fontSize="6.5" fontWeight="bold">
                             {val}ms
                           </text>
                         </g>
@@ -424,7 +424,7 @@ export default function MonitoramentoPage() {
                   <span className="flex items-center gap-1 font-medium">
                     <AlertCircle className="h-3.5 w-3.5" /> Telemetria de leitura imutável
                   </span>
-                  <span className="font-mono">
+                  <span className="font-mono" suppressHydrationWarning>
                     Última Verificação: {formatDate(srv.dataVerificacao)}
                   </span>
                 </div>
@@ -447,10 +447,10 @@ export default function MonitoramentoPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                    <th className="p-4">timestamp</th>
-                    <th className="p-4">Servidor Relacionado</th>
+                    <th className="p-4 text-center">timestamp</th>
+                    <th className="p-4 text-center">Servidor Relacionado</th>
                     <th className="p-4 text-center">Gravidade</th>
-                    <th className="p-4">Descrição do Evento</th>
+                    <th className="p-4 text-left">Descrição do Evento</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border text-xs">
@@ -463,8 +463,8 @@ export default function MonitoramentoPage() {
                   ) : (
                     historicoEventos.map((log) => (
                       <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                        <td className="p-4 font-mono text-muted-foreground">{formatDate(log.timestamp)}</td>
-                        <td className="p-4">
+                        <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(log.timestamp)}</td>
+                        <td className="p-4 text-center">
                           <div className="font-bold text-foreground">{log.nomeServidor}</div>
                           <div className="text-[10px] text-muted-foreground font-mono">ID: {log.servidorId}</div>
                         </td>
@@ -480,7 +480,7 @@ export default function MonitoramentoPage() {
                             {log.tipo === "error" ? "Falha" : log.tipo === "warning" ? "Alerta" : "Normal"}
                           </span>
                         </td>
-                        <td className={cn(
+                        <td className="text-left" className={cn(
                           "p-4 font-semibold leading-normal",
                           log.tipo === "error"
                             ? "text-destructive"

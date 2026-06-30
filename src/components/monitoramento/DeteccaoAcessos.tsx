@@ -124,12 +124,12 @@ export function DeteccaoAcessos() {
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                      <th className="p-3">IP / Usuário</th>
-                      <th className="p-3">Ocorrência</th>
+                      <th className="p-3 text-left">IP / Usuário</th>
+                      <th className="p-3 text-center">Ocorrência</th>
                       <th className="p-3 text-center">Tentativas</th>
-                      <th className="p-3">Data / Hora</th>
-                      <th className="p-3">Status</th>
-                      <th className="p-3 text-right">Ação</th>
+                      <th className="p-3 text-center">Data / Hora</th>
+                      <th className="p-3 text-center">Status</th>
+                      <th className="p-3 text-center">Ação</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60 font-mono">
@@ -139,7 +139,7 @@ export function DeteccaoAcessos() {
 
                       return (
                         <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                          <td className="p-3">
+                          <td className="p-3 text-left">
                             <div className="flex flex-col space-y-1">
                               <span className="font-semibold text-foreground flex items-center gap-1.5 font-mono">
                                 <Globe className="h-3 w-3 text-primary" />
@@ -150,18 +150,18 @@ export function DeteccaoAcessos() {
                               </span>
                             </div>
                           </td>
-                          <td className="p-3 text-foreground/80 font-sans">
+                          <td className="p-3 text-foreground/80 font-sans text-center">
                             {item.tipoOcorrencia}
                           </td>
-                          <td className="p-3 text-center font-bold">
+                          <td className="p-3 font-bold text-center">
                             {item.quantidadeTentativas}
                           </td>
-                          <td className="p-3 text-muted-foreground text-[11px] whitespace-nowrap">
+                          <td className="p-3 text-muted-foreground text-[11px] whitespace-nowrap text-center">
                             {new Date(item.dataTentativa).toLocaleString("pt-BR")}
                           </td>
-                          <td className="p-3 font-sans">
+                          <td className="p-3 font-sans text-center">
                             <span className={cn(
-                              "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border",
+                              "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border whitespace-nowrap",
                               item.statusBloqueio === "Liberado"
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                                 : isPermanente
@@ -171,7 +171,7 @@ export function DeteccaoAcessos() {
                               {item.statusBloqueio}
                             </span>
                           </td>
-                          <td className="p-3 text-right">
+                          <td className="p-3 text-center">
                             {isBloqueado ? (
                               <button
                                 onClick={() => handleDesbloquear(item.id, item.enderecoAcesso)}
@@ -216,33 +216,33 @@ export function DeteccaoAcessos() {
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-accent/20 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                      <th className="p-3">IP Origem</th>
-                      <th className="p-3">Usuário Relacionado</th>
-                      <th className="p-3">Tipo de Falha</th>
-                      <th className="p-3">Código</th>
+                      <th className="p-3 text-center">IP Origem</th>
+                      <th className="p-3 text-left">Usuário Relacionado</th>
+                      <th className="p-3 text-center">Tipo de Falha</th>
+                      <th className="p-3 text-center">Código</th>
                       <th className="p-3 text-center">Tentativa Nº</th>
-                      <th className="p-3">Registrado em</th>
+                      <th className="p-3 text-center">Registrado em</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60 font-mono text-muted-foreground">
                     {historicoEventos.map((log) => (
                       <tr key={log.id + "-" + log.quantidadeTentativas} className="hover:bg-accent/5 transition-colors">
-                        <td className="p-3 font-semibold text-foreground">
+                        <td className="p-3 font-semibold text-foreground text-center">
                           {log.enderecoAcesso}
                         </td>
-                        <td className="p-3 font-sans text-foreground/80">
+                        <td className="p-3 font-sans text-foreground/80 text-left">
                           {log.usuarioIdentificado}
                         </td>
-                        <td className="p-3 font-sans">
+                        <td className="p-3 font-sans text-center">
                           {log.tipoOcorrencia}
                         </td>
-                        <td className="p-3 font-semibold text-primary/80">
+                        <td className="p-3 font-semibold text-primary/80 text-center">
                           {log.codigoSeguranca}
                         </td>
-                        <td className="p-3 text-center font-bold text-foreground/70">
+                        <td className="p-3 font-bold text-foreground/70 text-center">
                           {log.quantidadeTentativas}
                         </td>
-                        <td className="p-3 text-[11px] whitespace-nowrap">
+                        <td className="p-3 text-[11px] whitespace-nowrap text-center">
                           {new Date(log.dataTentativa).toLocaleString("pt-BR")}
                         </td>
                       </tr>

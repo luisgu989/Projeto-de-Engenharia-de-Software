@@ -75,26 +75,26 @@ export function ConfigCriptografia() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">ID do Registro</th>
-                <th className="p-4">Tipo de Informação Protegida</th>
-                <th className="p-4">Algoritmo / Método do ERP</th>
-                <th className="p-4">Data da Criptografia (Última Chave)</th>
+                <th className="p-4 text-center">ID do Registro</th>
+                <th className="p-4 text-center">Tipo de Informação Protegida</th>
+                <th className="p-4 text-center">Algoritmo / Método do ERP</th>
+                <th className="p-4 text-center">Data da Criptografia (Última Chave)</th>
                 <th className="p-4 text-center">Status da Proteção</th>
-                <th className="p-4 text-right min-w-[200px]">Permissão de Acesso (Editável)</th>
+                <th className="p-4 min-w-[200px] text-center">Permissão de Acesso (Editável)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
               {dadosProtegidos.map((dados) => (
                 <tr key={dados.id} className="hover:bg-accent/10 transition-colors">
-                  <td className="p-4 font-mono font-bold text-foreground">
+                  <td className="p-4 font-mono font-bold text-foreground text-center">
                     <div className="flex items-center gap-1">
                       <Lock className="h-3 w-3 text-primary" />
                       {dados.id}
                     </div>
                   </td>
-                  <td className="p-4 font-bold text-foreground leading-normal">{dados.tipoInformacao}</td>
-                  <td className="p-4 font-mono text-muted-foreground">{dados.metodoCriptografia}</td>
-                  <td className="p-4 text-muted-foreground">
+                  <td className="p-4 font-bold text-foreground leading-normal text-center">{dados.tipoInformacao}</td>
+                  <td className="p-4 font-mono text-muted-foreground text-center">{dados.metodoCriptografia}</td>
+                  <td className="p-4 text-muted-foreground text-center">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3.5 w-3.5 text-muted-foreground/50" />
                       {formatDate(dados.dataCriptografia)}
@@ -110,7 +110,7 @@ export function ConfigCriptografia() {
                       {dados.statusProtecao}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="p-4 text-center">
                     <select
                       value={dados.permissaoAcesso}
                       onChange={(e) => handlePermissaoChange(dados.id, e.target.value)}
@@ -146,11 +146,11 @@ export function ConfigCriptografia() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Carimbo de Hora</th>
-                <th className="p-4">Operador da Chave</th>
-                <th className="p-4">Registro ID</th>
-                <th className="p-4">Tipo de Informação</th>
-                <th className="p-4">Operação Efetuada</th>
+                <th className="p-4 text-center">Carimbo de Hora</th>
+                <th className="p-4 text-center">Operador da Chave</th>
+                <th className="p-4 text-center">Registro ID</th>
+                <th className="p-4 text-center">Tipo de Informação</th>
+                <th className="p-4 text-center">Operação Efetuada</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
@@ -163,14 +163,14 @@ export function ConfigCriptografia() {
               ) : (
                 historicoOperacoes.map((log) => (
                   <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-4 font-mono text-muted-foreground">{formatDate(log.timestamp)}</td>
-                    <td className="p-4">
+                    <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(log.timestamp)}</td>
+                    <td className="p-4 text-center">
                       <div className="font-semibold text-foreground">{log.usuario}</div>
                       <div className="text-[10px] text-muted-foreground font-mono">{log.email}</div>
                     </td>
-                    <td className="p-4 font-mono font-semibold text-foreground">{log.registroId}</td>
-                    <td className="p-4 text-muted-foreground">{log.tipoInformacao}</td>
-                    <td className="p-4 font-bold text-primary">{log.acao}</td>
+                    <td className="p-4 font-mono font-semibold text-foreground text-center">{log.registroId}</td>
+                    <td className="p-4 text-muted-foreground text-center">{log.tipoInformacao}</td>
+                    <td className="p-4 font-bold text-primary text-center">{log.acao}</td>
                   </tr>
                 ))
               )}

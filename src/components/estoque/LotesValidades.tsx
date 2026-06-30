@@ -51,12 +51,12 @@ export function LotesValidades() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID</th>
-                  <th className="p-3">Produto</th>
-                  <th className="p-3">Nº Lote</th>
-                  <th className="p-3">Nº Série</th>
-                  <th className="p-3">Data de Validade</th>
-                  <th className="p-3 text-right">Ação</th>
+                  <th className="p-3 text-center">ID</th>
+                  <th className="p-3 text-left">Produto</th>
+                  <th className="p-3 text-center">Nº Lote</th>
+                  <th className="p-3 text-center">Nº Série</th>
+                  <th className="p-3 text-center">Data de Validade</th>
+                  <th className="p-3 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -68,17 +68,17 @@ export function LotesValidades() {
 
                   return (
                     <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3 font-mono font-semibold">{item.id}</td>
-                      <td className="p-3 font-bold text-foreground">
+                      <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                      <td className="p-3 font-bold text-foreground text-left">
                         {item.produtoNome}
                         <span className="block font-mono text-[9px] text-muted-foreground font-normal">ID: {item.produtoId}</span>
                       </td>
-                      <td className="p-3 font-mono font-medium text-foreground">{item.numeroLote}</td>
-                      <td className="p-3 font-mono text-muted-foreground font-medium">{item.numeroSerie}</td>
-                      <td className="p-3">
+                      <td className="p-3 font-mono font-medium text-foreground text-center">{item.numeroLote}</td>
+                      <td className="p-3 font-mono text-muted-foreground font-medium text-center">{item.numeroSerie}</td>
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
-                            "px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1",
+                            "px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 whitespace-nowrap",
                             isExpired
                               ? "bg-destructive/10 text-destructive"
                               : isCloseToExpiration
@@ -89,7 +89,7 @@ export function LotesValidades() {
                           {item.dataValidade} {isExpired ? "(Expirado)" : isCloseToExpiration ? "(Próximo do vencimento)" : ""}
                         </span>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <Button
                           variant="ghost"
                           size="icon-xs"

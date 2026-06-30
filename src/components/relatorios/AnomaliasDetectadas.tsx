@@ -66,25 +66,25 @@ export function AnomaliasDetectadas() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID</th>
-                  <th className="p-3">Anomalia</th>
-                  <th className="p-3">Área</th>
-                  <th className="p-3">Criticidade</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Data/Hora</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">ID</th>
+                  <th className="p-3 text-center">Anomalia</th>
+                  <th className="p-3 text-center">Área</th>
+                  <th className="p-3 text-center">Criticidade</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Data/Hora</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {anomaliasFiltradas.map((item) => (
                   <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-3 font-mono font-semibold">{item.id}</td>
-                    <td className="p-3 font-bold text-foreground">{item.tipoAnomalia}</td>
-                    <td className="p-3 font-medium text-muted-foreground">{item.areaOperacional}</td>
-                    <td className="p-3">
+                    <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                    <td className="p-3 font-bold text-foreground text-center">{item.tipoAnomalia}</td>
+                    <td className="p-3 font-medium text-muted-foreground text-center">{item.areaOperacional}</td>
+                    <td className="p-3 text-center">
                       <span
                         className={cn(
-                          "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase",
+                          "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase whitespace-nowrap",
                           item.nivelCriticidade === "critico"
                             ? "bg-destructive/15 text-destructive animate-pulse"
                             : item.nivelCriticidade === "alto"
@@ -97,7 +97,7 @@ export function AnomaliasDetectadas() {
                         {item.nivelCriticidade}
                       </span>
                     </td>
-                    <td className="p-3">
+                    <td className="p-3 text-center">
                       <select
                         value={item.status}
                         onChange={(e) =>
@@ -117,10 +117,10 @@ export function AnomaliasDetectadas() {
                         <option value="resolvida">Resolvida</option>
                       </select>
                     </td>
-                    <td className="p-3 text-muted-foreground">
+                    <td className="p-3 text-muted-foreground text-center">
                       {new Date(item.dataDetecao).toLocaleString("pt-BR")}
                     </td>
-                    <td className="p-3 text-right">
+                    <td className="p-3 text-center">
                       <button
                         onClick={() => setSelectedAnomalia(item)}
                         className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer transition-colors"

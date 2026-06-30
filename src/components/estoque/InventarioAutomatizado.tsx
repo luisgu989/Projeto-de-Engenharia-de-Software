@@ -280,13 +280,13 @@ export function InventarioAutomatizado() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                    <th className="p-3">Código</th>
-                    <th className="p-3">Produto</th>
-                    <th className="p-3 text-right">Qtd Anterior</th>
-                    <th className="p-3 text-right">Contada</th>
-                    <th className="p-3 text-right">Ajuste</th>
-                    <th className="p-3">Executor</th>
-                    <th className="p-3">Conclusão</th>
+                    <th className="p-3 text-center">Código</th>
+                    <th className="p-3 text-left">Produto</th>
+                    <th className="p-3 text-center">Qtd Anterior</th>
+                    <th className="p-3 text-center">Contada</th>
+                    <th className="p-3 text-center">Ajuste</th>
+                    <th className="p-3 text-center">Executor</th>
+                    <th className="p-3 text-center">Conclusão</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -299,14 +299,14 @@ export function InventarioAutomatizado() {
                   ) : (
                     completedSessoes.map((s) => (
                       <tr key={s.id} className="hover:bg-accent/5 transition-colors">
-                        <td className="p-3 font-mono font-bold text-primary">{s.id}</td>
-                        <td className="p-3">
+                        <td className="p-3 font-mono font-bold text-primary text-center">{s.id}</td>
+                        <td className="p-3 text-left">
                           <span className="font-semibold block">{s.produtoNome}</span>
                           <span className="text-[9px] text-muted-foreground font-mono">ID: {s.produtoId}</span>
                         </td>
-                        <td className="p-3 text-right font-medium">{s.quantidadeAtual} un.</td>
-                        <td className="p-3 text-right font-extrabold">{s.quantidadeContada} un.</td>
-                        <td className="p-3 text-right font-extrabold">
+                        <td className="p-3 font-medium text-center">{s.quantidadeAtual} un.</td>
+                        <td className="p-3 font-extrabold text-center">{s.quantidadeContada} un.</td>
+                        <td className="p-3 font-extrabold text-center">
                           <span
                             className={cn(
                               s.quantidadeAjustada === 0
@@ -320,10 +320,10 @@ export function InventarioAutomatizado() {
                             {s.quantidadeAjustada}
                           </span>
                         </td>
-                        <td className="p-3 text-muted-foreground font-medium flex items-center gap-1">
+                        <td className="p-3 text-muted-foreground font-medium flex items-center gap-1 text-center">
                           <User className="h-3 w-3 shrink-0" /> {s.responsavel}
                         </td>
-                        <td className="p-3 text-muted-foreground">
+                        <td className="p-3 text-muted-foreground text-center">
                           {new Date(s.dataContagem).toLocaleDateString("pt-BR")}
                         </td>
                       </tr>

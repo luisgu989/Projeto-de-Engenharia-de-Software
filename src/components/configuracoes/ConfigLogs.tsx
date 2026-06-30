@@ -112,10 +112,10 @@ export function ConfigLogs() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Carimbo de Data/Hora</th>
+                <th className="p-4 text-center">Carimbo de Data/Hora</th>
                 <th className="p-4 text-center">Módulo</th>
-                <th className="p-4">Operação Realizada</th>
-                <th className="p-4">Operador do Sistema</th>
+                <th className="p-4 text-center">Operação Realizada</th>
+                <th className="p-4 text-center">Operador do Sistema</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-sm">
@@ -130,7 +130,7 @@ export function ConfigLogs() {
                   const catMeta = categoriesMap[log.categoria] || { title: log.categoria, color: "bg-accent text-muted-foreground" };
                   return (
                     <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-4 text-xs font-mono text-muted-foreground">
+                      <td className="p-4 text-xs font-mono text-muted-foreground text-center">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
                           {formatDate(log.timestamp)}
@@ -144,10 +144,10 @@ export function ConfigLogs() {
                           {catMeta.title}
                         </span>
                       </td>
-                      <td className="p-4 text-xs font-semibold text-foreground leading-normal">
+                      <td className="p-4 text-xs font-semibold text-foreground leading-normal text-center">
                         {log.acao}
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 text-center">
                         <div className="font-semibold text-xs text-foreground/95">{log.usuario}</div>
                         <div className="text-[10px] text-muted-foreground font-mono leading-none">{log.email}</div>
                       </td>

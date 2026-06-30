@@ -337,23 +337,23 @@ export function Sidebar({
       {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 flex flex-col border-r border-border bg-[#f8fafc] dark:bg-[#0c0a09] text-card-foreground transition-all duration-300 ease-in-out lg:translate-x-0 select-none",
+          "fixed top-0 bottom-0 left-0 z-50 flex flex-col border-r border-border bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out lg:translate-x-0 select-none",
           collapsed ? "w-16" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header / Logo (EP Preto) */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border bg-card shrink-0">
-          <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-950 dark:bg-zinc-800 text-white font-black text-base shadow-lg shadow-slate-950/20">
-              EP
-            </div>
-            {!collapsed && (
+        <div className={cn("flex h-16 items-center px-4 border-b border-border bg-card shrink-0", collapsed ? "justify-center" : "justify-between")}>
+          {!collapsed && (
+            <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-base shadow-lg shadow-primary/20">
+                EP
+              </div>
               <span className="font-extrabold text-base tracking-tight truncate text-foreground">
                 ERP Pro
               </span>
-            )}
-          </Link>
+            </Link>
+          )}
           <Button
             variant="ghost"
             size="icon-sm"
@@ -374,10 +374,10 @@ export function Sidebar({
           <div className="px-3 pt-4 shrink-0">
             <input
               type="text"
-              placeholder="Pesquisa..."
+              placeholder="Pesquisar..."
               value={menuSearch}
               onChange={(e) => setMenuSearch(e.target.value)}
-              className="w-full bg-card border border-border hover:border-muted-foreground/35 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none transition-all shadow-sm text-foreground placeholder:text-muted-foreground/60"
+              className="w-full bg-card border border-border hover:border-muted-foreground/35 focus:border-primary focus:ring-1 focus:ring-primary rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none transition-all shadow-sm text-foreground placeholder:text-muted-foreground/60"
             />
           </div>
         )}
@@ -408,7 +408,7 @@ export function Sidebar({
                           className={cn(
                             "flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all duration-150 flex-1 min-w-0",
                             isActive
-                              ? "bg-rose-600 text-white font-bold shadow-md shadow-rose-600/10"
+                              ? "bg-primary text-primary-foreground font-bold shadow-md shadow-primary/10"
                               : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
@@ -444,13 +444,13 @@ export function Sidebar({
                 return (
                   <div key={cat.title} className="py-1">
                     <Tooltip>
-                      <TooltipTrigger asChild>
+                      <TooltipTrigger render={<div className="mx-auto" />}>
                         <Link
                           href={cat.href}
                           onClick={() => setMobileOpen(false)}
                           className={cn(
-                            "w-10 h-10 mx-auto flex items-center justify-center bg-card border rounded-xl shadow-sm transition-all hover:bg-accent cursor-pointer text-rose-600 dark:text-rose-400",
-                            active && "border-rose-500 bg-rose-500 text-white dark:text-white"
+                            "w-10 h-10 flex items-center justify-center bg-card border rounded-xl shadow-sm transition-all hover:bg-accent cursor-pointer text-primary",
+                            active && "border-primary bg-primary text-primary-foreground"
                           )}
                         >
                           <CategoryIcon className="h-5 w-5 shrink-0" />
@@ -469,13 +469,13 @@ export function Sidebar({
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold bg-card border border-border shadow-sm rounded-xl hover:shadow hover:bg-accent/40 transition-all cursor-pointer",
-                    active && "border-rose-500/35 bg-rose-500 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-600"
+                    active && "border-primary/35 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground dark:bg-primary"
                   )}
                 >
                   <CategoryIcon
                     className={cn(
-                      "h-4.5 w-4.5 text-rose-600 dark:text-rose-400 shrink-0",
-                      active && "text-white dark:text-white"
+                      "h-4.5 w-4.5 text-primary shrink-0",
+                      active && "text-primary-foreground dark:text-white"
                     )}
                   />
                   <span className="flex-1 text-left truncate leading-none">{cat.title}</span>
@@ -494,7 +494,7 @@ export function Sidebar({
             )}
             title={`${user.name} (${user.email})`}
           >
-            <div className="h-8 w-8 shrink-0 rounded-full bg-rose-600/10 flex items-center justify-center font-bold text-xs text-rose-600 border border-rose-600/20 uppercase">
+            <div className="h-8 w-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center font-bold text-xs text-primary border border-primary/20 uppercase">
               {user.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
             </div>
             {!collapsed && (

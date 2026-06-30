@@ -154,7 +154,7 @@ export default function ChatPage() {
                             isSelf ? "text-primary-foreground/75" : "text-muted-foreground"
                           )}
                         >
-                          <span>{new Date(m.dataEnvio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>
+                          <span suppressHydrationWarning>{new Date(m.dataEnvio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>
                           {isSelf && <CheckCheck className="h-3 w-3 shrink-0" />}
                         </div>
                       </div>

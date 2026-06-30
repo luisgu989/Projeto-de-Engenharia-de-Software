@@ -35,12 +35,12 @@ export default function ColaboracaoPage() {
             <Link
               key={sub.href}
               href={sub.href}
-              className="flex items-center justify-between p-6 bg-card border border-border hover:border-rose-500/20 hover:shadow-md transition-all duration-200 rounded-2xl group cursor-pointer"
+              className="flex items-center justify-between p-6 bg-card border border-border hover:border-primary/20 hover:shadow-md transition-all duration-200 rounded-2xl group cursor-pointer"
             >
-              <span className="font-extrabold text-foreground group-hover:text-rose-600 transition-colors text-base">
+              <span className="font-extrabold text-foreground group-hover:text-primary transition-colors text-base">
                 {sub.title}
               </span>
-              <div className="p-3 bg-rose-600/10 text-rose-600 rounded-xl group-hover:bg-rose-600 group-hover:text-white transition-all shrink-0">
+              <div className="p-3 bg-primary/10 text-primary rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all shrink-0">
                 <Icon className="h-6 w-6" />
               </div>
             </Link>

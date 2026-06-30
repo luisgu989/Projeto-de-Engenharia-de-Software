@@ -106,13 +106,13 @@ export function VersionadorRegistros() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Código</th>
-                  <th className="p-3">Versão</th>
-                  <th className="p-3">Origem / Descrição</th>
-                  <th className="p-3">Data</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Responsável</th>
-                  <th className="p-3 text-right">Ação</th>
+                  <th className="p-3 text-center">Código</th>
+                  <th className="p-3 text-center">Versão</th>
+                  <th className="p-3 text-left">Origem / Descrição</th>
+                  <th className="p-3 text-center">Data</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-left">Responsável</th>
+                  <th className="p-3 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -127,13 +127,13 @@ export function VersionadorRegistros() {
                         isVersaoAtiva && "bg-primary/[0.02] font-semibold"
                       )}
                     >
-                      <td className="p-3 font-mono text-muted-foreground">{item.id}</td>
-                      <td className="p-3 font-bold">v{item.versao}</td>
-                      <td className="p-3 text-foreground">{item.origemImportacao}</td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 font-mono text-muted-foreground text-center">{item.id}</td>
+                      <td className="p-3 font-bold text-center">v{item.versao}</td>
+                      <td className="p-3 text-foreground text-left">{item.origemImportacao}</td>
+                      <td className="p-3 text-muted-foreground text-center">
                         {new Date(item.dataImportacao).toLocaleString("pt-BR")}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase",
@@ -145,11 +145,11 @@ export function VersionadorRegistros() {
                           {item.statusVersao}
                         </span>
                       </td>
-                      <td className="p-3 flex items-center gap-1.5 text-muted-foreground">
+                      <td className="p-3 flex items-center gap-1.5 text-muted-foreground text-left">
                         <User className="h-3 w-3" />
                         <span>{item.usuarioResponsavel}</span>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <button
                           onClick={() => setSelectedVersao(item)}
                           className="px-2.5 py-1 text-[10px] font-bold border border-border rounded-lg hover:bg-accent cursor-pointer transition-colors"

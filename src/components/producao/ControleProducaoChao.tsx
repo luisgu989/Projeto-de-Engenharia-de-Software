@@ -156,7 +156,7 @@ export function ControleProducaoChao() {
                       <span className="font-mono text-[10px] font-bold text-muted-foreground">
                         {p.id}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-blue-500/10 text-blue-600 dark:text-blue-400 whitespace-nowrap">
                         {p.etapaProducao}
                       </span>
                     </div>

@@ -100,15 +100,14 @@ export function AcoesInteligentesComponent() {
           sugestoesFiltradas.map((s) => (
             <div
               key={s.idRecomendacao}
-              className="p-5 rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 border-l-4"
-              style={{
-                borderLeftColor:
-                  s.nivelPrioridade === "Alta"
-                    ? "rgb(239, 68, 68)"
-                    : s.nivelPrioridade === "Média"
-                    ? "rgb(245, 158, 11)"
-                    : "rgb(59, 130, 246)",
-              }}
+              className={cn(
+                "p-5 rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 border-l-4",
+                s.nivelPrioridade === "Alta"
+                  ? "border-l-destructive"
+                  : s.nivelPrioridade === "Média"
+                  ? "border-l-amber-500"
+                  : "border-l-primary"
+              )}
             >
               {/* Header */}
               <div className="flex justify-between items-start gap-4">

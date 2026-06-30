@@ -20,7 +20,7 @@ export default function AtivosPage() {
       </div>
 
       {/* Tabs Header Navigation */}
-      <div className="flex border-b border-border no-print overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-border no-print overflow-x-auto custom-scrollbar pb-px">
         <button
           onClick={() => setAbaAtiva("ativos")}
           className={cn(

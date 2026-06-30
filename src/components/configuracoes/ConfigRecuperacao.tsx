@@ -188,12 +188,12 @@ export function ConfigRecuperacao() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  <th className="p-4">ID da Execução</th>
-                  <th className="p-4">Cenário Operado</th>
+                  <th className="p-4 text-center">ID da Execução</th>
+                  <th className="p-4 text-center">Cenário Operado</th>
                   <th className="p-4 text-center">Status</th>
-                  <th className="p-4">Dados Recuperados (Backup)</th>
-                  <th className="p-4">Serviços Ativados</th>
-                  <th className="p-4">Data/Hora</th>
+                  <th className="p-4 text-center">Dados Recuperados (Backup)</th>
+                  <th className="p-4 text-center">Serviços Ativados</th>
+                  <th className="p-4 text-center">Data/Hora</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs">
@@ -206,8 +206,8 @@ export function ConfigRecuperacao() {
                 ) : (
                   execucoes.map((exec) => (
                     <tr key={exec.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-4 font-mono font-bold text-foreground">{exec.id}</td>
-                      <td className="p-4 font-bold text-foreground">{exec.tipoRecuperacao}</td>
+                      <td className="p-4 font-mono font-bold text-foreground text-center">{exec.id}</td>
+                      <td className="p-4 font-bold text-foreground text-center">{exec.tipoRecuperacao}</td>
                       <td className="p-4 text-center">
                         <span className={cn(
                           "inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold border",
@@ -220,9 +220,9 @@ export function ConfigRecuperacao() {
                           {exec.status}
                         </span>
                       </td>
-                      <td className="p-4 text-muted-foreground leading-normal font-medium">{exec.dadosRecuperados}</td>
-                      <td className="p-4 text-muted-foreground leading-normal">{exec.servicosRestaurados}</td>
-                      <td className="p-4 font-mono text-muted-foreground">{formatDate(exec.dataExecucao)}</td>
+                      <td className="p-4 text-muted-foreground leading-normal font-medium text-center">{exec.dadosRecuperados}</td>
+                      <td className="p-4 text-muted-foreground leading-normal text-center">{exec.servicosRestaurados}</td>
+                      <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(exec.dataExecucao)}</td>
                     </tr>
                   ))
                 )}
@@ -248,26 +248,26 @@ export function ConfigRecuperacao() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Carimbo de Hora</th>
-                <th className="p-4">Execução ID</th>
-                <th className="p-4">Operador TI</th>
-                <th className="p-4">Cenário</th>
-                <th className="p-4">Logs e Etapas Operadas</th>
+                <th className="p-4 text-center">Carimbo de Hora</th>
+                <th className="p-4 text-center">Execução ID</th>
+                <th className="p-4 text-center">Operador TI</th>
+                <th className="p-4 text-center">Cenário</th>
+                <th className="p-4 text-center">Logs e Etapas Operadas</th>
                 <th className="p-4 text-center">Status Etapa</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
               {historicoOperacoes.map((log) => (
                 <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                  <td className="p-4 font-mono text-muted-foreground">{formatDate(log.timestamp)}</td>
-                  <td className="p-4 font-mono text-muted-foreground font-semibold">{log.execucaoId}</td>
-                  <td className="p-4">
+                  <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(log.timestamp)}</td>
+                  <td className="p-4 font-mono text-muted-foreground font-semibold text-center">{log.execucaoId}</td>
+                  <td className="p-4 text-center">
                     <div className="font-semibold text-foreground">{log.usuario}</div>
                     <div className="text-[10px] text-muted-foreground font-mono">{log.email}</div>
                   </td>
-                  <td className="p-4 font-semibold text-foreground leading-normal">{log.tipoRecuperacao}</td>
-                  <td className="p-4 text-muted-foreground leading-normal font-medium">{log.mensagem}</td>
-                  <td className="p-4 text-center font-bold">
+                  <td className="p-4 font-semibold text-foreground leading-normal text-center">{log.tipoRecuperacao}</td>
+                  <td className="p-4 text-muted-foreground leading-normal font-medium text-center">{log.mensagem}</td>
+                  <td className="p-4 font-bold text-center">
                     <span className={cn(
                       "inline-block px-1.5 py-0.5 rounded text-[10px] border",
                       log.statusEtapa === "Conclusão" || log.statusEtapa === "Concluído"

@@ -167,14 +167,14 @@ export function TabelaVendas({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">CÓDIGO</th>
-                <th className="p-4">CLIENTE</th>
-                <th className="p-4">DATA/HORA</th>
-                <th className="p-4">PRODUTOS</th>
-                <th className="p-4">ITENS</th>
-                <th className="p-4">PAGAMENTO</th>
-                <th className="p-4">STATUS</th>
-                <th className="p-4 text-right">VALOR TOTAL</th>
+                <th className="p-4 text-center">CÓDIGO</th>
+                <th className="p-4 text-left">CLIENTE</th>
+                <th className="p-4 text-center">DATA/HORA</th>
+                <th className="p-4 text-center">PRODUTOS</th>
+                <th className="p-4 text-center">ITENS</th>
+                <th className="p-4 text-center">PAGAMENTO</th>
+                <th className="p-4 text-center">STATUS</th>
+                <th className="p-4 text-center">VALOR TOTAL</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-sm">
@@ -190,18 +190,18 @@ export function TabelaVendas({
                     key={venda.id}
                     className="hover:bg-accent/20 transition-colors"
                   >
-                    <td className="p-4 font-mono font-semibold text-foreground/80">
+                    <td className="p-4 font-mono font-semibold text-foreground/80 text-center">
                       {venda.id}
                     </td>
-                    <td className="p-4 font-medium">{venda.cliente}</td>
-                    <td className="p-4 text-muted-foreground text-xs">
+                    <td className="p-4 font-medium text-left">{venda.cliente}</td>
+                    <td className="p-4 text-muted-foreground text-xs text-center">
                       {formatDate(venda.data)}
                     </td>
-                    <td className="p-4 text-xs">
+                    <td className="p-4 text-xs text-left">
                       {venda.produtos && venda.produtos.length > 0 ? (
-                        <div className="flex flex-col gap-1 max-w-[180px]">
+                        <div className="flex flex-col gap-1 mx-auto max-w-[220px] items-center">
                           {venda.produtos.map((p) => (
-                            <span key={p.produtoId} className="truncate text-foreground/80 font-medium" title={p.nome}>
+                            <span key={p.produtoId} className="truncate w-full text-center text-foreground/80 font-medium" title={p.nome}>
                               {p.quantidade}x {p.nome}
                             </span>
                           ))}
@@ -210,16 +210,16 @@ export function TabelaVendas({
                         <span className="text-muted-foreground italic opacity-70">N/A</span>
                       )}
                     </td>
-                    <td className="p-4 text-muted-foreground">{venda.itens}</td>
-                    <td className="p-4">
+                    <td className="p-4 text-muted-foreground text-center">{venda.itens}</td>
+                    <td className="p-4 text-center">
                       <span className="inline-flex items-center gap-1.5 text-xs text-foreground/80 bg-accent px-2 py-0.5 rounded">
                         {venda.metodoPagamento}
                       </span>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span
                         className={cn(
-                          "inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full",
+                          "inline-flex items-center justify-center text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap",
                           venda.status === "confirmado"
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                             : venda.status === "pendente"
@@ -230,7 +230,7 @@ export function TabelaVendas({
                         {venda.status.charAt(0).toUpperCase() + venda.status.slice(1)}
                       </span>
                     </td>
-                    <td className="p-4 text-right font-bold tracking-tight">
+                    <td className="p-4 font-bold tracking-tight text-right">
                       {formatCurrency(venda.valorTotal)}
                     </td>
                   </tr>

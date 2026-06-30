@@ -174,12 +174,12 @@ export function SincronizadorDados() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  <th className="p-4">ID da Sincronização</th>
-                  <th className="p-4">Relação Origem → Destino</th>
+                  <th className="p-4 text-center">ID da Sincronização</th>
+                  <th className="p-4 text-center">Relação Origem → Destino</th>
                   <th className="p-4 text-center">Situação</th>
                   <th className="p-4 text-center">Versão</th>
-                  <th className="p-4">Horário Execução</th>
-                  <th className="p-4">Responsável</th>
+                  <th className="p-4 text-center">Horário Execução</th>
+                  <th className="p-4 text-left">Responsável</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs">
@@ -194,7 +194,7 @@ export function SincronizadorDados() {
                     const isConflict = sync.status === "Conflito Detectado";
                     return (
                       <tr key={sync.id} className="hover:bg-accent/10 transition-colors">
-                        <td className="p-4 font-mono font-bold text-foreground">
+                        <td className="p-4 font-mono font-bold text-foreground text-center">
                           <div className="flex flex-col gap-1">
                             <span className="flex items-center gap-1 font-bold">
                               <Globe className="h-3 w-3 text-primary" /> {sync.id}
@@ -202,7 +202,7 @@ export function SincronizadorDados() {
                             <span className="text-[9px] font-mono text-muted-foreground uppercase">{sync.tipoEvento}</span>
                           </div>
                         </td>
-                        <td className="p-4 font-semibold text-foreground">
+                        <td className="p-4 font-semibold text-foreground text-center">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="bg-muted px-1.5 py-0.5 rounded text-[10px] text-muted-foreground font-mono">{sync.origem}</span>
                             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
@@ -224,8 +224,8 @@ export function SincronizadorDados() {
                             v{sync.versaoRegistro}
                           </span>
                         </td>
-                        <td className="p-4 font-mono text-muted-foreground">{formatDate(sync.horarioExecucao)}</td>
-                        <td className="p-4">
+                        <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(sync.horarioExecucao)}</td>
+                        <td className="p-4 text-left">
                           <div className="font-semibold text-foreground">{sync.usuarioResponsavel}</div>
                           <div className="text-[9px] text-muted-foreground font-mono">{sync.emailResponsavel}</div>
                         </td>
@@ -264,7 +264,7 @@ export function SincronizadorDados() {
             >
               <div className="flex justify-between items-center text-[10px] text-muted-foreground border-b border-border/50 pb-1">
                 <span>[SYNC ID: {sync.id}] [VERSÃO: v{sync.versaoRegistro}]</span>
-                <span>{formatDate(sync.horarioExecucao)}</span>
+                <span suppressHydrationWarning>{formatDate(sync.horarioExecucao)}</span>
               </div>
               <p className={cn(
                 "font-semibold leading-relaxed",

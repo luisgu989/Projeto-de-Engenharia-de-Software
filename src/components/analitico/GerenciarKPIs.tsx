@@ -206,7 +206,7 @@ export function GerenciarKPIsComponent() {
                   <span className="flex items-center gap-1 text-[8px] uppercase tracking-wider text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
                     <ShieldAlert className="h-3 w-3" /> Protegido
                   </span>
-                  <span className="truncate">At.: {new Date(k.dataAtualizacao).toLocaleDateString("pt-BR")}</span>
+                  <span className="truncate" suppressHydrationWarning>At.: {new Date(k.dataAtualizacao).toLocaleDateString("pt-BR")}</span>
                 </div>
               </div>
             );

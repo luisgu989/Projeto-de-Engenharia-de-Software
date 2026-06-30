@@ -58,13 +58,13 @@ export function ReposicaoEstoque() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                    <th className="p-3">Produto</th>
-                    <th className="p-3">Categoria</th>
-                    <th className="p-3 text-right">Qtd Atual</th>
-                    <th className="p-3 text-right">Qtd Mínima</th>
-                    <th className="p-3 text-right text-amber-600 dark:text-amber-500">Reposição Sugerida</th>
-                    <th className="p-3">Fornecedor</th>
-                    <th className="p-3 text-right">Ação</th>
+                    <th className="p-3 text-left">Produto</th>
+                    <th className="p-3 text-left">Categoria</th>
+                    <th className="p-3 text-center">Qtd Atual</th>
+                    <th className="p-3 text-center">Qtd Mínima</th>
+                    <th className="p-3 text-amber-600 dark:text-amber-500 text-center">Reposição Sugerida</th>
+                    <th className="p-3 text-left">Fornecedor</th>
+                    <th className="p-3 text-center">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
@@ -75,15 +75,15 @@ export function ReposicaoEstoque() {
 
                     return (
                       <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                        <td className="p-3 font-bold text-foreground">
+                        <td className="p-3 font-bold text-foreground text-left">
                           {item.nome}
                           <span className="block font-mono text-[9px] text-muted-foreground font-normal">SKU: {item.sku}</span>
                         </td>
-                        <td className="p-3 text-muted-foreground font-medium">{item.categoria}</td>
-                        <td className="p-3 text-right font-semibold">{item.quantidade} un.</td>
-                        <td className="p-3 text-right text-muted-foreground font-semibold">{item.estoqueMinimo} un.</td>
-                        <td className="p-3 text-right font-extrabold text-amber-600 dark:text-amber-500">{quantidadeSugerida} un.</td>
-                        <td className="p-3">
+                        <td className="p-3 text-muted-foreground font-medium text-left">{item.categoria}</td>
+                        <td className="p-3 font-semibold text-center">{item.quantidade} un.</td>
+                        <td className="p-3 text-muted-foreground font-semibold text-center">{item.estoqueMinimo} un.</td>
+                        <td className="p-3 font-extrabold text-amber-600 dark:text-amber-500 text-center">{quantidadeSugerida} un.</td>
+                        <td className="p-3 text-left">
                           <select
                             value={selectedFornecedor}
                             onChange={(e) => handleFornecedorChange(item.id, e.target.value)}
@@ -97,7 +97,7 @@ export function ReposicaoEstoque() {
                             ))}
                           </select>
                         </td>
-                        <td className="p-3 text-right">
+                        <td className="p-3 text-center">
                           {isSuccess ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg">
                               <CheckCircle className="h-3 w-3" /> Solicitado

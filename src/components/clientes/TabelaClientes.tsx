@@ -67,12 +67,12 @@ export function TabelaClientes({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">CÓDIGO</th>
-                <th className="p-4">NOME / RAZÃO SOCIAL</th>
-                <th className="p-4">DOCUMENTO (CPF/CNPJ)</th>
-                <th className="p-4">CONTATO</th>
-                <th className="p-4">LOCALIZAÇÃO</th>
-                <th className="p-4">STATUS</th>
+                <th className="p-4 text-center">CÓDIGO</th>
+                <th className="p-4 text-left">NOME / RAZÃO SOCIAL</th>
+                <th className="p-4 text-left">DOCUMENTO (CPF/CNPJ)</th>
+                <th className="p-4 text-center">CONTATO</th>
+                <th className="p-4 text-center">LOCALIZAÇÃO</th>
+                <th className="p-4 text-center">STATUS</th>
                 <th className="p-4 text-center">AÇÕES</th>
               </tr>
             </thead>
@@ -89,26 +89,26 @@ export function TabelaClientes({
                     key={cliente.id}
                     className="hover:bg-accent/20 transition-colors"
                   >
-                    <td className="p-4 font-mono font-semibold text-foreground/80">
+                    <td className="p-4 font-mono font-semibold text-foreground/80 text-center">
                       {cliente.id}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-left">
                       <div className="font-medium text-foreground">{cliente.nome}</div>
                       <div className="text-[10px] text-muted-foreground font-semibold">
                         Pessoa {cliente.tipo === "PF" ? "Física (PF)" : "Jurídica (PJ)"}
                       </div>
                     </td>
-                    <td className="p-4 font-mono text-xs">
+                    <td className="p-4 font-mono text-xs text-left">
                       {cliente.documento}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <div className="text-xs">{cliente.email}</div>
                       <div className="text-[10px] text-muted-foreground">{cliente.telefone}</div>
                     </td>
-                    <td className="p-4 text-muted-foreground">
+                    <td className="p-4 text-muted-foreground text-center">
                       {cliente.cidade} - {cliente.estado}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span
                         className={cn(
                           "inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full",
@@ -120,7 +120,7 @@ export function TabelaClientes({
                         {cliente.status === "ativo" ? "Ativo" : "Inativo"}
                       </span>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-1">
                         {/* Audit Details Trigger */}
                         <Button

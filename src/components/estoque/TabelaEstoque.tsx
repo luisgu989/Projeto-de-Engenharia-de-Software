@@ -501,12 +501,12 @@ export function TabelaEstoque({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">SKU / CÓDIGO</th>
-                <th className="p-4">NOME DO PRODUTO</th>
-                <th className="p-4">CATEGORIA</th>
+                <th className="p-4 text-center">SKU / CÓDIGO</th>
+                <th className="p-4 text-center">NOME DO PRODUTO</th>
+                <th className="p-4 text-center">CATEGORIA</th>
                 <th className="p-4 text-center">QTD EM ESTOQUE</th>
-                <th className="p-4 text-right">PREÇO CUSTO</th>
-                <th className="p-4 text-right">PREÇO VENDA</th>
+                <th className="p-4 text-center">PREÇO CUSTO</th>
+                <th className="p-4 text-center">PREÇO VENDA</th>
                 <th className="p-4 text-center">AÇÕES</th>
               </tr>
             </thead>
@@ -528,12 +528,12 @@ export function TabelaEstoque({
                         isLowStock && "bg-destructive/5 hover:bg-destructive/10"
                       )}
                     >
-                      <td className="p-4 font-mono text-xs">
+                      <td className="p-4 font-mono text-xs text-center">
                         <span className="font-semibold text-foreground/80">{item.sku}</span>
                         <div className="text-[10px] text-muted-foreground">{item.id}</div>
                       </td>
-                      <td className="p-4">
-                        <div className="font-medium text-foreground flex items-center gap-2">
+                      <td className="p-4 text-left">
+                        <div className="font-medium text-foreground flex items-center justify-center gap-2">
                           {item.nome}
                           {isLowStock && (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.2 bg-destructive/10 text-destructive rounded">
@@ -543,8 +543,8 @@ export function TabelaEstoque({
                           )}
                         </div>
                       </td>
-                      <td className="p-4 text-muted-foreground">{item.categoria}</td>
-                      <td className="p-4 text-center font-semibold">
+                      <td className="p-4 text-muted-foreground text-left">{item.categoria}</td>
+                      <td className="p-4 font-semibold text-center">
                         <span
                           className={cn(
                             isLowStock
@@ -559,8 +559,8 @@ export function TabelaEstoque({
                           / {item.estoqueMinimo} (mín)
                         </span>
                       </td>
-                      <td className="p-4 text-right font-mono">{formatCurrency(item.precoCusto)}</td>
-                      <td className="p-4 text-right font-mono font-bold">{formatCurrency(item.precoVenda)}</td>
+                      <td className="p-4 font-mono text-right">{formatCurrency(item.precoCusto)}</td>
+                      <td className="p-4 font-mono font-bold text-right">{formatCurrency(item.precoVenda)}</td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-1">
                           {/* Histórico de Auditoria */}
@@ -1039,7 +1039,7 @@ export function TabelaEstoque({
                         </div>
                         <div className="text-[10px] text-muted-foreground flex items-center justify-between">
                           <span className="flex items-center gap-1"><User className="h-3 w-3" /> {mov.usuario}</span>
-                          <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {formatDate(mov.data)}</span>
+                          <span className="flex items-center gap-1" suppressHydrationWarning><Calendar className="h-3 w-3" /> {formatDate(mov.data)}</span>
                         </div>
                       </div>
                     ))}

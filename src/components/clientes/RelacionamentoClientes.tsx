@@ -208,12 +208,12 @@ export function RelacionamentoClientes() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                <th className="px-4 py-3 text-left">ID Ticket</th>
+                <th className="px-4 py-3 text-center">ID Ticket</th>
                 <th className="px-4 py-3 text-left">Cliente</th>
-                <th className="px-4 py-3 text-left">Canal</th>
+                <th className="px-4 py-3 text-center">Canal</th>
                 <th className="px-4 py-3 text-left">Descrição da Interação</th>
-                <th className="px-4 py-3 text-left hidden md:table-cell">Registrado por</th>
-                <th className="px-4 py-3 text-left hidden lg:table-cell">Data/Hora</th>
+                <th className="px-4 py-3 hidden md:table-cell text-center">Registrado por</th>
+                <th className="px-4 py-3 hidden lg:table-cell text-center">Data/Hora</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-center">Ações</th>
               </tr>
@@ -228,24 +228,24 @@ export function RelacionamentoClientes() {
               ) : (
                 filteredCRM.map((item) => (
                   <tr key={item.id} className="hover:bg-accent/30 transition-colors duration-100">
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{item.id}</td>
-                    <td className="px-4 py-3 font-bold">{item.clienteNome}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground text-center">{item.id}</td>
+                    <td className="px-4 py-3 font-bold text-left">{item.clienteNome}</td>
+                    <td className="px-4 py-3 text-center">
                       <div className="flex items-center gap-1.5 text-xs">
                         {getTipoIcon(item.tipoInteracao)}
                         <span>{item.tipoInteracao}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs max-w-[280px] break-words">
+                    <td className="px-4 py-3 text-muted-foreground text-xs max-w-[280px] break-words text-left">
                       {item.descricao}
                     </td>
-                    <td className="px-4 py-3 text-xs hidden md:table-cell font-medium">
+                    <td className="px-4 py-3 text-xs hidden md:table-cell font-medium text-center">
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <User className="h-3.5 w-3.5" />
                         {item.usuarioResponsavel}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell">
+                    <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell text-center">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
                         {formatDate(item.dataRegistro)}

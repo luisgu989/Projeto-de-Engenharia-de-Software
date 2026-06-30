@@ -162,14 +162,14 @@ export function GerenciadorAtivos() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID do Ativo</th>
-                  <th className="p-3">Cód. Patrimonial</th>
-                  <th className="p-3">Descrição</th>
-                  <th className="p-3">Setor Responsável</th>
-                  <th className="p-3">Localização</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Atualização</th>
-                  <th className="p-3 text-right">Ação</th>
+                  <th className="p-3 text-center">ID do Ativo</th>
+                  <th className="p-3 text-center">Cód. Patrimonial</th>
+                  <th className="p-3 text-left">Descrição</th>
+                  <th className="p-3 text-left">Setor Responsável</th>
+                  <th className="p-3 text-center">Localização</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Atualização</th>
+                  <th className="p-3 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -182,16 +182,16 @@ export function GerenciadorAtivos() {
                 ) : (
                   ativosFiltrados.map((a) => (
                     <tr key={a.id} className="hover:bg-accent/5 transition-colors">
-                      <td className="p-3 font-mono font-bold text-muted-foreground">{a.id}</td>
-                      <td className="p-3 font-mono font-bold text-foreground">{a.codigoPatrimonial}</td>
-                      <td className="p-3 font-medium text-foreground max-w-[150px] truncate" title={a.descricao}>
+                      <td className="p-3 font-mono font-bold text-muted-foreground text-center">{a.id}</td>
+                      <td className="p-3 font-mono font-bold text-foreground text-center">{a.codigoPatrimonial}</td>
+                      <td className="p-3 font-medium text-foreground max-w-[150px] truncate text-left" title={a.descricao}>
                         {a.descricao}
                       </td>
-                      <td className="p-3 font-medium text-muted-foreground">{a.setorResponsavel}</td>
-                      <td className="p-3 text-muted-foreground flex items-center gap-1">
+                      <td className="p-3 font-medium text-muted-foreground text-left">{a.setorResponsavel}</td>
+                      <td className="p-3 text-muted-foreground flex items-center gap-1 text-center">
                         <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" /> {a.localizacaoAtual}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase",
@@ -205,13 +205,13 @@ export function GerenciadorAtivos() {
                           {a.status === "em_manutencao" ? "Em Manutenção" : a.status}
                         </span>
                       </td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 text-muted-foreground text-center">
                         <span className="block text-[10px]">
                           {new Date(a.dataAtualizacao).toLocaleDateString("pt-BR")}
                         </span>
                         <span className="block text-[9px] text-muted-foreground/80">Por: {a.responsavel}</span>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <Button
                           variant="ghost"
                           size="icon-xs"

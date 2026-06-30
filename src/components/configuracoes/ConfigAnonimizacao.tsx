@@ -61,15 +61,15 @@ export function ConfigAnonimizacao() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">ID do Registro</th>
-                <th className="p-4">Tipo de Dado</th>
-                <th className="p-4">Valor Original (Mapeado)</th>
-                <th className="p-4">Valor Processado (Banco)</th>
+                <th className="p-4 text-center">ID do Registro</th>
+                <th className="p-4 text-center">Tipo de Dado</th>
+                <th className="p-4 text-center">Valor Original (Mapeado)</th>
+                <th className="p-4 text-center">Valor Processado (Banco)</th>
                 <th className="p-4 text-center">Situação</th>
-                <th className="p-4">Algoritmo / Método</th>
-                <th className="p-4">Data do Processamento</th>
+                <th className="p-4 text-center">Algoritmo / Método</th>
+                <th className="p-4 text-center">Data do Processamento</th>
                 <th className="p-4 text-center">Ref. Integridade</th>
-                <th className="p-4 text-right">Ação</th>
+                <th className="p-4 text-center">Ação</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
@@ -77,14 +77,14 @@ export function ConfigAnonimizacao() {
                 const isAnon = reg.status === "Anonimizado";
                 return (
                   <tr key={reg.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-4 font-mono font-bold text-foreground">{reg.id}</td>
-                    <td className="p-4">
+                    <td className="p-4 font-mono font-bold text-foreground text-center">{reg.id}</td>
+                    <td className="p-4 text-center">
                       <span className="inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-primary/10 text-primary border border-primary/20">
                         {reg.tipoDado}
                       </span>
                     </td>
-                    <td className="p-4 font-medium text-muted-foreground">{reg.valorOriginal}</td>
-                    <td className={cn("p-4 font-mono font-bold", isAnon ? "text-emerald-500" : "text-foreground")}>
+                    <td className="p-4 font-medium text-muted-foreground text-right">{reg.valorOriginal}</td>
+                    <td className="text-right" className={cn("p-4 font-mono font-bold", isAnon ? "text-emerald-500" : "text-foreground")}>
                       {reg.valorAtual}
                     </td>
                     <td className="p-4 text-center">
@@ -97,8 +97,8 @@ export function ConfigAnonimizacao() {
                         {reg.status}
                       </span>
                     </td>
-                    <td className="p-4 text-muted-foreground italic font-semibold">{reg.metodoAplicado}</td>
-                    <td className="p-4 font-mono text-muted-foreground">{formatDate(reg.dataAnonimizacao)}</td>
+                    <td className="p-4 text-muted-foreground italic font-semibold text-center">{reg.metodoAplicado}</td>
+                    <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(reg.dataAnonimizacao)}</td>
                     <td className="p-4 text-center">
                       {reg.integridadePreservada ? (
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
@@ -108,7 +108,7 @@ export function ConfigAnonimizacao() {
                         <span className="text-destructive font-semibold">Instável</span>
                       )}
                     </td>
-                    <td className="p-4 text-right">
+                    <td className="p-4 text-center">
                       {!isAnon ? (
                         <button
                           onClick={() => handleAnonimizar(reg.id, reg.tipoDado)}
@@ -146,26 +146,26 @@ export function ConfigAnonimizacao() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/10 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Carimbo de Hora</th>
-                <th className="p-4">Operador Responsável</th>
-                <th className="p-4">Registro ID</th>
-                <th className="p-4">Categoria de Dado</th>
-                <th className="p-4">Método Utilizado</th>
-                <th className="p-4">Operação Registrada</th>
+                <th className="p-4 text-center">Carimbo de Hora</th>
+                <th className="p-4 text-left">Operador Responsável</th>
+                <th className="p-4 text-center">Registro ID</th>
+                <th className="p-4 text-left">Categoria de Dado</th>
+                <th className="p-4 text-center">Método Utilizado</th>
+                <th className="p-4 text-center">Operação Registrada</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
               {historicoOperacoes.map((log) => (
                 <tr key={log.id} className="hover:bg-accent/10 transition-colors">
-                  <td className="p-4 font-mono text-muted-foreground">{formatDate(log.timestamp)}</td>
-                  <td className="p-4">
+                  <td className="p-4 font-mono text-muted-foreground text-center" suppressHydrationWarning>{formatDate(log.timestamp)}</td>
+                  <td className="p-4 text-left">
                     <div className="font-semibold text-foreground">{log.usuario}</div>
                     <div className="text-[10px] text-muted-foreground font-mono">{log.email}</div>
                   </td>
-                  <td className="p-4 font-mono font-bold text-foreground">{log.registroId}</td>
-                  <td className="p-4 font-semibold text-foreground">{log.tipoDado}</td>
-                  <td className="p-4 font-mono font-bold uppercase text-primary">{log.metodo}</td>
-                  <td className="p-4 text-muted-foreground font-medium leading-normal">{log.acao}</td>
+                  <td className="p-4 font-mono font-bold text-foreground text-center">{log.registroId}</td>
+                  <td className="p-4 font-semibold text-foreground text-left">{log.tipoDado}</td>
+                  <td className="p-4 font-mono font-bold uppercase text-primary text-center">{log.metodo}</td>
+                  <td className="p-4 text-muted-foreground font-medium leading-normal text-center">{log.acao}</td>
                 </tr>
               ))}
             </tbody>

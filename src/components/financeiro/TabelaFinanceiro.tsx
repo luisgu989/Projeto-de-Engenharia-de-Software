@@ -157,14 +157,14 @@ export function TabelaFinanceiro({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">ID</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Descrição</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Contraparte</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Categoria</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Vencimento</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tipo</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">ID</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-left">Descrição</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell text-left">Contraparte</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell text-left">Categoria</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell text-center">Vencimento</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Tipo</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Valor</th>
+              <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -180,16 +180,16 @@ export function TabelaFinanceiro({
                   key={l.id}
                   className="hover:bg-accent/30 transition-colors duration-100"
                 >
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{l.id}</td>
-                  <td className="px-4 py-3 font-medium max-w-[180px] truncate">{l.descricao}</td>
-                  <td className="px-4 py-3 text-muted-foreground hidden md:table-cell max-w-[160px] truncate">{l.contraparte}</td>
-                  <td className="px-4 py-3 hidden lg:table-cell">
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground text-center">{l.id}</td>
+                  <td className="px-4 py-3 font-medium max-w-[180px] truncate text-left">{l.descricao}</td>
+                  <td className="px-4 py-3 text-muted-foreground hidden md:table-cell max-w-[160px] truncate text-left">{l.contraparte}</td>
+                  <td className="px-4 py-3 hidden lg:table-cell text-left">
                     <span className="text-xs px-2 py-0.5 rounded-md bg-accent text-accent-foreground font-medium">
                       {l.categoria}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{formatDate(l.vencimento)}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell text-center" suppressHydrationWarning>{formatDate(l.vencimento)}</td>
+                  <td className="px-4 py-3 text-center">
                     <span className={`inline-flex items-center gap-1 text-xs font-medium ${
                       l.tipo === "receber"
                         ? "text-emerald-600 dark:text-emerald-400"
@@ -201,7 +201,7 @@ export function TabelaFinanceiro({
                       {l.tipo === "receber" ? "Receber" : "Pagar"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold tracking-tight">
+                  <td className="px-4 py-3 font-bold tracking-tight text-right">
                     {formatCurrency(l.valor)}
                   </td>
                   <td className="px-4 py-3 text-center">

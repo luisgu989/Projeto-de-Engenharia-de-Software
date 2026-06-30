@@ -177,7 +177,7 @@ export default function ChamadosPage() {
                 <div className="flex flex-wrap justify-between items-center gap-4 text-[10px] text-muted-foreground font-semibold">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" /> {c.usuarioSolicitante} ({c.solicitanteEmail})</span>
-                    <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {new Date(c.dataAbertura).toLocaleString("pt-BR")}</span>
+                    <span className="flex items-center gap-1" suppressHydrationWarning><Calendar className="h-3.5 w-3.5" /> {new Date(c.dataAbertura).toLocaleString("pt-BR")}</span>
                   </div>
 
                   <button
@@ -251,7 +251,7 @@ export default function ChamadosPage() {
                           
                           <div className="flex justify-between items-center text-[10px] text-muted-foreground font-semibold">
                             <span className="flex items-center gap-1">{log.usuario} | Status: <strong className="text-foreground">{log.status}</strong></span>
-                            <span>{new Date(log.data).toLocaleString("pt-BR")}</span>
+                            <span suppressHydrationWarning>{new Date(log.data).toLocaleString("pt-BR")}</span>
                           </div>
                           <p className="text-foreground font-medium">{log.descricaoAcao}</p>
                         </div>
@@ -265,7 +265,7 @@ export default function ChamadosPage() {
                   <span className="flex items-center gap-1 text-[8px] uppercase tracking-wider text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
                     <ShieldAlert className="h-3 w-3" /> Imutável
                   </span>
-                  <span>Data de Abertura: {new Date(c.dataAbertura).toLocaleDateString("pt-BR")}</span>
+                  <span suppressHydrationWarning>Data de Abertura: {new Date(c.dataAbertura).toLocaleDateString("pt-BR")}</span>
                 </div>
               </div>
             );

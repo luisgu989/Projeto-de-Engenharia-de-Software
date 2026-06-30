@@ -90,7 +90,7 @@ export function MonitorSensores() {
                     </span>
                     <span
                       className={cn(
-                        "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide",
+                        "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide whitespace-nowrap",
                         sensor.status === "ativo"
                           ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                           : sensor.status === "manutencao"

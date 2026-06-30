@@ -167,12 +167,12 @@ export function ContasAPagar() {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground font-bold uppercase tracking-wider">
-                <th className="p-4">Código</th>
-                <th className="p-4">Descrição da Despesa</th>
-                <th className="p-4">Fornecedor (Contraparte)</th>
-                <th className="p-4">Vencimento</th>
-                <th className="p-4">Categoria</th>
-                <th className="p-4 text-right">Valor</th>
+                <th className="p-4 text-center">Código</th>
+                <th className="p-4 text-left">Descrição da Despesa</th>
+                <th className="p-4 text-left">Fornecedor (Contraparte)</th>
+                <th className="p-4 text-center">Vencimento</th>
+                <th className="p-4 text-left">Categoria</th>
+                <th className="p-4 text-center">Valor</th>
                 <th className="p-4 text-center">Status</th>
                 <th className="p-4 text-center">Ações</th>
               </tr>
@@ -190,15 +190,15 @@ export function ContasAPagar() {
                   const isVencida = c.status === "vencido";
                   return (
                     <tr key={c.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-4 font-mono font-bold text-muted-foreground">{c.id}</td>
-                      <td className="p-4 font-bold text-foreground">{c.descricao}</td>
-                      <td className="p-4">
+                      <td className="p-4 font-mono font-bold text-muted-foreground text-center">{c.id}</td>
+                      <td className="p-4 font-bold text-foreground text-left">{c.descricao}</td>
+                      <td className="p-4 text-left">
                         <div className="flex items-center gap-1.5 font-semibold text-foreground/80">
                           <User className="h-3.5 w-3.5 text-muted-foreground" />
                           {c.contraparte}
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 text-center">
                         <div className="flex items-center gap-1.5 font-semibold">
                           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                           <span className={cn(isVencida ? "text-destructive font-bold" : "text-muted-foreground")}>
@@ -206,11 +206,11 @@ export function ContasAPagar() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 text-muted-foreground font-semibold">{c.categoria}</td>
-                      <td className="p-4 text-right font-bold text-foreground">{formatCurrency(c.valor)}</td>
+                      <td className="p-4 text-muted-foreground font-semibold text-left">{c.categoria}</td>
+                      <td className="p-4 font-bold text-foreground text-right">{formatCurrency(c.valor)}</td>
                       <td className="p-4 text-center">
                         <span className={cn(
-                          "px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase",
+                          "px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase whitespace-nowrap",
                           c.status === "pago"
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
                             : c.status === "vencido"

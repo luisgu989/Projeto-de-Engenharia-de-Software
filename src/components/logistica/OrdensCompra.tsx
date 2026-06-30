@@ -55,29 +55,29 @@ export function OrdensCompra() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID</th>
-                  <th className="p-3">Fornecedor</th>
-                  <th className="p-3">Produto</th>
-                  <th className="p-3 text-right">Qtd</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Data</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">ID</th>
+                  <th className="p-3 text-left">Fornecedor</th>
+                  <th className="p-3 text-left">Produto</th>
+                  <th className="p-3 text-center">Qtd</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Data</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {ordensCompra.map((item) => (
                   <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-3 font-mono font-semibold">{item.id}</td>
-                    <td className="p-3 font-medium text-foreground">{item.fornecedor}</td>
-                    <td className="p-3 font-bold text-foreground">
+                    <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                    <td className="p-3 font-medium text-foreground text-left">{item.fornecedor}</td>
+                    <td className="p-3 font-bold text-foreground text-left">
                       {item.produtoNome}
                       <span className="block font-mono text-[9px] text-muted-foreground font-normal">ID: {item.produtoId}</span>
                     </td>
-                    <td className="p-3 text-right font-semibold">{item.quantidade} un.</td>
-                    <td className="p-3">
+                    <td className="p-3 font-semibold text-center">{item.quantidade} un.</td>
+                    <td className="p-3 text-center">
                       <span
                         className={cn(
-                          "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase",
+                          "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase whitespace-nowrap",
                           item.status === "entregue"
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                             : item.status === "aprovada"
@@ -90,10 +90,10 @@ export function OrdensCompra() {
                         {item.status}
                       </span>
                     </td>
-                    <td className="p-3 text-muted-foreground">
+                    <td className="p-3 text-muted-foreground text-center">
                       {new Date(item.dataSolicitacao).toLocaleDateString("pt-BR")}
                     </td>
-                    <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
+                    <td className="p-3 space-x-1.5 whitespace-nowrap text-center">
                       {item.status === "pendente" && (
                         <Button
                           variant="ghost"

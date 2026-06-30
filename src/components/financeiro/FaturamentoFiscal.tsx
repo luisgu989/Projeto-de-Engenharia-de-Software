@@ -267,7 +267,7 @@ export function FaturamentoFiscal() {
       )}
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-border no-print overflow-x-auto scrollbar-none gap-2">
+      <div className="flex border-b border-border no-print overflow-x-auto custom-scrollbar pb-px gap-2">
         <button
           onClick={() => { setAbaAtiva("saidas"); setBusca(""); }}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
@@ -376,14 +376,14 @@ export function FaturamentoFiscal() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase">Identificador</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase">Tipo</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase">Destinatário</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase hidden md:table-cell">Data Emissão</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase">Chave de Acesso / Histórico</th>
-                  <th className="px-4 py-3 text-right font-bold text-muted-foreground uppercase">Valor Total</th>
-                  <th className="px-4 py-3 text-center font-bold text-muted-foreground uppercase">Status</th>
-                  <th className="px-4 py-3 text-center font-bold text-muted-foreground uppercase">Ações</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Identificador</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Tipo</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Destinatário</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase hidden md:table-cell text-center">Data Emissão</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-left">Chave de Acesso / Histórico</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Valor Total</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Status</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -396,22 +396,22 @@ export function FaturamentoFiscal() {
                 ) : (
                   filteredDocs.map((doc) => (
                     <tr key={doc.id} className="hover:bg-accent/20 transition-colors">
-                      <td className="px-4 py-3 font-mono font-bold text-muted-foreground">{doc.id}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 font-mono font-bold text-muted-foreground text-center">{doc.id}</td>
+                      <td className="px-4 py-3 text-center">
                         <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground font-semibold">
                           {doc.tipoDocumento}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-center">
                         <div className="flex flex-col">
                           <span className="font-bold text-foreground">{doc.destinatarioNome}</span>
                           <span className="text-[10px] text-muted-foreground">{doc.destinatarioDocumento}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                      <td className="px-4 py-3 text-muted-foreground hidden md:table-cell text-center">
                         {formatDate(doc.dataEmissao)}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-left">
                         {doc.statusEmissao === "processando" ? (
                           <span className="text-muted-foreground flex items-center gap-1.5">
                             <Loader2 className="h-3 w-3 animate-spin text-primary" />
@@ -448,7 +448,7 @@ export function FaturamentoFiscal() {
                           <span className="text-muted-foreground">-</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right font-bold text-foreground">
+                      <td className="px-4 py-3 font-bold text-foreground text-right">
                         {formatCurrency(doc.valorTotal)}
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -503,13 +503,13 @@ export function FaturamentoFiscal() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase">Nº Documento</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase">Emitente (Indústria/Pessoa)</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase hidden md:table-cell">Emissão</th>
-                  <th className="px-4 py-3 text-left font-bold text-muted-foreground uppercase hidden lg:table-cell">Chave de Acesso</th>
-                  <th className="px-4 py-3 text-right font-bold text-muted-foreground uppercase">Valor Total</th>
-                  <th className="px-4 py-3 text-center font-bold text-muted-foreground uppercase">Status ERP</th>
-                  <th className="px-4 py-3 text-center font-bold text-muted-foreground uppercase">Ações</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-left">Nº Documento</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Emitente (Indústria/Pessoa)</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase hidden md:table-cell text-center">Emissão</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase hidden lg:table-cell text-center">Chave de Acesso</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Valor Total</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Status ERP</th>
+                  <th className="px-4 py-3 font-bold text-muted-foreground uppercase text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -524,17 +524,17 @@ export function FaturamentoFiscal() {
                     const isPendente = nota.status === "recebida";
                     return (
                       <tr key={nota.id} className="hover:bg-accent/20 transition-colors">
-                        <td className="px-4 py-3 font-mono font-bold text-muted-foreground">{nota.id}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 font-mono font-bold text-muted-foreground text-left">{nota.id}</td>
+                        <td className="px-4 py-3 text-center">
                           <div className="flex flex-col">
                             <span className="font-bold text-foreground">{nota.emitente}</span>
                             <span className="text-[10px] text-muted-foreground">CNPJ/CPF: {nota.documentoEmitente}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                        <td className="px-4 py-3 text-muted-foreground hidden md:table-cell text-center">
                           {formatDate(nota.dataEmissao)}
                         </td>
-                        <td className="px-4 py-3 hidden lg:table-cell">
+                        <td className="px-4 py-3 hidden lg:table-cell text-center">
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-muted-foreground select-all tracking-tighter">
                               {nota.chaveAcesso.slice(0, 16)}...{nota.chaveAcesso.slice(-8)}
@@ -552,7 +552,7 @@ export function FaturamentoFiscal() {
                             </button>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-right font-bold text-foreground">
+                        <td className="px-4 py-3 font-bold text-foreground text-right">
                           {formatCurrency(nota.valorTotal)}
                         </td>
                         <td className="px-4 py-3 text-center">
@@ -890,7 +890,7 @@ export function FaturamentoFiscal() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Emissão:</span>
-                  <span className="font-semibold">{formatDate(cancelDoc.dataEmissao)}</span>
+                  <span className="font-semibold" suppressHydrationWarning>{formatDate(cancelDoc.dataEmissao)}</span>
                 </div>
               </div>
 

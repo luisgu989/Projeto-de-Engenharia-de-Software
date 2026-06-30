@@ -52,22 +52,22 @@ export function OrdensServico() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID</th>
-                  <th className="p-3">Tipo de Serviço</th>
-                  <th className="p-3">Responsável</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Abertura</th>
-                  <th className="p-3">Conclusão</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">ID</th>
+                  <th className="p-3 text-center">Tipo de Serviço</th>
+                  <th className="p-3 text-left">Responsável</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Abertura</th>
+                  <th className="p-3 text-center">Conclusão</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
                 {ordensServico.map((item) => (
                   <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                    <td className="p-3 font-mono font-semibold">{item.id}</td>
-                    <td className="p-3 font-medium text-foreground">{item.tipoServico}</td>
-                    <td className="p-3 text-muted-foreground font-semibold">{item.responsavelOperacional}</td>
-                    <td className="p-3">
+                    <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                    <td className="p-3 font-medium text-foreground text-center">{item.tipoServico}</td>
+                    <td className="p-3 text-muted-foreground font-semibold text-left">{item.responsavelOperacional}</td>
+                    <td className="p-3 text-center">
                       <select
                         value={item.status}
                         onChange={(e) =>
@@ -90,13 +90,13 @@ export function OrdensServico() {
                         <option value="cancelada">Cancelada</option>
                       </select>
                     </td>
-                    <td className="p-3 text-muted-foreground">
+                    <td className="p-3 text-muted-foreground text-center">
                       {new Date(item.dataAbertura).toLocaleDateString("pt-BR")}
                     </td>
-                    <td className="p-3 text-muted-foreground font-medium">
+                    <td className="p-3 text-muted-foreground font-medium text-center">
                       {item.dataConclusao ? new Date(item.dataConclusao).toLocaleDateString("pt-BR") : "-"}
                     </td>
-                    <td className="p-3 text-right">
+                    <td className="p-3 text-center">
                       <Button
                         variant="ghost"
                         size="icon-xs"

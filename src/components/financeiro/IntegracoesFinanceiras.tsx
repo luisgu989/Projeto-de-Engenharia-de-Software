@@ -255,12 +255,12 @@ export function IntegracoesFinanceiras() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/30 text-[10px] text-muted-foreground uppercase font-bold">
-                    <th className="px-4 py-2.5 text-left">Identificador</th>
-                    <th className="px-4 py-2.5 text-left">Banco de Origem</th>
+                    <th className="px-4 py-2.5 text-center">Identificador</th>
+                    <th className="px-4 py-2.5 text-center">Banco de Origem</th>
                     <th className="px-4 py-2.5 text-left">Descrição da Transação</th>
-                    <th className="px-4 py-2.5 text-left">Data</th>
-                    <th className="px-4 py-2.5 text-left">Tipo</th>
-                    <th className="px-4 py-2.5 text-right">Valor</th>
+                    <th className="px-4 py-2.5 text-center">Data</th>
+                    <th className="px-4 py-2.5 text-center">Tipo</th>
+                    <th className="px-4 py-2.5 text-center">Valor</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border text-xs">
@@ -274,11 +274,11 @@ export function IntegracoesFinanceiras() {
                     conexoes.flatMap((c) =>
                       c.transacoes.map((t) => (
                         <tr key={t.id} className="hover:bg-accent/30 transition-colors">
-                          <td className="px-4 py-2.5 font-mono text-muted-foreground">{t.id}</td>
-                          <td className="px-4 py-2.5 font-medium">{c.bancoNome}</td>
-                          <td className="px-4 py-2.5 font-medium">{t.descricao}</td>
-                          <td className="px-4 py-2.5 text-muted-foreground">{formatDateTime(t.data)}</td>
-                          <td className="px-4 py-2.5">
+                          <td className="px-4 py-2.5 font-mono text-muted-foreground text-center">{t.id}</td>
+                          <td className="px-4 py-2.5 font-medium text-center">{c.bancoNome}</td>
+                          <td className="px-4 py-2.5 font-medium text-left">{t.descricao}</td>
+                          <td className="px-4 py-2.5 text-muted-foreground text-center">{formatDateTime(t.data)}</td>
+                          <td className="px-4 py-2.5 text-center">
                             <span className={`inline-flex items-center gap-1 font-bold ${
                               t.tipo === "credito" ? "text-emerald-600" : "text-red-600"
                             }`}>
@@ -295,7 +295,7 @@ export function IntegracoesFinanceiras() {
                               )}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-right font-bold tracking-tight">
+                          <td className="px-4 py-2.5 font-bold tracking-tight text-right">
                             {formatCurrency(t.valor)}
                           </td>
                         </tr>
@@ -320,12 +320,12 @@ export function IntegracoesFinanceiras() {
                 <table className="w-full text-xs text-left">
                   <thead>
                     <tr className="border-b border-border bg-muted/40 font-bold text-muted-foreground uppercase text-[10px]">
-                      <th className="p-2.5">ID</th>
-                      <th className="p-2.5">Cliente</th>
-                      <th className="p-2.5">Descrição</th>
-                      <th className="p-2.5">Vencimento</th>
-                      <th className="p-2.5 text-right">Valor</th>
-                      <th className="p-2.5 text-right">Ação</th>
+                      <th className="p-2.5 text-center">ID</th>
+                      <th className="p-2.5 text-left">Cliente</th>
+                      <th className="p-2.5 text-left">Descrição</th>
+                      <th className="p-2.5 text-center">Vencimento</th>
+                      <th className="p-2.5 text-center">Valor</th>
+                      <th className="p-2.5 text-center">Ação</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -344,12 +344,12 @@ export function IntegracoesFinanceiras() {
                         .filter((l) => !boletos.some((b) => b.lancamentoId === l.id && b.status !== "cancelado"))
                         .map((l) => (
                           <tr key={l.id} className="hover:bg-accent/20">
-                            <td className="p-2.5 font-mono text-muted-foreground">{l.id}</td>
-                            <td className="p-2.5 font-bold">{l.contraparte}</td>
-                            <td className="p-2.5 text-muted-foreground">{l.descricao}</td>
-                            <td className="p-2.5">{formatDate(l.vencimento)}</td>
-                            <td className="p-2.5 text-right font-bold">{formatCurrency(l.valor)}</td>
-                            <td className="p-2.5 text-right">
+                            <td className="p-2.5 font-mono text-muted-foreground text-center">{l.id}</td>
+                            <td className="p-2.5 font-bold text-left">{l.contraparte}</td>
+                            <td className="p-2.5 text-muted-foreground text-left">{l.descricao}</td>
+                            <td className="p-2.5 text-center" suppressHydrationWarning>{formatDate(l.vencimento)}</td>
+                            <td className="p-2.5 font-bold text-right">{formatCurrency(l.valor)}</td>
+                            <td className="p-2.5 text-center">
                               <Button
                                 size="xs"
                                 onClick={() => handleGerarBoleto(l.id, l.contraparte, l.valor)}
@@ -410,11 +410,11 @@ export function IntegracoesFinanceiras() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/30 text-[10px] text-muted-foreground uppercase font-bold">
-                    <th className="px-4 py-3 text-left">Boleto ID</th>
+                    <th className="px-4 py-3 text-center">Boleto ID</th>
                     <th className="px-4 py-3 text-left">Cliente</th>
-                    <th className="px-4 py-3 text-left">Código de Barras</th>
-                    <th className="px-4 py-3 text-left">Vencimento</th>
-                    <th className="px-4 py-3 text-right">Valor</th>
+                    <th className="px-4 py-3 text-center">Código de Barras</th>
+                    <th className="px-4 py-3 text-center">Vencimento</th>
+                    <th className="px-4 py-3 text-center">Valor</th>
                     <th className="px-4 py-3 text-center">Status</th>
                     <th className="px-4 py-3 text-center">Ações</th>
                   </tr>
@@ -429,13 +429,13 @@ export function IntegracoesFinanceiras() {
                   ) : (
                     boletos.map((b) => (
                       <tr key={b.id} className="hover:bg-accent/20 transition-colors">
-                        <td className="px-4 py-3 font-mono font-bold">{b.id}</td>
-                        <td className="px-4 py-3 font-bold">{b.clienteNome}</td>
-                        <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground tracking-tighter select-all">
+                        <td className="px-4 py-3 font-mono font-bold text-center">{b.id}</td>
+                        <td className="px-4 py-3 font-bold text-left">{b.clienteNome}</td>
+                        <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground tracking-tighter select-all text-center">
                           {b.codigoBarras}
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(b.dataVencimento)}</td>
-                        <td className="px-4 py-3 text-right font-extrabold">{formatCurrency(b.valor)}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-center" suppressHydrationWarning>{formatDate(b.dataVencimento)}</td>
+                        <td className="px-4 py-3 font-extrabold text-right">{formatCurrency(b.valor)}</td>
                         <td className="px-4 py-3 text-center">
                           {b.status === "pago" ? (
                             <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
@@ -643,7 +643,7 @@ export function IntegracoesFinanceiras() {
                 </div>
                 <div>
                   <span className="block text-[8px] uppercase font-bold text-slate-500">Vencimento</span>
-                  <span className="font-extrabold">{formatDate(selectedBoletoPrint.dataVencimento)}</span>
+                  <span className="font-extrabold" suppressHydrationWarning>{formatDate(selectedBoletoPrint.dataVencimento)}</span>
                 </div>
               </div>
 
@@ -661,7 +661,7 @@ export function IntegracoesFinanceiras() {
               <div className="grid grid-cols-4 border-b border-slate-400 pb-1.5 gap-2">
                 <div>
                   <span className="block text-[8px] uppercase font-bold text-slate-500">Data do Documento</span>
-                  <span className="font-semibold">{formatDate(selectedBoletoPrint.dataGeracao)}</span>
+                  <span className="font-semibold" suppressHydrationWarning>{formatDate(selectedBoletoPrint.dataGeracao)}</span>
                 </div>
                 <div>
                   <span className="block text-[8px] uppercase font-bold text-slate-500">Número Documento</span>

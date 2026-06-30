@@ -190,12 +190,12 @@ export function TabelasPrecos() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Código</th>
-                  <th className="p-3">Nome da Tabela</th>
-                  <th className="p-3">Cliente Alvo</th>
-                  <th className="p-3">Produto Vinculado</th>
-                  <th className="p-3">Região / Status</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">Código</th>
+                  <th className="p-3 text-left">Nome da Tabela</th>
+                  <th className="p-3 text-left">Cliente Alvo</th>
+                  <th className="p-3 text-left">Produto Vinculado</th>
+                  <th className="p-3 text-center">Região / Status</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -208,20 +208,20 @@ export function TabelasPrecos() {
                 ) : (
                   tabelas.map((t) => (
                     <tr key={t.id} className="hover:bg-accent/5 transition-colors">
-                      <td className="p-3 font-mono font-bold text-foreground">
+                      <td className="p-3 font-mono font-bold text-foreground text-center">
                         {t.codigoTabela}
                         <span className="block text-[8px] text-muted-foreground font-normal">ID: {t.id}</span>
                       </td>
-                      <td className="p-3 font-medium text-foreground">{t.nomeTabela}</td>
-                      <td className="p-3 font-semibold text-foreground/80 flex items-center gap-1.5 mt-1 border-none">
+                      <td className="p-3 font-medium text-foreground text-left">{t.nomeTabela}</td>
+                      <td className="p-3 font-semibold text-foreground/80 flex items-center gap-1.5 mt-1 border-none text-left">
                         <User className="h-3.5 w-3.5 text-muted-foreground" />
                         {getClienteNome(t.clienteVinculado)}
                       </td>
-                      <td className="p-3 text-muted-foreground font-medium flex items-center gap-1.5 mt-1 border-none">
+                      <td className="p-3 text-muted-foreground font-medium flex items-center gap-1.5 mt-1 border-none text-left">
                         <Package className="h-3.5 w-3.5 text-primary" />
                         {getProdutoNome(t.produtoAssociado)}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-bold text-primary flex items-center gap-1 font-sans">
                             <MapPin className="h-3 w-3 text-primary shrink-0" />
@@ -239,7 +239,7 @@ export function TabelasPrecos() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <Button
                           variant="ghost"
                           size="icon-xs"

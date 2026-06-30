@@ -180,7 +180,7 @@ export function HistoricoMovimentacoes({
           </button>
         </div>
         
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <div className="relative lg:col-span-2">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <input
@@ -221,7 +221,7 @@ export function HistoricoMovimentacoes({
             </select>
           </div>
 
-          <div className="flex items-center gap-2 lg:col-span-1 sm:col-span-2">
+          <div className="flex items-center gap-2 lg:col-span-2 sm:col-span-2">
             <input
               type="date"
               value={dataInicio}
@@ -246,14 +246,14 @@ export function HistoricoMovimentacoes({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Data / Hora</th>
-                <th className="p-4">SKU / Produto</th>
-                <th className="p-4">Categoria</th>
+                <th className="p-4 text-center">Data / Hora</th>
+                <th className="p-4 text-left">SKU / Produto</th>
+                <th className="p-4 text-left">Categoria</th>
                 <th className="p-4 text-center">Tipo</th>
-                <th className="p-4">Depósito</th>
+                <th className="p-4 text-center">Depósito</th>
                 <th className="p-4 text-center">Qtd</th>
-                <th className="p-4">Motivo / Justificativa</th>
-                <th className="p-4">Operador</th>
+                <th className="p-4 text-left">Motivo / Justificativa</th>
+                <th className="p-4 text-center">Operador</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-sm">
@@ -267,17 +267,17 @@ export function HistoricoMovimentacoes({
                 movimentacoesFiltradas.map((mov, idx) => {
                   return (
                     <tr key={idx} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-4 text-xs font-mono text-muted-foreground">
+                      <td className="p-4 text-xs font-mono text-muted-foreground text-center">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="h-3.5 w-3.5" />
                           {formatDate(mov.data)}
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 text-left">
                         <div className="font-semibold text-xs text-muted-foreground font-mono">{mov.itemSku}</div>
                         <div className="font-medium text-foreground">{mov.itemNome}</div>
                       </td>
-                      <td className="p-4 text-xs text-muted-foreground">{mov.itemCategoria}</td>
+                      <td className="p-4 text-xs text-muted-foreground text-left">{mov.itemCategoria}</td>
                       <td className="p-4 text-center">
                         <span
                           className={cn(
@@ -295,8 +295,8 @@ export function HistoricoMovimentacoes({
                           {mov.tipo}
                         </span>
                       </td>
-                      <td className="p-4 text-xs text-foreground/80 font-medium">{mov.deposito || "Depósito Central"}</td>
-                      <td className={cn(
+                      <td className="p-4 text-xs text-foreground/80 font-medium text-center">{mov.deposito || "Depósito Central"}</td>
+                      <td className="text-center" className={cn(
                         "p-4 text-center font-bold font-mono",
                         mov.tipo === "entrada" && "text-emerald-600 dark:text-emerald-400",
                         mov.tipo === "saida" && "text-rose-600 dark:text-rose-400",
@@ -309,8 +309,8 @@ export function HistoricoMovimentacoes({
                         {mov.tipo === "ajuste" && "⚙"}
                         {mov.quantidade}
                       </td>
-                      <td className="p-4 text-xs text-foreground/80 font-medium">{mov.motivo}</td>
-                      <td className="p-4 text-xs text-muted-foreground font-medium">{mov.usuario}</td>
+                      <td className="p-4 text-xs text-foreground/80 font-medium text-left">{mov.motivo}</td>
+                      <td className="p-4 text-xs text-muted-foreground font-medium text-center">{mov.usuario}</td>
                     </tr>
                   );
                 })

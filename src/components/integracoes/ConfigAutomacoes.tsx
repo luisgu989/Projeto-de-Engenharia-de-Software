@@ -167,12 +167,12 @@ export function ConfigAutomacoes() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Nome / Regra</th>
-                  <th className="p-3">Tipo</th>
-                  <th className="p-3">Frequência</th>
-                  <th className="p-3">Última Execução</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-left">Nome / Regra</th>
+                  <th className="p-3 text-center">Tipo</th>
+                  <th className="p-3 text-center">Frequência</th>
+                  <th className="p-3 text-center">Última Execução</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -182,7 +182,7 @@ export function ConfigAutomacoes() {
 
                   return (
                     <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3">
+                      <td className="p-3 text-left">
                         <div className="flex flex-col space-y-1 max-w-[200px]">
                           <span className="font-semibold text-foreground leading-snug">{item.nome}</span>
                           <span className="text-[10px] text-muted-foreground line-clamp-1" title={item.regraExecucao}>
@@ -190,23 +190,23 @@ export function ConfigAutomacoes() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span className="px-2 py-0.5 rounded-full text-[9px] font-bold border bg-accent text-accent-foreground font-mono">
                           {item.tipoProcesso}
                         </span>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <Clock className="h-3 w-3 shrink-0" />
                           <span>{item.frequencia}</span>
                         </div>
                       </td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 text-muted-foreground text-center">
                         {item.ultimaExecucao
                           ? new Date(item.ultimaExecucao).toLocaleString("pt-BR")
                           : "Nunca executada"}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase",
@@ -218,7 +218,7 @@ export function ConfigAutomacoes() {
                           {isActive ? "ativo" : "inativo"}
                         </span>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleRunNow(item)}

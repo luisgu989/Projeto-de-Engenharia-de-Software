@@ -84,13 +84,13 @@ export function ConfigBackup() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">ID</th>
-                  <th className="p-3">Tipo</th>
-                  <th className="p-3">Arquivo de Cópia</th>
-                  <th className="p-3">Executado em</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Responsável</th>
-                  <th className="p-3 text-right">Ação</th>
+                  <th className="p-3 text-center">ID</th>
+                  <th className="p-3 text-center">Tipo</th>
+                  <th className="p-3 text-center">Arquivo de Cópia</th>
+                  <th className="p-3 text-center">Executado em</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-left">Responsável</th>
+                  <th className="p-3 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -100,15 +100,15 @@ export function ConfigBackup() {
 
                   return (
                     <tr key={item.id} className="hover:bg-accent/10 transition-colors">
-                      <td className="p-3 font-mono font-semibold">{item.id}</td>
-                      <td className="p-3 font-bold text-foreground uppercase">{item.tipo}</td>
-                      <td className="p-3 font-mono text-muted-foreground text-[10px] truncate max-w-[150px]">
+                      <td className="p-3 font-mono font-semibold text-center">{item.id}</td>
+                      <td className="p-3 font-bold text-foreground uppercase text-center">{item.tipo}</td>
+                      <td className="p-3 font-mono text-muted-foreground text-[10px] truncate max-w-[150px] text-center">
                         {item.caminhoArquivo}
                       </td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 text-muted-foreground text-center">
                         {new Date(item.dataExecucao).toLocaleString("pt-BR")}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1",
@@ -123,8 +123,8 @@ export function ConfigBackup() {
                           {item.status}
                         </span>
                       </td>
-                      <td className="p-3 text-muted-foreground">{item.usuarioResponsavel}</td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-muted-foreground text-left">{item.usuarioResponsavel}</td>
+                      <td className="p-3 text-center">
                         <button
                           onClick={() => handleRestore(item)}
                           disabled={isExecutingBackup || !isSuccess}

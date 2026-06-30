@@ -178,13 +178,13 @@ export function ManutencaoPreventiva() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/40 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Código</th>
-                  <th className="p-3">Equipamento (Ativo)</th>
-                  <th className="p-3">Categoria</th>
-                  <th className="p-3">Periodicidade</th>
-                  <th className="p-3">Previsão</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Ações</th>
+                  <th className="p-3 text-center">Código</th>
+                  <th className="p-3 text-center">Equipamento (Ativo)</th>
+                  <th className="p-3 text-left">Categoria</th>
+                  <th className="p-3 text-center">Periodicidade</th>
+                  <th className="p-3 text-center">Previsão</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -197,21 +197,21 @@ export function ManutencaoPreventiva() {
                 ) : (
                   manutencoesAtivas.map((m) => (
                     <tr key={m.id} className="hover:bg-accent/5 transition-colors">
-                      <td className="p-3 font-mono font-bold text-muted-foreground">{m.id}</td>
-                      <td className="p-3">
+                      <td className="p-3 font-mono font-bold text-muted-foreground text-center">{m.id}</td>
+                      <td className="p-3 text-center">
                         <span className="font-semibold block text-foreground">{m.ativoDescricao}</span>
                         <span className="text-[9px] text-muted-foreground font-mono">Pat: {m.ativoCodigo}</span>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-left">
                         <span className="bg-primary/10 text-primary px-2 py-0.5 rounded font-semibold text-[10px]">
                           {m.tipoManutencao}
                         </span>
                       </td>
-                      <td className="p-3 font-medium text-muted-foreground">{m.periodicidade}</td>
-                      <td className="p-3 font-medium text-foreground">
+                      <td className="p-3 font-medium text-muted-foreground text-center">{m.periodicidade}</td>
+                      <td className="p-3 font-medium text-foreground text-center">
                         {new Date(m.dataAgendada).toLocaleDateString("pt-BR")}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-center">
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase",
@@ -223,7 +223,7 @@ export function ManutencaoPreventiva() {
                           {m.status === "em_execucao" ? "Em Execução" : "Agendada"}
                         </span>
                       </td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-center">
                         <div className="flex items-center justify-end gap-1">
                           {/* Controles de Status */}
                           {m.status === "agendada" && (

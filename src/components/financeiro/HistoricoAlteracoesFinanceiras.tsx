@@ -106,45 +106,45 @@ export function HistoricoAlteracoesFinanceiras() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-accent/30 border-b border-border font-bold text-muted-foreground text-[10px] uppercase">
-                  <th className="p-3">Data / Hora</th>
-                  <th className="p-3">Código Auditoria</th>
-                  <th className="p-3">Lançamento Ref.</th>
-                  <th className="p-3">Executor</th>
-                  <th className="p-3">Tipo de Alteração</th>
-                  <th className="p-3">Valor Anterior (Imutável)</th>
-                  <th className="p-3">Valor Novo</th>
-                  <th className="p-3">ID Log</th>
+                  <th className="p-3 text-center">Data / Hora</th>
+                  <th className="p-3 text-center">Código Auditoria</th>
+                  <th className="p-3 text-center">Lançamento Ref.</th>
+                  <th className="p-3 text-center">Executor</th>
+                  <th className="p-3 text-center">Tipo de Alteração</th>
+                  <th className="p-3 text-center">Valor Anterior (Imutável)</th>
+                  <th className="p-3 text-center">Valor Novo</th>
+                  <th className="p-3 text-center">ID Log</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60 font-mono text-[11px] text-muted-foreground">
                 {filteredLogs.map((log) => {
                   return (
                     <tr key={log.id} className="hover:bg-accent/5 transition-colors">
-                      <td className="p-3 text-muted-foreground whitespace-nowrap">
+                      <td className="p-3 text-muted-foreground whitespace-nowrap text-center">
                         {new Date(log.dataAlteracao).toLocaleString("pt-BR")}
                       </td>
-                      <td className="p-3 font-semibold text-primary/80">
+                      <td className="p-3 font-semibold text-primary/80 text-center">
                         {log.codigoAuditoria}
                       </td>
-                      <td className="p-3 font-bold text-foreground font-sans">
+                      <td className="p-3 font-bold text-foreground font-sans text-center">
                         {log.registroFinanceiro}
                       </td>
-                      <td className="p-3 text-foreground/80 font-sans flex items-center gap-1.5 mt-1 border-none">
+                      <td className="p-3 text-foreground/80 font-sans flex items-center gap-1.5 mt-1 border-none text-center">
                         <UserCheck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         <span>{log.usuarioResponsavel}</span>
                       </td>
-                      <td className="p-3 font-sans whitespace-nowrap">
+                      <td className="p-3 font-sans whitespace-nowrap text-center">
                         <span className="px-1.5 py-0.5 rounded border bg-accent text-[9px] font-bold">
                           {log.tipoAlteracao}
                         </span>
                       </td>
-                      <td className="p-3 text-destructive font-bold">
+                      <td className="p-3 text-destructive font-bold text-right">
                         {log.valorAnterior}
                       </td>
-                      <td className="p-3 text-emerald-600 dark:text-emerald-400 font-bold">
+                      <td className="p-3 text-emerald-600 dark:text-emerald-400 font-bold text-right">
                         {log.valorAtualizado}
                       </td>
-                      <td className="p-3 text-foreground/50 text-[10px]">
+                      <td className="p-3 text-foreground/50 text-[10px] text-center">
                         {log.id}
                       </td>
                     </tr>

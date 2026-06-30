@@ -232,14 +232,14 @@ export function TabelaOportunidades({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-accent/20 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                <th className="p-4">Código</th>
-                <th className="p-4">Título / Cliente</th>
-                <th className="p-4">Responsável</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Prioridade</th>
-                <th className="p-4">Prob.</th>
-                <th className="p-4">Fechamento Prev.</th>
-                <th className="p-4 text-right">Valor Estimado</th>
+                <th className="p-4 text-center">Código</th>
+                <th className="p-4 text-left">Título / Cliente</th>
+                <th className="p-4 text-left">Responsável</th>
+                <th className="p-4 text-center">Status</th>
+                <th className="p-4 text-center">Prioridade</th>
+                <th className="p-4 text-center">Prob.</th>
+                <th className="p-4 text-center">Fechamento Prev.</th>
+                <th className="p-4 text-center">Valor Estimado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-sm">
@@ -258,10 +258,10 @@ export function TabelaOportunidades({
                     key={op.id}
                     className="hover:bg-accent/20 transition-colors"
                   >
-                    <td className="p-4 font-mono text-xs font-semibold text-foreground/70">
+                    <td className="p-4 font-mono text-xs font-semibold text-foreground/70 text-center">
                       {op.id}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-left">
                       <div className="font-medium text-foreground">
                         {op.titulo}
                       </div>
@@ -270,13 +270,13 @@ export function TabelaOportunidades({
                         {op.cliente}
                       </div>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-left">
                       <div className="flex items-center gap-1.5 text-sm text-foreground/80">
                         <User className="h-3.5 w-3.5 text-muted-foreground" />
                         {op.responsavel}
                       </div>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span
                         className={cn(
                           "inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap",
@@ -286,7 +286,7 @@ export function TabelaOportunidades({
                         {statusConfig[op.status].label}
                       </span>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span
                         className={cn(
                           "inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded",
@@ -296,7 +296,7 @@ export function TabelaOportunidades({
                         {prioridadeConfig[op.prioridade].label}
                       </span>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <div className="flex items-center gap-2">
                         <div className="h-1.5 w-16 bg-accent rounded-full overflow-hidden">
                           <div
@@ -316,13 +316,13 @@ export function TabelaOportunidades({
                         </span>
                       </div>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
                         {formatDate(op.dataFechamentoPrevisto)}
                       </div>
                     </td>
-                    <td className="p-4 text-right font-bold tracking-tight">
+                    <td className="p-4 font-bold tracking-tight text-right">
                       {formatCurrency(op.valorEstimado)}
                     </td>
                   </tr>
