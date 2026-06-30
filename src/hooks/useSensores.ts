@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface LeituraSensor {
   valor: number;
@@ -73,6 +74,7 @@ const sensoresIniciais: DispositivoSensor[] = [
 ];
 
 export function useSensores() {
+  const { addLog } = useLogs();
   const [sensores, setSensores] = useState<DispositivoSensor[]>(sensoresIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -156,9 +158,13 @@ export function useSensores() {
 
   const alterarStatusDispositivo = (id: string, novoStatus: DispositivoSensor["status"]) => {
     setSensores((prev) =>
-      prev.map((sensor) =>
-        sensor.id === id ? { ...sensor, status: novoStatus } : sensor
-      )
+      prev.map((sensor) => {
+        if (sensor.id === id && sensor.status !== novoStatus) {
+          addLog(`Alterou status do sensor ${sensor.nome} para ${novoStatus}`, "infraestrutura");
+          return { ...sensor, status: novoStatus };
+        }
+        return sensor;
+      })
     );
   };
 

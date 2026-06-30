@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface MovimentacaoCentro {
   timestamp: string;
@@ -85,6 +86,7 @@ const mockCentrosIniciais: CentroCusto[] = [
 
 export function useCentrosCusto() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [centros, setCentros] = useState<CentroCusto[]>(() => {
@@ -208,6 +210,8 @@ export function useCentrosCusto() {
 
       setCentros((prev) => [...prev, novoCentro]);
 
+      addLog(`Cadastrou o centro de custo ${cleanedCodigo}`, "financeiro");
+
       addNotification(
         "Centro de Custo Mapeado",
         `Centro de custo ${cleanedCodigo} cadastrado sob responsabilidade de ${responsavelFinanceiro}.`,
@@ -322,6 +326,8 @@ export function useCentrosCusto() {
           return c;
         })
       );
+
+      addLog(`Editou o centro de custo ${id}`, "financeiro");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));

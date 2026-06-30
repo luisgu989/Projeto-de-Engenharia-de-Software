@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface LogAcesso {
   id: string;
@@ -16,6 +17,7 @@ export interface LogAcesso {
 
 export function useMFA() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [mfaMethod, setMfaMethod] = useState<string>("email");
   const [loginSimuladoAtivo, setLoginSimuladoAtivo] = useState(false);
   const [codigoSecreto, setCodigoSecreto] = useState<string>("");
@@ -45,6 +47,7 @@ export function useMFA() {
   const alterarMetodoMFA = (metodo: string) => {
     setMfaMethod(metodo);
     localStorage.setItem(`erp_mfa_method_${user.email}`, metodo);
+    addLog(`Alterou método de MFA para ${metodo}`, "seguranca");
   };
 
   const iniciarLoginSimulado = () => {
@@ -106,6 +109,8 @@ export function useMFA() {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("storage"));
     }
+
+    addLog(`Tentativa de acesso via MFA: Status ${status}`, "seguranca");
   };
 
   const validarCodigoMFA = (codigo: string, dispositivo: string = "Chrome / Windows 11"): boolean => {

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface OcorrenciaAcesso {
   id: string;
@@ -40,6 +41,7 @@ const mockOcorrenciasIniciais: OcorrenciaAcesso[] = [
 
 export function useDeteccaoAcessos() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [ocorrencias, setOcorrencias] = useState<OcorrenciaAcesso[]>(() => {
@@ -154,6 +156,8 @@ export function useDeteccaoAcessos() {
       // Copia para o Histórico de Eventos (imutável)
       setHistoricoEventos((prev) => [ocorrenciaAtualizada, ...prev]);
 
+      addLog(`Registrou tentativa de acesso suspeita do IP ${cleanedIP}`, "seguranca");
+
       // Alertas de segurança
       if (statusBloqueio !== "Liberado") {
         addNotification(
@@ -196,6 +200,8 @@ export function useDeteccaoAcessos() {
           return o;
         })
       );
+
+      addLog(`Desbloqueou o IP do registro de acesso ${id}`, "seguranca");
 
       addNotification(
         "Acesso Desbloqueado",

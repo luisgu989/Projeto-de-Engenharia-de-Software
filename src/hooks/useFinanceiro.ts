@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export type StatusLancamento = "pago" | "pendente" | "vencido";
 export type TipoLancamento = "receber" | "pagar";
@@ -80,6 +81,7 @@ const mockLancamentos: Lancamento[] = [
 ];
 
 export function useFinanceiro() {
+  const { addLog } = useLogs();
   const [lancamentos, setLancamentos] = useState<Lancamento[]>(mockLancamentos);
   const [busca, setBusca] = useState("");
   const [filtroTipo, setFiltroTipo] = useState<TipoLancamento | "todos">("todos");
@@ -109,12 +111,19 @@ export function useFinanceiro() {
     const idGerado = `FIN-${String(lancamentos.length + 1).padStart(3, "0")}`;
     const lancamentoCompleto: Lancamento = { ...novoLancamento, id: idGerado };
     setLancamentos((prev) => [lancamentoCompleto, ...prev]);
+    addLog(`Criou lançamento financeiro ${idGerado} no valor de R$ ${novoLancamento.valor}`, "financeiro");
     return true;
   };
 
   const quitarLancamento = (id: string) => {
     setLancamentos((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status: "pago" } : l))
+      prev.map((l) => {
+        if (l.id === id && l.status !== "pago") {
+          addLog(`Quitou o lançamento financeiro ${id}`, "financeiro");
+          return { ...l, status: "pago" };
+        }
+        return l;
+      })
     );
   };
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface RotinaFinanceira {
   id: string;
@@ -66,6 +67,7 @@ const mockRotinasIniciais: RotinaFinanceira[] = [
 
 export function useAutomacaoFinanceira() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [rotinas, setRotinas] = useState<RotinaFinanceira[]>(() => {
@@ -193,6 +195,8 @@ export function useAutomacaoFinanceira() {
 
       setRotinas((prev) => [...prev, novaRotina]);
 
+      addLog(`Cadastrou rotina financeira ${cleanedCodigo}`, "financeiro");
+
       addNotification(
         "Rotina Financeira Criada",
         `Rotina de ${tipoOperacao} (${frequencia}) cadastrada sob o código ${cleanedCodigo}.`,
@@ -261,6 +265,8 @@ export function useAutomacaoFinanceira() {
         })
       );
 
+      addLog(`Editou a rotina financeira ${id}`, "financeiro");
+
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));
       }, 100);
@@ -323,6 +329,8 @@ export function useAutomacaoFinanceira() {
 
       setHistoricoProcessamentos((prev) => [novoProcessamento, ...prev]);
 
+      addLog(`Executou rotina financeira ${rotina.codigoRotina} com resultado: ${resultado}`, "financeiro");
+
       addNotification(
         `Execução de Rotina Financeira: ${resultado}`,
         `A rotina contábil ${rotina.codigoRotina} foi executada. Resultado: ${resultado}`,
@@ -350,6 +358,8 @@ export function useAutomacaoFinanceira() {
       }
 
       setRotinas((prev) => prev.filter((r) => r.id !== id));
+      
+      addLog(`Removeu a rotina financeira ${id}`, "financeiro");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));

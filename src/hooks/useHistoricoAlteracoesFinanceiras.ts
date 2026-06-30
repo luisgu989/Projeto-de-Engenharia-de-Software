@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface HistoricoAlteracaoFinanceira {
   id: string;
@@ -39,6 +40,7 @@ const mockAuditoriaIniciais: HistoricoAlteracaoFinanceira[] = [
 
 export function useHistoricoAlteracoesFinanceiras() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
 
   const [logs, setLogs] = useState<HistoricoAlteracaoFinanceira[]>(() => {
     if (typeof window !== "undefined") {
@@ -111,6 +113,8 @@ export function useHistoricoAlteracoesFinanceiras() {
       };
 
       setLogs((prev) => [novoLog, ...prev]);
+
+      addLog(`Registrou alteração financeira no registro ${registroFinanceiro}`, "financeiro");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));

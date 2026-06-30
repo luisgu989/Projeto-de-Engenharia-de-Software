@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Importacao {
   id: string;
@@ -43,6 +44,7 @@ const mockImportacoesIniciais: Importacao[] = [
 
 export function useValidacaoImportacao() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [importacoes, setImportacoes] = useState<Importacao[]>(() => {
@@ -175,6 +177,8 @@ export function useValidacaoImportacao() {
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));
       }, 100);
+
+      addLog(`Validou importação de arquivo ${cleanedNome}: ${statusValida}`, "sistema");
 
       // Retorna true se passou na validação (permitindo a persistência nos módulos internos)
       return statusValida === "Aprovado";

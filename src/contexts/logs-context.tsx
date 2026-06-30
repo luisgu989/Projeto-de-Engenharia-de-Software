@@ -9,7 +9,7 @@ export interface SystemLog {
   usuario: string;
   email: string;
   acao: string;
-  categoria: "estoque" | "funcionarios" | "seguranca" | "relatorios" | "vendas" | "financeiro";
+  categoria: string;
   detalhes?: string;
 }
 

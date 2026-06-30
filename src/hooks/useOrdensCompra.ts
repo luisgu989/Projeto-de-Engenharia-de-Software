@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useEstoque } from "./useEstoque";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface OrdemCompra {
   id: string;
@@ -42,6 +43,7 @@ export const listaFornecedores = ["TechDistrib", "Inova Componentes", "Sul Eletr
 
 export function useOrdensCompra() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { registrarMovimentacao } = useEstoque();
 
   const [ordensCompra, setOrdensCompra] = useState<OrdemCompra[]>(mockOrdensCompra);
@@ -127,6 +129,7 @@ export function useOrdensCompra() {
     };
 
     setOrdensCompra((prev) => [novaOrdem, ...prev]);
+    addLog(`Cadastrou a ordem de compra ${idGerado} para o fornecedor ${fornecedor}`, "estoque");
     return true;
   };
 
@@ -152,6 +155,7 @@ export function useOrdensCompra() {
             }
           }
 
+          addLog(`Atualizou o status da ordem de compra ${id} para ${novoStatus}`, "estoque");
           return { ...item, status: novoStatus };
         }
         return item;
@@ -163,7 +167,10 @@ export function useOrdensCompra() {
 
   const removerOrdemCompra = (id: string) => {
     setErrorMessage(null);
-    setOrdensCompra((prev) => prev.filter((item) => item.id !== id));
+    setOrdensCompra((prev) => prev.filter((item) => {
+      if (item.id === id) addLog(`Removeu a ordem de compra ${id}`, "estoque");
+      return item.id !== id;
+    }));
     return true;
   };
 

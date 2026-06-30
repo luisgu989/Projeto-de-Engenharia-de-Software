@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Servidor {
   id: string; // Imutável
@@ -87,6 +88,7 @@ const EVENTOS_INICIAIS: EventoServidor[] = [
 
 export function useServidores() {
   const { addNotification } = useNotifications();
+  const { addLog } = useLogs();
   const [servidores, setServidores] = useState<Servidor[]>([]);
   const [historicoEventos, setHistoricoEventos] = useState<EventoServidor[]>([]);
 
@@ -227,6 +229,7 @@ export function useServidores() {
                 tipoEvento === "error" ? "error" : tipoEvento === "warning" ? "warning" : "info",
                 "geral"
               );
+              addLog(`Evento de servidor registrado: ${srv.nome} - ${mensagem}`, "sistema");
             }
           }
 

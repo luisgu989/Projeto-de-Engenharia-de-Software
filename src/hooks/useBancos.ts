@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface TransacaoBancaria {
   id: string;
@@ -47,6 +48,7 @@ const conexoesIniciais: ConexaoBancaria[] = [
 ];
 
 export function useBancos() {
+  const { addLog } = useLogs();
   const [conexoes, setConexoes] = useState<ConexaoBancaria[]>(conexoesIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorBancos, setErrorBancos] = useState<string | null>(null);
@@ -101,11 +103,16 @@ export function useBancos() {
     };
 
     setConexoes((prev) => [...prev, nova]);
+    addLog(`Adicionou conexão bancária: ${dados.bancoNome} (Ag: ${dados.agencia} CC: ${dados.contaNumero})`, "financeiro");
     return true;
   };
 
   const removerConexao = (id: string) => {
+    const conexao = conexoes.find((c) => c.id === id);
     setConexoes((prev) => prev.filter((c) => c.id !== id));
+    if (conexao) {
+      addLog(`Removeu conexão bancária: ${conexao.bancoNome}`, "financeiro");
+    }
   };
 
   const sincronizarConexao = (id: string) => {
@@ -131,6 +138,8 @@ export function useBancos() {
             const novoSaldo = novasTransacoes.reduce((acc, t) => {
               return t.tipo === "credito" ? acc + t.valor : acc - t.valor;
             }, 10000);
+
+            addLog(`Sincronizou extrato bancário (Banco: ${c.bancoNome}, ID: ${c.id})`, "financeiro");
 
             return {
               ...c,

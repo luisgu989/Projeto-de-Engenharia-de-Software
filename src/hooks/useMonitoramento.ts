@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface MetricaPerformance {
   id: string;
@@ -63,6 +64,7 @@ const mockMetricasIniciais: MetricaPerformance[] = [
 
 export function useMonitoramento() {
   const { addNotification } = useNotifications();
+  const { addLog } = useLogs();
   const [metricas, setMetricas] = useState<MetricaPerformance[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("erp_monitoramento_performance");
@@ -168,6 +170,7 @@ export function useMonitoramento() {
                 "error",
                 "gerente"
               );
+              addLog(`Alerta de Monitoramento de Performance gerado para ${metric.tipoRecurso}: ${novoNivel}`, "sistema");
             }
           }
 

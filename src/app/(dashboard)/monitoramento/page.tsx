@@ -480,8 +480,8 @@ export default function MonitoramentoPage() {
                             {log.tipo === "error" ? "Falha" : log.tipo === "warning" ? "Alerta" : "Normal"}
                           </span>
                         </td>
-                        <td className="text-left" className={cn(
-                          "p-4 font-semibold leading-normal",
+                        <td className={cn(
+                          "text-left p-4 font-semibold leading-normal",
                           log.tipo === "error"
                             ? "text-destructive"
                             : log.tipo === "warning"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export type StatusOportunidade =
   | "prospeccao"
@@ -282,6 +283,7 @@ const mockOportunidadesIniciais: Oportunidade[] = [
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 export function useOportunidades() {
+  const { addLog } = useLogs();
   const [oportunidades, setOportunidades] = useState<Oportunidade[]>(
     mockOportunidadesIniciais
   );
@@ -301,6 +303,7 @@ export function useOportunidades() {
       historico: [],
     };
     setOportunidades((prev) => [oportunidadeCompleta, ...prev]);
+    addLog(`Criou a oportunidade ${idGerado} para o cliente ${nova.cliente}`, "vendas");
   };
 
   /**
@@ -324,6 +327,13 @@ export function useOportunidades() {
       };
     }
 
+    if (novaEtapa === "fechado_perdido" && (!observacao || !observacao.trim())) {
+      return {
+        sucesso: false,
+        erro: "É obrigatório informar uma justificativa (observação) ao marcar a oportunidade como Perdida.",
+      };
+    }
+
     const movimentacao: MovimentacaoPipeline = {
       id: `MOV-${id}-${Date.now()}`,
       etapaAnterior: oportunidade.status,
@@ -342,6 +352,8 @@ export function useOportunidades() {
       )
     );
 
+    addLog(`Avançou etapa da oportunidade ${id} para ${statusLabels[novaEtapa]}`, "vendas");
+
     return { sucesso: true };
   };
 
@@ -359,6 +371,7 @@ export function useOportunidades() {
     setOportunidades((prev) =>
       prev.map((op) => (op.id === id ? { ...op, ...campos } : op))
     );
+    addLog(`Editou os dados da oportunidade ${id}`, "vendas");
     return { sucesso: true };
   };
 

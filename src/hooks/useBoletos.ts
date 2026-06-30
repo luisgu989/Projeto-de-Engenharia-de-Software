@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Boleto {
   id: string;
@@ -37,6 +38,7 @@ const boletosIniciais: Boleto[] = [
 ];
 
 export function useBoletos() {
+  const { addLog } = useLogs();
   const [boletos, setBoletos] = useState<Boleto[]>(boletosIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorBoletos, setErrorBoletos] = useState<string | null>(null);
@@ -107,18 +109,31 @@ export function useBoletos() {
     };
 
     setBoletos((prev) => [novoBoleto, ...prev]);
+    addLog(`Gerou boleto ${idGerado} para ${dados.clienteNome} no valor de R$ ${dados.valor}`, "financeiro");
     return true;
   };
 
   const cancelarBoleto = (id: string) => {
     setBoletos((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "cancelado" } : b))
+      prev.map((b) => {
+        if (b.id === id) {
+          addLog(`Cancelou o boleto ${id}`, "financeiro");
+          return { ...b, status: "cancelado" };
+        }
+        return b;
+      })
     );
   };
 
   const liquidarBoleto = (id: string) => {
     setBoletos((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "pago" } : b))
+      prev.map((b) => {
+        if (b.id === id) {
+          addLog(`Liquidou o boleto ${id}`, "financeiro");
+          return { ...b, status: "pago" };
+        }
+        return b;
+      })
     );
   };
 

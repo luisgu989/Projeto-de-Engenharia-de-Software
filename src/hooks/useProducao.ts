@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
 import { useEstoque } from "./useEstoque";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface OrdemProducao {
   id: string;
@@ -75,6 +76,7 @@ const ordensIniciais: OrdemProducao[] = [
 
 export function useProducao() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
   const { registrarMovimentacao } = useEstoque();
 
@@ -144,6 +146,8 @@ export function useProducao() {
     const cargaRecurso = calcularCargaRecurso(novaOP.recursoId, novaOP.dataInicio) + 
       Math.round((novaOP.quantidade / (recursos.find(r => r.id === novaOP.recursoId)?.capacidadeMax || 100)) * 100);
 
+    addLog(`Cadastrou a ordem de produção ${id} para o produto ${novaOP.produtoNome}`, "producao");
+
     const recursoNome = recursos.find((r) => r.id === novaOP.recursoId)?.nome || "Recurso";
 
     addNotification(
@@ -186,6 +190,8 @@ export function useProducao() {
     if (statusAlteradoValido && opEncontrada) {
       setOrdens(ordensAtualizadas);
       const op = opEncontrada as OrdemProducao;
+
+      addLog(`Atualizou o status da ordem de produção ${op.id} para ${novoStatus}`, "producao");
 
       addNotification(
         "Status de Produção Alterado",
@@ -232,6 +238,7 @@ export function useProducao() {
     if (!op) return false;
 
     setOrdens((prev) => prev.filter((o) => o.id !== id));
+    addLog(`Removeu a ordem de produção ${op.id}`, "producao");
     addNotification(
       "Ordem de Produção Cancelada",
       `A ordem ${op.id} para ${op.produtoNome} foi removida do planejamento.`,

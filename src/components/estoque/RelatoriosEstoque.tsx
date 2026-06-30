@@ -586,7 +586,7 @@ export function RelatoriosEstoque({ estoque }: RelatoriosEstoqueProps) {
                                 {isEntry ? "Entrada" : "Saída"}
                               </span>
                             </td>
-                            <td className="text-center" className={cn(
+                            <td className={cn(
                               "p-3 text-center font-bold font-mono",
                               isEntry ? "text-emerald-600" : "text-rose-600"
                             )}>

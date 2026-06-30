@@ -296,7 +296,7 @@ export function HistoricoMovimentacoes({
                         </span>
                       </td>
                       <td className="p-4 text-xs text-foreground/80 font-medium text-center">{mov.deposito || "Depósito Central"}</td>
-                      <td className="text-center" className={cn(
+                      <td className={cn(
                         "p-4 text-center font-bold font-mono",
                         mov.tipo === "entrada" && "text-emerald-600 dark:text-emerald-400",
                         mov.tipo === "saida" && "text-rose-600 dark:text-rose-400",

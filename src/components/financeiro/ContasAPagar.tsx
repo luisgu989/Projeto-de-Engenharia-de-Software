@@ -26,7 +26,7 @@ export function ContasAPagar() {
 
   const fornecedoresAtivos = useMemo(() => {
     if (!fornecedores) return [];
-    return fornecedores.filter(f => f.status === "ativo").map(f => f.nome);
+    return fornecedores.filter(f => f.status === "ativo").map(f => f.razaoSocial);
   }, [fornecedores]);
 
   // Filter pagar lancamentos

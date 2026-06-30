@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface AtendimentoCRM {
   id: string;
@@ -39,6 +40,7 @@ const atendimentosIniciais: AtendimentoCRM[] = [
 
 export function useRelacionamento() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [atendimentos, setAtendimentos] = useState<AtendimentoCRM[]>(atendimentosIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorCRM, setErrorCRM] = useState<string | null>(null);
@@ -92,6 +94,7 @@ export function useRelacionamento() {
     };
 
     setAtendimentos((prev) => [novoAtendimento, ...prev]);
+    addLog(`Cadastrou atendimento ${idGerado} para o cliente ${dados.clienteNome}`, "crm");
     return true;
   };
 
@@ -99,10 +102,14 @@ export function useRelacionamento() {
     setAtendimentos((prev) =>
       prev.map((a) => (a.id === id ? { ...a, statusAtendimento: novoStatus } : a))
     );
+    addLog(`Atualizou o status do atendimento ${id} para ${novoStatus}`, "crm");
   };
 
   const removerAtendimento = (id: string) => {
-    setAtendimentos((prev) => prev.filter((a) => a.id !== id));
+    setAtendimentos((prev) => prev.filter((a) => {
+      if (a.id === id) addLog(`Removeu o atendimento ${id}`, "crm");
+      return a.id !== id;
+    }));
   };
 
   return {

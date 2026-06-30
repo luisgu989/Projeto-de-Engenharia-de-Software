@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Workflow {
   id: string;
@@ -72,6 +73,7 @@ const mockWorkflowsIniciais: Workflow[] = [
 
 export function useWorkflow() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [workflows, setWorkflows] = useState<Workflow[]>(() => {
@@ -205,6 +207,8 @@ export function useWorkflow() {
       };
       setHistoricoAtividades((prev) => [novaAtividade, ...prev]);
 
+      addLog(`Configurou o workflow ${id} para o processo ${processoVinculado.trim()}`, "sistema");
+
       addNotification(
         "Workflow Configurado",
         `O fluxo "${nomeFluxo}" foi mapeado sob o processo "${processoVinculado}". Prioridade: ${prioridade.toUpperCase()}`,
@@ -328,6 +332,7 @@ export function useWorkflow() {
 
       if (logsAlteracao.length > 0) {
         setHistoricoAtividades((prev) => [...logsAlteracao, ...prev]);
+        addLog(`Atualizou o workflow ${id}`, "sistema");
       }
 
       if (novosDados.statusExecucao === "concluido") {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useLogs } from "@/contexts/logs-context";
 import { DispositivoSensor } from "./useSensores";
 import { ItemEstoque } from "./useEstoque";
 
@@ -36,6 +37,7 @@ const anomaliasIniciais: OcorrenciaAnomalia[] = [
 ];
 
 export function useAnomalias() {
+  const { addLog } = useLogs();
   const [anomalias, setAnomalias] = useState<OcorrenciaAnomalia[]>(anomaliasIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -139,6 +141,8 @@ export function useAnomalias() {
         dispararNotificacaoAnomalia(`Anomalia: ${tipo}`, desc, criticidade);
       }, 0);
 
+      addLog(`Registrou nova anomalia no sistema: ${tipo}`, "sistema");
+
       return [novaAnomalia, ...prev];
     });
 
@@ -202,6 +206,7 @@ export function useAnomalias() {
     setAnomalias((prev) =>
       prev.map((item) => (item.id === id ? { ...item, status: novoStatus } : item))
     );
+    addLog(`Atualizou o status da anomalia ${id} para ${novoStatus}`, "sistema");
   };
 
   return {

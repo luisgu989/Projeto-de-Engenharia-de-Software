@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface HistoricoAprovacao {
   timestamp: string;
@@ -79,6 +80,7 @@ const mockSolicitacoesIniciais: SolicitacaoInterna[] = [
 
 export function useSolicitacoesInternas() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoInterna[]>(() => {
@@ -194,6 +196,8 @@ export function useSolicitacoesInternas() {
         window.dispatchEvent(new Event("storage"));
       }, 100);
 
+      addLog(`Criou nova solicitação interna ${cleanedCodigo}`, "sistema");
+
       return true;
     },
     [solicitacoes, user, addNotification]
@@ -258,6 +262,8 @@ export function useSolicitacoesInternas() {
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));
       }, 100);
+
+      addLog(`Decidiu sobre a solicitação interna ${solicitacao.codigoSolicitacao}: ${acao}`, "sistema");
 
       return true;
     },

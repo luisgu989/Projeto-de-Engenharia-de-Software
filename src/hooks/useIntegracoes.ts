@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 import { ItemEstoque } from "./useEstoque";
 
 export interface RegistroImportado {
@@ -105,6 +106,7 @@ const importacoesIniciais: VersaoImportacao[] = [
 
 export function useIntegracoes() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [versoes, setVersoes] = useState<VersaoImportacao[]>(importacoesIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -165,6 +167,7 @@ export function useIntegracoes() {
     setVersoes((prev) =>
       prev.map((item) => ({ ...item, statusVersao: "arquivada" as const } as VersaoImportacao)).concat(novaVersao)
     );
+    addLog(`Importou nova versão de integração ${idGerado} da origem ${origem.trim()}`, "sistema");
     return true;
   };
 
@@ -203,6 +206,8 @@ export function useIntegracoes() {
         item.id === id ? { ...item, statusVersao: "ativa" as const } : { ...item, statusVersao: "arquivada" as const }
       )
     );
+
+    addLog(`Restaurou a versão de integração ${id}`, "sistema");
 
     return true;
   };

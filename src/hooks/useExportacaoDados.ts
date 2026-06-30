@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Exportacao {
   id: string;
@@ -42,6 +43,7 @@ const mockExportacoesIniciais: Exportacao[] = [
 
 export function useExportacaoDados() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [exportacoes, setExportacoes] = useState<Exportacao[]>(() => {
@@ -181,6 +183,8 @@ export function useExportacaoDados() {
 
       setExportacoes((prev) => [novaExportacao, ...prev]);
 
+      addLog(`Agendou exportação ${id} para a rotina ${cleanedCodigo}`, "relatorios");
+
       addNotification(
         "Exportação Agendada",
         `Extração automática de relatórios agendada (${tipoArquivo.toUpperCase()}) para o diretório ${diretorioDestino}.`,
@@ -259,6 +263,8 @@ export function useExportacaoDados() {
         })
       );
 
+      addLog(`Editou configuração de exportação ${id}`, "relatorios");
+
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));
       }, 100);
@@ -311,6 +317,8 @@ export function useExportacaoDados() {
 
       setHistoricoExportacoes((prev) => [exportacaoConcluida, ...prev]);
 
+      addLog(`Concluiu a exportação ${id}`, "relatorios");
+
       addNotification(
         "Exportação de Dados Concluída",
         `O relatório programado "${exportacao.rotinaProgramada}" foi gerado e salvo em ${exportacao.diretorioDestino}.`,
@@ -349,6 +357,7 @@ export function useExportacaoDados() {
       }
 
       setExportacoes((prev) => prev.filter((e) => e.id !== id));
+      addLog(`Removeu agendamento de exportação ${id}`, "relatorios");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import { useLogs } from "@/contexts/logs-context";
 
 export interface OrdemServico {
   id: string;
@@ -23,7 +23,7 @@ const mockOrdensServico: OrdemServico[] = [
 ];
 
 export function useOrdensServico() {
-
+  const { addLog } = useLogs();
   const [ordensServico, setOrdensServico] = useState<OrdemServico[]>(mockOrdensServico);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -90,6 +90,7 @@ export function useOrdensServico() {
     };
 
     setOrdensServico((prev) => [novaOrdem, ...prev]);
+    addLog(`Cadastrou a ordem de serviço ${idGerado}`, "manutencao");
     return true;
   };
 
@@ -104,12 +105,16 @@ export function useOrdensServico() {
         return item;
       })
     );
+    addLog(`Atualizou o status da ordem de serviço ${id} para ${novoStatus}`, "manutencao");
     return true;
   };
 
   const removerOrdemServico = (id: string) => {
     setErrorMessage(null);
-    setOrdensServico((prev) => prev.filter((item) => item.id !== id));
+    setOrdensServico((prev) => prev.filter((item) => {
+      if (item.id === id) addLog(`Removeu a ordem de serviço ${id}`, "manutencao");
+      return item.id !== id;
+    }));
     return true;
   };
 

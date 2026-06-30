@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface ExecucaoRecuperacao {
   id: string; // ID da Execução gerado automaticamente (imutável)
@@ -49,6 +50,7 @@ const LOGS_INICIAIS: LogOperacaoRecuperacao[] = [
 
 export function useRecuperacaoDesastres() {
   const { user } = useAuth();
+  const { addLog: addGlobalLog } = useLogs();
   const [execucoes, setExecucoes] = useState<ExecucaoRecuperacao[]>([]);
   const [historicoOperacoes, setHistoricoOperacoes] = useState<LogOperacaoRecuperacao[]>([]);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -103,6 +105,8 @@ export function useRecuperacaoDesastres() {
     };
 
     setExecucoes((prev) => [novaExec, ...prev]);
+
+    addGlobalLog(`Iniciou plano de recuperação de desastres: ${scenario}`, "sistema");
 
     // Helper para adicionar log
     const addLog = (msg: string, etapa: string, statusExec: ExecucaoRecuperacao["status"]) => {

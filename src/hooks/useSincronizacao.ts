@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface SincronizacaoRegistro {
   id: string; // ID da Sincronização gerado automaticamente (imutável)
@@ -45,6 +46,7 @@ const SINCRONIZACOES_INICIAIS: SincronizacaoRegistro[] = [
 
 export function useSincronizacao() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [sincronizacoes, setSincronizacoes] = useState<SincronizacaoRegistro[]>([]);
   const [activeVersions, setActiveVersions] = useState<Record<string, number>>({});
 
@@ -106,6 +108,8 @@ export function useSincronizacao() {
       localStorage.setItem("erp_sincronizacoes_data", JSON.stringify(list));
       return list;
     });
+
+    addLog(`Rodou sincronização: ${origem} para ${destino}`, "sistema");
   };
 
   return {

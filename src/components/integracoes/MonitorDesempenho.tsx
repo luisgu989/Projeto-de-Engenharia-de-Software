@@ -218,10 +218,10 @@ export function MonitorDesempenho() {
                         {new Date(item.timestamp).toLocaleTimeString("pt-BR")}
                       </td>
                       <td className="p-3 text-muted-foreground font-semibold text-center">{item.id}</td>
-                      <td className="text-center" className={cn("p-3 font-bold", item.cpu > 80 ? "text-destructive" : "text-foreground")}>
+                      <td className={cn("text-center p-3 font-bold", item.cpu > 80 ? "text-destructive" : item.cpu > 50 ? "text-amber-500" : "text-emerald-500")}>
                         {item.cpu}%
                       </td>
-                      <td className="text-center" className={cn("p-3 font-bold", item.memoria > 80 ? "text-destructive" : "text-foreground")}>
+                      <td className={cn("text-center p-3 font-bold", item.memoria > 80 ? "text-destructive" : item.memoria > 50 ? "text-amber-500" : "text-emerald-500")}>
                         {item.memoria}%
                       </td>
                       <td className="p-3 text-foreground text-center">{item.disco}%</td>

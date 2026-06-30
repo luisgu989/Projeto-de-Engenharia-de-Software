@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
 import { useEstoque } from "./useEstoque";
 import { useProducao } from "./useProducao";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface ProducaoChao {
   id: string;
@@ -56,6 +57,7 @@ const mockProducoesIniciais: ProducaoChao[] = [
 
 export function useProducaoChao() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
   const { estoque, registrarMovimentacaoEstoque } = useEstoque();
   const { ordens } = useProducao();
@@ -174,6 +176,8 @@ export function useProducaoChao() {
 
       setProducoesChao((prev) => [novaProducao, ...prev]);
 
+      addLog(`Iniciou acompanhamento de chão de fábrica para OP ${ordemProdutivaId} (Rastreio: ${id})`, "producao");
+
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));
       }, 100);
@@ -228,6 +232,8 @@ export function useProducaoChao() {
           return p;
         })
       );
+
+      addLog(`Atualizou etapa de produção do rastreio ${id} para ${etapaProducao}`, "producao");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));
@@ -314,6 +320,8 @@ export function useProducaoChao() {
       };
 
       setHistoricoOperacional((prev) => [novoLog, ...prev]);
+
+      addLog(`Homologou produção de chão de fábrica (Rastreio: ${id}) consumindo ${producao.quantidadeConsumida} un. de ${producao.insumoNome}`, "producao");
 
       addNotification(
         "Produção Chão de Fábrica Homologada",

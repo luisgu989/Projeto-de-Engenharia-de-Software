@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useEstoque } from "./useEstoque";
+import { useLogs } from "@/contexts/logs-context";
+import { useAuth } from "@/contexts/auth-context";
 
 export interface ProdutoVenda {
   produtoId: string;
@@ -19,6 +21,11 @@ export interface Venda {
   status: "confirmado" | "pendente" | "cancelado";
   metodoPagamento: string;
   produtos?: ProdutoVenda[];
+  // Audit
+  criadoEm?: string;
+  criadoPor?: string;
+  atualizadoEm?: string;
+  atualizadoPor?: string;
 }
 
 const mockVendasIniciais: Venda[] = [
@@ -88,11 +95,13 @@ const mockVendasIniciais: Venda[] = [
 ];
 
 export function useVendas() {
+  const { user } = useAuth();
+  const { addLog } = useLogs();
   const [vendas, setVendas] = useState<Venda[]>(mockVendasIniciais);
   const [busca, setBusca] = useState("");
   const { estoque, registrarMovimentacaoEstoque, setError: setEstoqueError } = useEstoque();
 
-  const adicionarVenda = (novaVenda: Omit<Venda, "id" | "data">) => {
+  const adicionarVenda = (novaVenda: Omit<Venda, "id" | "data" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">) => {
     // Se a venda estiver sendo confirmada e tiver produtos, precisamos validar o estoque e dar baixa
     if (novaVenda.status === "confirmado" && novaVenda.produtos && novaVenda.produtos.length > 0) {
       // Validar disponibilidade de estoque para todos os itens primeiro
@@ -123,16 +132,79 @@ export function useVendas() {
     const dataAtual = new Date().toISOString();
     const idGerado = `VEN-2026-00${vendas.length + 1}`;
     
-    // Atualizar o motivo da movimentação com o ID gerado (já fizemos a movimentação, 
-    // mas se quiséssemos atrelar perfeitamente, poderíamos passar o ID da venda no motivo)
-    // Para simplificar, registramos apenas "Venda" acima.
-
     const vendaCompleta: Venda = {
       ...novaVenda,
       id: idGerado,
       data: dataAtual,
+      criadoEm: dataAtual,
+      criadoPor: user.name,
     };
     setVendas((prev) => [vendaCompleta, ...prev]);
+    addLog(`Cadastrou a venda ${idGerado} para o cliente ${novaVenda.cliente} no valor de R$ ${novaVenda.valorTotal}`, "vendas");
+    return true;
+  };
+
+  const atualizarVenda = (id: string, dadosAlterados: Partial<Omit<Venda, "id" | "data" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">>) => {
+    const vendaAtual = vendas.find((v) => v.id === id);
+    if (!vendaAtual) return false;
+
+    // Se estiver mudando de pendente para confirmado, tem que baixar estoque
+    if (vendaAtual.status === "pendente" && dadosAlterados.status === "confirmado" && vendaAtual.produtos) {
+      for (const prodVenda of vendaAtual.produtos) {
+        const itemEstoque = estoque.find((i) => i.id === prodVenda.produtoId);
+        if (!itemEstoque || itemEstoque.quantidade < prodVenda.quantidade) {
+          setEstoqueError(`Saldo insuficiente para o produto ${itemEstoque?.nome || prodVenda.nome}.`);
+          return false;
+        }
+      }
+      for (const prodVenda of vendaAtual.produtos) {
+        registrarMovimentacaoEstoque(prodVenda.produtoId, "saida", prodVenda.quantidade, "Depósito Central", `Confirmação da Venda ${id}`);
+      }
+    }
+
+    const dataAtual = new Date().toISOString();
+    setVendas((prev) =>
+      prev.map((v) =>
+        v.id === id
+          ? {
+              ...v,
+              ...dadosAlterados,
+              atualizadoEm: dataAtual,
+              atualizadoPor: user.name,
+            }
+          : v
+      )
+    );
+    addLog(`Atualizou os dados do pedido de venda ${id}`, "vendas");
+    return true;
+  };
+
+  const cancelarVenda = (id: string) => {
+    const vendaAtual = vendas.find((v) => v.id === id);
+    if (!vendaAtual || vendaAtual.status === "cancelado") return false;
+
+    // Se já foi confirmado antes, o estoque foi baixado, então precisamos estornar
+    if (vendaAtual.status === "confirmado" && vendaAtual.produtos) {
+      for (const prodVenda of vendaAtual.produtos) {
+        registrarMovimentacaoEstoque(
+          prodVenda.produtoId,
+          "entrada",
+          prodVenda.quantidade,
+          "Depósito Central",
+          `Estorno - Cancelamento da Venda ${id}`
+        );
+      }
+    }
+
+    const dataAtual = new Date().toISOString();
+    setVendas((prev) =>
+      prev.map((v) =>
+        v.id === id
+          ? { ...v, status: "cancelado", atualizadoEm: dataAtual, atualizadoPor: user.name }
+          : v
+      )
+    );
+    addLog(`Cancelou o pedido de venda ${id} e estornou o estoque.`, "vendas");
     return true;
   };
 
@@ -157,6 +229,8 @@ export function useVendas() {
     busca,
     setBusca,
     adicionarVenda,
+    atualizarVenda,
+    cancelarVenda,
     faturamentoTotal,
     ticketMedio,
   };

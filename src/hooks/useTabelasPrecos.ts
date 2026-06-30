@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface LogAlteracaoTabela {
   timestamp: string;
@@ -69,6 +70,7 @@ const mockTabelasIniciais: TabelaPreco[] = [
 
 export function useTabelasPrecos() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
 
   const [tabelas, setTabelas] = useState<TabelaPreco[]>(() => {
@@ -206,6 +208,8 @@ export function useTabelasPrecos() {
 
       setTabelas((prev) => [novaTabela, ...prev]);
 
+      addLog(`Cadastrou a tabela de preços ${cleanedCodigo}`, "faturamento");
+
       addNotification(
         "Tabela de Preços Cadastrada",
         `Nova regra comercial ${cleanedCodigo} ativada para o produto ${produtoAssociado}.`,
@@ -336,6 +340,8 @@ export function useTabelasPrecos() {
           return t;
         })
       );
+
+      addLog(`Editou a tabela de preços ${id}`, "faturamento");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));

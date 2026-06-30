@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface ConsentimentoLGPD {
   id: string; // ID do Consentimento imutável
@@ -61,6 +62,7 @@ const ALTERACOES_INICIAIS: LogAlteracaoLGPD[] = [
 
 export function useLGPD() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [consentimentos, setConsentimentos] = useState<ConsentimentoLGPD[]>([]);
   const [historicoAlteracoes, setHistoricoAlteracoes] = useState<LogAlteracaoLGPD[]>([]);
 
@@ -132,6 +134,9 @@ export function useLGPD() {
       const alteracoesAtualizadas = [novaAlteracao, ...historicoAlteracoes];
       setHistoricoAlteracoes(alteracoesAtualizadas);
       localStorage.setItem("erp_lgpd_alteracoes", JSON.stringify(alteracoesAtualizadas));
+      
+      // Global audit integration
+      addLog(novaAlteracao.acao, "seguranca");
     }
   };
 

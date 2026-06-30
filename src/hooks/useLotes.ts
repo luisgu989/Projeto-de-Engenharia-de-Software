@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface LoteItem {
   id: string;
@@ -29,6 +30,7 @@ const lotesIniciais: LoteItem[] = [
 
 export function useLotes() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [lotes, setLotes] = useState<LoteItem[]>(lotesIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -131,12 +133,16 @@ export function useLotes() {
     };
 
     setLotes((prev) => [novoLote, ...prev]);
+    addLog(`Cadastrou o lote ${numeroLote} para o produto ${produtoNome}`, "estoque");
     return true;
   };
 
   const removerLote = (id: string) => {
     setErrorMessage(null);
-    setLotes((prev) => prev.filter((item) => item.id !== id));
+    setLotes((prev) => prev.filter((item) => {
+      if (item.id === id) addLog(`Removeu o lote ${item.numeroLote}`, "estoque");
+      return item.id !== id;
+    }));
     return true;
   };
 

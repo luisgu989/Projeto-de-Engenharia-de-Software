@@ -10,6 +10,7 @@ export interface Funcionario {
   email: string;
   cargo: string;
   departamento: string;
+  cpf: string;
   status: "ativo" | "inativo";
   dataAdmissao: string;
   // Audit details
@@ -26,6 +27,7 @@ const mockFuncionariosIniciais: Funcionario[] = [
     email: "joao.silva@erppro.com",
     cargo: "Gerente",
     departamento: "Vendas",
+    cpf: "111.111.111-11",
     status: "ativo",
     dataAdmissao: "2024-03-10",
     criadoEm: "2024-03-10T09:00:00.000Z",
@@ -37,6 +39,7 @@ const mockFuncionariosIniciais: Funcionario[] = [
     email: "maria.santos@erppro.com",
     cargo: "Analista",
     departamento: "Administrativo",
+    cpf: "222.222.222-22",
     status: "ativo",
     dataAdmissao: "2025-01-15",
     criadoEm: "2025-01-15T10:30:00.000Z",
@@ -48,6 +51,7 @@ const mockFuncionariosIniciais: Funcionario[] = [
     email: "pedro.oliveira@erppro.com",
     cargo: "Suporte",
     departamento: "Tecnologia",
+    cpf: "333.333.333-33",
     status: "inativo",
     dataAdmissao: "2025-08-01",
     criadoEm: "2025-08-01T14:00:00.000Z",
@@ -127,12 +131,25 @@ export function useFuncionarios() {
     );
   };
 
+  const checkDuplicateCpf = (cpf: string, excludeId?: string) => {
+    const cleanedCpf = cpf.replace(/\D/g, "");
+    if (!cleanedCpf) return false;
+    return funcionarios.some(
+      (f) => f.id !== excludeId && f.cpf.replace(/\D/g, "") === cleanedCpf
+    );
+  };
+
   const adicionarFuncionario = (
     novoFunc: Omit<Funcionario, "id" | "criadoEm" | "criadoPor" | "atualizadoEm" | "atualizadoPor">
   ) => {
     setError(null);
     if (checkDuplicateEmail(novoFunc.email)) {
       setError(`O e-mail "${novoFunc.email.trim().toLowerCase()}" já está cadastrado para outro funcionário.`);
+      return false;
+    }
+
+    if (checkDuplicateCpf(novoFunc.cpf)) {
+      setError(`O CPF "${novoFunc.cpf}" já está cadastrado para outro funcionário.`);
       return false;
     }
 
@@ -158,6 +175,11 @@ export function useFuncionarios() {
     setError(null);
     if (checkDuplicateEmail(dadosAlterados.email, id)) {
       setError(`O e-mail "${dadosAlterados.email.trim().toLowerCase()}" já está cadastrado para outro funcionário.`);
+      return false;
+    }
+
+    if (checkDuplicateCpf(dadosAlterados.cpf, id)) {
+      setError(`O CPF "${dadosAlterados.cpf}" já está cadastrado para outro funcionário.`);
       return false;
     }
 
@@ -196,6 +218,7 @@ export function useFuncionarios() {
     (f) =>
       f.nome.toLowerCase().includes(busca.toLowerCase()) ||
       f.email.toLowerCase().includes(busca.toLowerCase()) ||
+      f.cpf.includes(busca) ||
       f.departamento.toLowerCase().includes(busca.toLowerCase()) ||
       f.cargo.toLowerCase().includes(busca.toLowerCase())
   );

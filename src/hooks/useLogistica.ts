@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useNotifications } from "@/contexts/notifications-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface HistoricoStatus {
   status: string;
@@ -164,6 +165,7 @@ const coordenadasCidades: Record<string, { lat: number; lng: number }> = {
 
 export function useLogistica() {
   const { addNotification } = useNotifications();
+  const { addLog } = useLogs();
 
   const [cargas, setCargas] = useState<CargaLogistica[]>(cargasIniciais);
   const [rotas, setRotas] = useState<RotaLogistica[]>(rotasIniciais);
@@ -235,6 +237,7 @@ export function useLogistica() {
     };
 
     setCargas((prev) => [cargaCompleta, ...prev]);
+    addLog(`Agendou expedição de carga ${id} para ${novaCarga.cliente}`, "estoque");
     addNotification(
       "Expedição de Carga",
       `Carga ${id} destinada a ${novaCarga.cliente} foi agendada.`,
@@ -282,6 +285,7 @@ export function useLogistica() {
 
     const c = cargas.find((c) => c.id === id);
     if (c) {
+      addLog(`Atualizou status da carga ${id} para ${status}`, "estoque");
       addNotification(
         `Carga ${status === "entregue" ? "Entregue" : "Status Alterado"}`,
         `A entrega ${id} para ${c.cliente} está agora: ${status === "em_transito" ? "Em trânsito" : status}.`,
@@ -424,6 +428,7 @@ export function useLogistica() {
     };
 
     setRotas((prev) => [...prev, rotaCompleta]);
+    addLog(`Cadastrou nova rota logística: ${rotaCompleta.nome}`, "estoque");
     addNotification(
       "Nova Rota",
       `A rota "${rotaCompleta.nome}" foi cadastrada com sucesso.`,
@@ -442,6 +447,7 @@ export function useLogistica() {
     if (!rota) return false;
 
     setRotas(prev => prev.filter(r => r.id !== rotaId));
+    addLog(`Removeu rota logística: ${rota.nome}`, "estoque");
     addNotification(
       "Rota Removida",
       `A rota "${rota.nome}" foi removida com sucesso.`,

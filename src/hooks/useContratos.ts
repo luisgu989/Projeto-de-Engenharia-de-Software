@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface AssinaturaContrato {
   usuario: string;
@@ -54,6 +55,7 @@ const contratosIniciais: Contrato[] = [
 
 export function useContratos() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [contratos, setContratos] = useState<Contrato[]>(contratosIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -130,6 +132,7 @@ export function useContratos() {
     };
 
     setContratos((prev) => [novoContrato, ...prev]);
+    addLog(`Cadastrou o contrato ${idGerado} para ${novo.empresaVinculada}`, "relatorios");
     return true;
   };
 
@@ -164,12 +167,19 @@ export function useContratos() {
       })
     );
 
+    addLog(`Assinou digitalmente o contrato ${id}`, "relatorios");
     return true;
   };
 
   const cancelarContrato = (id: string) => {
     setContratos((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "cancelado" as const } : c))
+      prev.map((c) => {
+        if (c.id === id && c.status !== "cancelado") {
+          addLog(`Cancelou o contrato ${id}`, "relatorios");
+          return { ...c, status: "cancelado" as const };
+        }
+        return c;
+      })
     );
   };
 

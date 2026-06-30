@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface DocumentoCorporativo {
   id: string; // ID do Documento gerado automaticamente (imutável)
@@ -104,6 +105,7 @@ const VERSOES_INICIAIS: VersaoDocumento[] = [
 
 export function useDocumentos() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [documentos, setDocumentos] = useState<DocumentoCorporativo[]>([]);
   const [versoes, setVersoes] = useState<VersaoDocumento[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -188,6 +190,7 @@ export function useDocumentos() {
     };
 
     persistData([novoDoc, ...documentos], [novaVersao, ...versoes]);
+    addLog(`Cadastrou o documento ${docId} - ${nome.trim()}`, "sistema");
     return true;
   };
 
@@ -237,6 +240,7 @@ export function useDocumentos() {
     });
 
     persistData(docsAtualizados, versoesAtualizadas);
+    addLog(`Atualizou o documento ${id}`, "sistema");
     return true;
   };
 
@@ -289,6 +293,7 @@ export function useDocumentos() {
     });
 
     persistData(docsAtualizados, [novaVersao, ...versoesDesativadas]);
+    addLog(`Enviou nova versão do documento ${docId}`, "sistema");
     return true;
   };
 
@@ -348,6 +353,7 @@ export function useDocumentos() {
     });
 
     persistData(docsAtualizados, [novaVersao, ...versoesDesativadas]);
+    addLog(`Restaurou versão anterior do documento ${docId}`, "sistema");
     return true;
   };
 

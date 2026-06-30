@@ -53,6 +53,7 @@ export function TabelaFuncionarios({
   // Form states (Cadastro)
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [cargo, setCargo] = useState("Analista");
   const [departamento, setDepartamento] = useState("Administrativo");
   const [status, setStatus] = useState<"ativo" | "inativo">("ativo");
@@ -61,6 +62,7 @@ export function TabelaFuncionarios({
   // Form states (Edição)
   const [editNome, setEditNome] = useState("");
   const [editEmail, setEditEmail] = useState("");
+  const [editCpf, setEditCpf] = useState("");
   const [editCargo, setEditCargo] = useState("");
   const [editDepartamento, setEditDepartamento] = useState("");
   const [editStatus, setEditStatus] = useState<"ativo" | "inativo">("ativo");
@@ -69,6 +71,7 @@ export function TabelaFuncionarios({
   const resetForm = () => {
     setNome("");
     setEmail("");
+    setCpf("");
     setCargo("Analista");
     setDepartamento("Administrativo");
     setStatus("ativo");
@@ -99,6 +102,7 @@ export function TabelaFuncionarios({
     const success = onAdicionarFuncionario({
       nome: nome.trim(),
       email: email.trim().toLowerCase(),
+      cpf: cpf.trim(),
       cargo,
       departamento,
       status,
@@ -135,6 +139,7 @@ export function TabelaFuncionarios({
     const success = onAtualizarFuncionario(selectedFunc.id, {
       nome: editNome.trim(),
       email: editEmail.trim().toLowerCase(),
+      cpf: editCpf.trim(),
       cargo: editCargo,
       departamento: editDepartamento,
       status: editStatus,
@@ -260,6 +265,7 @@ export function TabelaFuncionarios({
                             setSelectedFunc(func);
                             setEditNome(func.nome);
                             setEditEmail(func.email);
+                            setEditCpf(func.cpf);
                             setEditCargo(func.cargo);
                             setEditDepartamento(func.departamento);
                             setEditStatus(func.status);
@@ -346,6 +352,21 @@ export function TabelaFuncionarios({
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
+                    setError(null);
+                  }}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">CPF</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="000.000.000-00"
+                  value={cpf}
+                  onChange={(e) => {
+                    setCpf(e.target.value);
                     setError(null);
                   }}
                   className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
@@ -513,6 +534,20 @@ export function TabelaFuncionarios({
                   value={editEmail}
                   onChange={(e) => {
                     setEditEmail(e.target.value);
+                    setError(null);
+                  }}
+                  className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">CPF</label>
+                <input
+                  type="text"
+                  required
+                  value={editCpf}
+                  onChange={(e) => {
+                    setEditCpf(e.target.value);
                     setError(null);
                   }}
                   className="w-full bg-accent/40 border border-border focus:border-ring/30 focus:ring-2 focus:ring-ring/10 focus:outline-none rounded-md px-3 py-2 text-sm"

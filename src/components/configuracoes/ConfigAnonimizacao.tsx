@@ -84,7 +84,7 @@ export function ConfigAnonimizacao() {
                       </span>
                     </td>
                     <td className="p-4 font-medium text-muted-foreground text-right">{reg.valorOriginal}</td>
-                    <td className="text-right" className={cn("p-4 font-mono font-bold", isAnon ? "text-emerald-500" : "text-foreground")}>
+                    <td className={cn("text-right p-4 font-mono font-bold", isAnon ? "text-emerald-500" : "text-foreground")}>
                       {reg.valorAtual}
                     </td>
                     <td className="p-4 text-center">

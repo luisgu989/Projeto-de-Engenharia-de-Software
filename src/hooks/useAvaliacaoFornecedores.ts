@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface AvaliacaoFornecedor {
   id: string;
@@ -45,6 +46,7 @@ const avaliacoesIniciais: AvaliacaoFornecedor[] = [
 
 export function useAvaliacaoFornecedores() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [avaliacoes, setAvaliacoes] = useState<AvaliacaoFornecedor[]>(avaliacoesIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -102,6 +104,7 @@ export function useAvaliacaoFornecedores() {
     };
 
     setAvaliacoes((prev) => [avaliacaoCompleta, ...prev]);
+    addLog(`Cadastrou avaliação ${idGerado} para o fornecedor ${nova.fornecedorNome}`, "fornecedores");
     return true;
   };
 

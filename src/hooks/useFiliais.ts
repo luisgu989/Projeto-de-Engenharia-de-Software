@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Filial {
   id: string;
@@ -36,6 +37,7 @@ const filiaisIniciais: Filial[] = [
 
 export function useFiliais() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [filiais, setFiliais] = useState<Filial[]>(filiaisIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -119,6 +121,7 @@ export function useFiliais() {
     };
 
     setFiliais((prev) => [...prev, novaFilial]);
+    addLog(`Cadastrou a filial ${idGerado} - ${nome.trim()}`, "sistema");
     return true;
   };
 
@@ -127,12 +130,16 @@ export function useFiliais() {
     setFiliais((prev) =>
       prev.map((item) => (item.id === id ? { ...item, status: novoStatus } : item))
     );
+    addLog(`Atualizou o status da filial ${id} para ${novoStatus}`, "sistema");
     return true;
   };
 
   const removerFilial = (id: string) => {
     setErrorMessage(null);
-    setFiliais((prev) => prev.filter((item) => item.id !== id));
+    setFiliais((prev) => prev.filter((item) => {
+      if (item.id === id) addLog(`Removeu a filial ${id}`, "sistema");
+      return item.id !== id;
+    }));
     return true;
   };
 

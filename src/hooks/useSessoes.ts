@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface SessaoUsuario {
   id: string; // ID da Sessão imutável
@@ -45,6 +46,7 @@ const SESSOES_INICIAIS: SessaoUsuario[] = [
 
 export function useSessoes() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [sessoes, setSessoes] = useState<SessaoUsuario[]>([]);
   const [historicoAcessos, setHistoricoAcessos] = useState<any[]>([]);
 
@@ -123,6 +125,8 @@ export function useSessoes() {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("storage"));
     }
+
+    addLog(`Encerrou a sessão do usuário ${sessaoId}`, "seguranca");
   };
 
   return {

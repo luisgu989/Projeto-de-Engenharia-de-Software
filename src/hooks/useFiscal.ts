@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface DocumentoFiscal {
   id: string;
@@ -48,6 +49,7 @@ const documentosFiscaisIniciais: DocumentoFiscal[] = [
 
 export function useFiscal() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [documentos, setDocumentos] = useState<DocumentoFiscal[]>(documentosFiscaisIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -143,6 +145,8 @@ export function useFiscal() {
 
     setDocumentos((prev) => [novoDocumento, ...prev]);
 
+    addLog(`Emitiu documento fiscal ${idGerado} para o destinatário ${dados.destinatarioNome}`, "financeiro");
+
     setTimeout(() => {
       setDocumentos((prev) =>
         prev.map((doc) =>
@@ -181,6 +185,7 @@ export function useFiscal() {
           : doc
       )
     );
+    addLog(`Cancelou documento fiscal ${id}`, "financeiro");
     return true;
   };
 

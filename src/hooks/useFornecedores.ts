@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Fornecedor {
   id: string;
@@ -63,6 +64,7 @@ const fornecedoresIniciais: Fornecedor[] = [
 
 export function useFornecedores() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>(fornecedoresIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -148,17 +150,58 @@ export function useFornecedores() {
     };
 
     setFornecedores((prev) => [novoFornecedor, ...prev]);
+    addLog(`Cadastrou fornecedor: ${novo.razaoSocial} (CNPJ: ${novo.cnpj})`, "estoque");
+    return true;
+  };
+
+  const atualizarFornecedor = (id: string, dados: Omit<Fornecedor, "id" | "dataCadastro" | "usuarioResponsavel">) => {
+    setErrorMessage(null);
+
+    if (!dados.razaoSocial.trim()) {
+      setErrorMessage("A Razão Social é obrigatória.");
+      return false;
+    }
+
+    if (!dados.cnpj.trim()) {
+      setErrorMessage("O CNPJ é obrigatório.");
+      return false;
+    }
+
+    if (checkDuplicateCnpj(dados.cnpj, id)) {
+      setErrorMessage("Este CNPJ já está cadastrado para outro fornecedor.");
+      return false;
+    }
+
+    if (!dados.contato.trim()) {
+      setErrorMessage("O contato comercial é obrigatório.");
+      return false;
+    }
+
+    setFornecedores((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, ...dados } : f))
+    );
+    addLog(`Atualizou cadastro do fornecedor: ${dados.razaoSocial} (ID: ${id})`, "estoque");
     return true;
   };
 
   const atualizarFornecedorStatus = (id: string, novoStatus: Fornecedor["status"]) => {
     setFornecedores((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, status: novoStatus } : f))
+      prev.map((f) => {
+        if (f.id === id) {
+          addLog(`Alterou status do fornecedor ${f.razaoSocial} para ${novoStatus}`, "estoque");
+          return { ...f, status: novoStatus };
+        }
+        return f;
+      })
     );
   };
 
   const removerFornecedor = (id: string) => {
+    const fornecedor = fornecedores.find((f) => f.id === id);
     setFornecedores((prev) => prev.filter((f) => f.id !== id));
+    if (fornecedor) {
+      addLog(`Removeu fornecedor: ${fornecedor.razaoSocial}`, "estoque");
+    }
   };
 
   return {
@@ -166,6 +209,7 @@ export function useFornecedores() {
     errorMessage,
     limparErro,
     adicionarFornecedor,
+    atualizarFornecedor,
     atualizarFornecedorStatus,
     removerFornecedor
   };

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
 import { useEstoque } from "./useEstoque";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface SessaoInventario {
   id: string;
@@ -31,6 +32,7 @@ export interface AjusteInventario {
 
 export function useInventario() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
   const { estoque, ajustarEstoque } = useEstoque();
 
@@ -120,6 +122,7 @@ export function useInventario() {
     };
 
     setSessoes((prev) => [novaSessao, ...prev]);
+    addLog(`Iniciou inventário ${novaSessao.id} para o produto ${produto.nome}`, "estoque");
     addNotification(
       "Sessão de Inventário Aberta",
       `Inventário ${novaSessao.id} iniciado para ${produto.nome} (Saldo atual: ${produto.quantidade} un.).`,
@@ -238,6 +241,8 @@ export function useInventario() {
     };
 
     setHistoricoAjustes((prev) => [novoAjuste, ...prev]);
+
+    addLog(`Finalizou conciliação do inventário ${id} para ${sessao.produtoNome}. Ajuste: ${sessao.quantidadeAjustada}`, "estoque");
 
     addNotification(
       "Inventário Finalizado",

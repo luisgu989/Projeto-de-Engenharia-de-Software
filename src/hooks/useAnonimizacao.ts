@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface RegistroSensivel {
   id: string; // ID do Registro gerado automaticamente (imutável)
@@ -83,6 +84,7 @@ const HISTORICO_INICIAL: LogOperacaoAnonima[] = [
 
 export function useAnonimizacao() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [registros, setRegistros] = useState<RegistroSensivel[]>([]);
   const [historicoOperacoes, setHistoricoOperacoes] = useState<LogOperacaoAnonima[]>([]);
 
@@ -178,6 +180,8 @@ export function useAnonimizacao() {
       const historicoAtualizado = [novaOperacao, ...historicoOperacoes];
       setHistoricoOperacoes(historicoAtualizado);
       localStorage.setItem("erp_anon_historico", JSON.stringify(historicoAtualizado));
+
+      addLog(`Anonimizou o registro sensível ${registroId}`, "seguranca");
     }
   };
 

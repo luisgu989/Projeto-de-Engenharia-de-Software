@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Cobranca {
   id: string;
@@ -37,6 +38,7 @@ const cobrancasIniciais: Cobranca[] = [
 ];
 
 export function useCobrancas() {
+  const { addLog } = useLogs();
   const [cobrancas, setCobrancas] = useState<Cobranca[]>(cobrancasIniciais);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorCobrancas, setErrorCobrancas] = useState<string | null>(null);
@@ -103,6 +105,7 @@ export function useCobrancas() {
     };
 
     setCobrancas((prev) => [nova, ...prev]);
+    addLog(`Enviou cobrança ${idGerado} para o cliente ${dados.clienteNome}`, "financeiro");
     return true;
   };
 

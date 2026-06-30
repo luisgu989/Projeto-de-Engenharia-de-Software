@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notifications-context";
 import { useAtivos, Ativo } from "./useAtivos";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Manutencao {
   id: string;
@@ -65,6 +66,7 @@ const mockManutencoesIniciais: Manutencao[] = [
 
 export function useManutencaoPreventiva() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const { addNotification } = useNotifications();
   const { ativos } = useAtivos();
 
@@ -191,6 +193,8 @@ export function useManutencaoPreventiva() {
 
       setManutencoes((prev) => [novaManutencao, ...prev]);
 
+      addLog(`Agendou manutenção preventiva ${id} para o ativo ${ativo.descricao}`, "manutencao");
+
       // Alertas de Programação automáticos para logística/gerência
       addNotification(
         "Manutenção Preventiva Agendada",
@@ -262,6 +266,8 @@ export function useManutencaoPreventiva() {
         })
       );
 
+      addLog(`Editou o agendamento da manutenção preventiva ${id}`, "manutencao");
+
       addNotification(
         "Cronograma de Manutenção Alterado",
         `O agendamento da manutenção ${id} foi reprogramado para ${dataAgendada}.`,
@@ -324,6 +330,8 @@ export function useManutencaoPreventiva() {
 
         setHistoricoIntervencoes((prev) => [intervencaoConcluida, ...prev]);
 
+        addLog(`Concluiu a manutenção preventiva ${id} para o ativo ${manutencao.ativoDescricao}`, "manutencao");
+
         addNotification(
           "Manutenção Preventiva Concluída",
           `Revisão ${id} do equipamento "${manutencao.ativoDescricao}" finalizada com sucesso.`,
@@ -364,6 +372,7 @@ export function useManutencaoPreventiva() {
       }
 
       setManutencoes((prev) => prev.filter((m) => m.id !== id));
+      addLog(`Removeu o agendamento de manutenção preventiva ${id}`, "manutencao");
       addNotification(
         "Agendamento de Manutenção Removido",
         `O agendamento da manutenção ${id} foi excluído do cronograma de controle.`,

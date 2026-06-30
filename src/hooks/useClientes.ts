@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface Cliente {
   id: string;
@@ -64,6 +65,7 @@ const mockClientesIniciais: Cliente[] = [
 ];
 
 export function useClientes() {
+  const { addLog } = useLogs();
   const [clientes, setClientes] = useState<Cliente[]>(mockClientesIniciais);
   const [busca, setBusca] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +103,7 @@ export function useClientes() {
     };
 
     setClientes((prev) => [clienteCompleto, ...prev]);
+    addLog(`Cadastrou o cliente ${idGerado} - ${clienteCompleto.nome}`, "crm");
     return true;
   };
 
@@ -130,11 +133,15 @@ export function useClientes() {
           : c
       )
     );
+    addLog(`Atualizou o cliente ${id}`, "crm");
     return true;
   };
 
   const removerCliente = (id: string) => {
-    setClientes((prev) => prev.filter((c) => c.id !== id));
+    setClientes((prev) => prev.filter((c) => {
+      if (c.id === id) addLog(`Removeu o cliente ${id}`, "crm");
+      return c.id !== id;
+    }));
   };
 
   const clientesFiltrados = clientes.filter(

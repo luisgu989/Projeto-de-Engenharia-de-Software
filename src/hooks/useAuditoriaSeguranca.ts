@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface EventoAuditoria {
   id: string;
@@ -58,6 +59,7 @@ const mockAuditoriaInicial: EventoAuditoria[] = [
 
 export function useAuditoriaSeguranca() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
 
   const [logs, setLogs] = useState<EventoAuditoria[]>(() => {
     if (typeof window !== "undefined") {
@@ -138,6 +140,8 @@ export function useAuditoriaSeguranca() {
       };
 
       setLogs((prev) => [novoLog, ...prev]);
+
+      addLog(`Registrou evento de auditoria ${id}: ${tipoEvento.trim()}`, "seguranca");
 
       setTimeout(() => {
         window.dispatchEvent(new Event("storage"));

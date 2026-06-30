@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useLogs } from "@/contexts/logs-context";
 
 export interface RegistroProtegido {
   id: string; // ID do Registro protegido pelo sistema (imutável)
@@ -71,6 +72,7 @@ const OPERACOES_INICIAIS: LogOperacaoCripto[] = [
 
 export function useCriptografia() {
   const { user } = useAuth();
+  const { addLog } = useLogs();
   const [dadosProtegidos, setDadosProtegidos] = useState<RegistroProtegido[]>([]);
   const [historicoOperacoes, setHistoricoOperacoes] = useState<LogOperacaoCripto[]>([]);
 
@@ -133,6 +135,8 @@ export function useCriptografia() {
       const operacoesAtualizadas = [novaOperacao, ...historicoOperacoes];
       setHistoricoOperacoes(operacoesAtualizadas);
       localStorage.setItem("erp_cripto_operacoes", JSON.stringify(operacoesAtualizadas));
+
+      addLog(`Atualizou permissão de acesso criptográfico no registro ${registroId}`, "seguranca");
     }
   };
 
