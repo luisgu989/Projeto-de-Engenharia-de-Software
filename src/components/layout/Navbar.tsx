@@ -2,8 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, Bell, Search, Sun, Moon, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, Bell, Search, Sun, Moon, Trash2, CheckCircle2, AlertTriangle, XCircle, Info, CheckCheck, LogOut, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
@@ -17,6 +17,7 @@ export interface NavbarProps {
 
 export function Navbar({ setMobileOpen, collapsed: _collapsed }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, switchProfile, availableProfiles, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { filteredNotifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
@@ -46,7 +47,20 @@ export function Navbar({ setMobileOpen, collapsed: _collapsed }: NavbarProps) {
 
         {/* Page Title / Breadcrumb */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground hidden md:inline">Sistema ERP</span>
+          {pathname !== "/" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-8 w-8 mr-1 hover:bg-accent text-muted-foreground hover:text-foreground"
+              title="Voltar"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          )}
+          <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors hidden md:inline">
+            Sistema ERP
+          </Link>
           <span className="text-xs text-muted-foreground hidden md:inline">/</span>
           <h1 className="text-base font-semibold text-foreground tracking-tight">
             {getPageTitle()}

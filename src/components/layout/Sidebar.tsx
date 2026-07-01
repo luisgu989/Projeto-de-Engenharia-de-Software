@@ -31,6 +31,7 @@ import {
   GitBranch,
   ClipboardList,
   Star,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -238,7 +239,7 @@ export function Sidebar({
   setMobileOpen,
 }: SidebarProps) {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { addToast } = useNotifications();
 
   const [favoritos, setFavoritos] = useState<string[]>([]);
@@ -489,12 +490,13 @@ export function Sidebar({
 
         {/* Footer — User Info */}
         <div className="p-3 border-t border-border bg-card shrink-0 no-print">
-          <div
+          <Link
+            href="/configuracoes"
             className={cn(
-              "flex items-center gap-3 rounded-md px-2 py-2 hover:bg-accent transition-colors cursor-pointer",
+              "flex items-center gap-3 rounded-md px-2 py-2 hover:bg-accent transition-colors cursor-pointer outline-none",
               collapsed && "justify-center px-0"
             )}
-            title={`${user.name} (${user.email})`}
+            title={`${user.name} (${user.email}) - Acessar Perfil e Configurações`}
           >
             <div className="h-8 w-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center font-bold text-xs text-primary border border-primary/20 uppercase">
               {user.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
@@ -507,7 +509,7 @@ export function Sidebar({
                 </span>
               </div>
             )}
-          </div>
+          </Link>
         </div>
       </aside>
     </>
