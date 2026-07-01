@@ -13,7 +13,7 @@ export interface RelatorioGerado {
   dataGeracao: string;
   status: "processando" | "concluido";
   parametros: {
-    tipoRelatorio: "giro" | "producao_demanda" | "margem_logistica" | "anomalias";
+    tipoRelatorio: "giro" | "producao_demanda" | "margem_logistica" | "anomalias" | "comercial_crm" | "financeiro_contratos" | "rh_produtividade" | "suporte_ti" | "ativos_ti";
     dataInicio: string;
     dataFim: string;
     categoriaSel: string;
@@ -43,7 +43,7 @@ export function useRelatorios() {
   }, [relatorios]);
 
   const gerarRelatorioRun = (
-    tipo: "giro" | "producao_demanda" | "margem_logistica" | "anomalias",
+    tipo: "giro" | "producao_demanda" | "margem_logistica" | "anomalias" | "comercial_crm" | "financeiro_contratos" | "rh_produtividade" | "suporte_ti" | "ativos_ti",
     modulo: string,
     dataInicio: string,
     dataFim: string,
@@ -54,9 +54,21 @@ export function useRelatorios() {
     const dataAtual = new Date().toISOString();
     const periodo = `${dataInicio || "Início"} até ${dataFim || "Fim"}`;
 
+    const mapNomes = {
+      giro: "Giro de Estoque",
+      producao_demanda: "Produção vs Demanda",
+      margem_logistica: "Margens vs Fretes",
+      anomalias: "Anomalias Detectadas",
+      comercial_crm: "Desempenho Comercial & CRM",
+      financeiro_contratos: "Saúde Financeira & Contratos",
+      rh_produtividade: "Eficiência e Custo de Pessoal",
+      suporte_ti: "Eficiência de Suporte (TI)",
+      ativos_ti: "Gestão de Ativos e Manutenções",
+    };
+
     const novoRelatorio: RelatorioGerado = {
       id: reportId,
-      tipo: tipo === "giro" ? "Giro de Estoque" : tipo === "producao_demanda" ? "Produção vs Demanda" : tipo === "margem_logistica" ? "Margens vs Fretes" : "Anomalias Detectadas",
+      tipo: mapNomes[tipo],
       modulo,
       periodo,
       usuarioSolicitante: user?.name || "Usuário",

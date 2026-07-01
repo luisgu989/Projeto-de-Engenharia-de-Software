@@ -65,6 +65,7 @@ export function FaturamentoFiscal() {
   const [xmlFileError, setXmlFileError] = useState<string | null>(null);
   const [xmlFileSuccess, setXmlFileSuccess] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [viewingDANFENota, setViewingDANFENota] = useState<DocumentoFiscal | null>(null);
 
   const activeClientes = clientes.filter((c) => c.status === "ativo");
 
@@ -470,24 +471,38 @@ export function FaturamentoFiscal() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        {doc.statusEmissao === "emitida" ? (
-                          <Button
-                            variant="ghost"
-                            size="icon-xs"
-                            onClick={() => {
-                              setCancelDoc(doc);
-                              setMotivoCancel("");
-                              setCancelError(null);
-                              setCancelModalOpen(true);
-                            }}
-                            className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors cursor-pointer"
-                            title="Cancelar nota fiscal"
-                          >
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
+                        <div className="flex items-center justify-center gap-1.5">
+                          {doc.statusEmissao === "emitida" && (
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              onClick={() => setViewingDANFENota(doc)}
+                              className="h-7 text-[10px] font-bold border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10 cursor-pointer"
+                              title="Visualizar DANFE"
+                            >
+                              <FileText className="h-3.5 w-3.5 mr-1" />
+                              Ver DANFE
+                            </Button>
+                          )}
+                          {doc.statusEmissao === "emitida" ? (
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              onClick={() => {
+                                setCancelDoc(doc);
+                                setMotivoCancel("");
+                                setCancelError(null);
+                                setCancelModalOpen(true);
+                              }}
+                              className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors cursor-pointer"
+                              title="Cancelar nota fiscal"
+                            >
+                              <Ban className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -832,6 +847,74 @@ export function FaturamentoFiscal() {
                 />
               </div>
 
+              {/* Dynamic Tax Calculator Card */}
+              {parseFloat(valor) > 0 && (
+                <div className="bg-accent/40 rounded-xl p-3 border border-border/80 text-[10px] space-y-2 animate-in fade-in duration-200">
+                  <span className="font-extrabold text-muted-foreground uppercase tracking-wider block border-b border-border/60 pb-1 text-left">
+                    Demonstrativo Tributário Estimado
+                  </span>
+                  
+                  {tipoDoc === "NF-e" && (
+                    <div className="space-y-1 font-mono font-medium text-left">
+                      <div className="flex justify-between">
+                        <span>Base de Cálculo (70%):</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.7)}</span>
+                      </div>
+                      <div className="flex justify-between text-indigo-500 font-bold">
+                        <span>ICMS (18%):</span>
+                        <span>{formatCurrency((parseFloat(valor) * 0.7) * 0.18)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>PIS (1,65%):</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.0165)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>COFINS (7,6%):</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.076)}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-dashed border-border/60 pt-1 text-xs font-black mt-1">
+                        <span>Total de Impostos:</span>
+                        <span>{formatCurrency(((parseFloat(valor) * 0.7) * 0.18) + (parseFloat(valor) * 0.0165) + (parseFloat(valor) * 0.076))}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {tipoDoc === "NFS-e" && (
+                    <div className="space-y-1 font-mono font-medium text-left">
+                      <div className="flex justify-between text-indigo-500 font-bold">
+                        <span>ISS Municipal (5%):</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.05)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>PIS (0,65%):</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.0065)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>COFINS (3,00%):</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.03)}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-dashed border-border/60 pt-1 text-xs font-black mt-1">
+                        <span>Total Retenções + ISS:</span>
+                        <span>{formatCurrency((parseFloat(valor) * 0.05) + (parseFloat(valor) * 0.0065) + (parseFloat(valor) * 0.03))}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {tipoDoc === "NFC-e" && (
+                    <div className="space-y-1 font-mono font-medium text-left">
+                      <div className="flex justify-between">
+                        <span>Alíquota Média Estimada:</span>
+                        <span>31,00% (IBPT)</span>
+                      </div>
+                      <div className="flex justify-between text-indigo-500 font-bold border-t border-dashed border-border/60 pt-1 text-xs font-black mt-1">
+                        <span>Tributos Totais Aprox.:</span>
+                        <span>{formatCurrency(parseFloat(valor) * 0.31)}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {formError && (
                 <div className="p-3 text-[11px] font-semibold text-destructive bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-2">
                   <AlertTriangle className="h-4.5 w-4.5 shrink-0" />
@@ -948,6 +1031,439 @@ export function FaturamentoFiscal() {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Visualizador de DANFE / Espelho Fiscal Modal */}
+      {viewingDANFENota && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-4xl bg-white text-black border border-slate-300 rounded-2xl shadow-2xl overflow-hidden flex flex-col my-8 animate-in zoom-in-95 duration-200 max-h-[90vh]">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50 no-print shrink-0">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                  <FileText className="h-4.5 w-4.5 text-emerald-600" />
+                  Espelho Fiscal - {viewingDANFENota.tipoDocumento === "NF-e" ? "DANFE (NF-e de Produto)" : viewingDANFENota.tipoDocumento === "NFS-e" ? "Nota Fiscal de Serviço (NFS-e)" : "Cupom Fiscal (NFC-e)"}
+                </h3>
+                <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
+                  ID: {viewingDANFENota.id} | Chave: {viewingDANFENota.chaveFiscal}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => window.print()}
+                  size="xs"
+                  className="bg-slate-800 hover:bg-slate-700 text-white font-bold h-7 text-[10px] cursor-pointer"
+                >
+                  Imprimir Documento
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setViewingDANFENota(null)}
+                  className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Document Mirror Content */}
+            <div className="flex-1 p-8 overflow-y-auto bg-slate-100/50 print:bg-white print:p-0">
+              
+              {/* NF-e / DANFE Layout */}
+              {viewingDANFENota.tipoDocumento === "NF-e" && (
+                <div className="bg-white border-2 border-black p-4 space-y-4 max-w-[800px] mx-auto text-[10px] font-sans">
+                  
+                  {/* Receipts and Top Bar */}
+                  <div className="grid grid-cols-12 gap-2 border-b-2 border-black pb-2">
+                    <div className="col-span-8 border border-black p-2 flex flex-col justify-between h-14 text-left">
+                      <span className="font-bold">RECEBEMOS DE ERP Pro S.A. OS PRODUTOS/SERVIÇOS CONSTANTES DA NOTA FISCAL INDICADA AO LADO</span>
+                      <div className="flex justify-between text-[8px] mt-1">
+                        <span>DATA DE RECEBIMENTO</span>
+                        <span>IDENTIFICAÇÃO E ASSINATURA DO RECEBEDOR</span>
+                      </div>
+                    </div>
+                    <div className="col-span-4 border border-black p-2 flex flex-col items-center justify-center h-14">
+                      <span className="font-extrabold text-sm">NF-e</span>
+                      <span className="font-bold text-[9px]">Nº {viewingDANFENota.id.replace("NF-2026-", "")}</span>
+                      <span className="font-semibold text-[8px]">SÉRIE: 001</span>
+                    </div>
+                  </div>
+
+                  {/* DANFE Identifier and Barcode */}
+                  <div className="grid grid-cols-12 gap-2 border-b-2 border-black pb-2">
+                    {/* Logo/Emitente Info */}
+                    <div className="col-span-4 border border-black p-2 flex flex-col items-center justify-center text-center">
+                      <div className="font-black text-lg tracking-tight bg-slate-900 text-white px-2 py-0.5 rounded">ERP Pro</div>
+                      <span className="font-bold mt-1">ERP Pro S.A.</span>
+                      <span className="text-[8px] text-slate-500">Av. Das Nações, 1500 - Lagarto/SE</span>
+                      <span className="text-[8px] text-slate-500">CNPJ: 12.345.678/0001-90</span>
+                    </div>
+                    {/* DANFE Type box */}
+                    <div className="col-span-3 border border-black p-2 flex flex-col items-center justify-center text-center">
+                      <span className="font-black text-sm">DANFE</span>
+                      <span className="text-[7.5px] leading-tight mt-1 text-slate-600">Documento Auxiliar da<br/>Nota Fiscal Eletrônica</span>
+                      <div className="border border-black px-2.5 py-0.5 mt-1 font-bold text-[9px] flex gap-2">
+                        <span>0 - Entrada</span>
+                        <span className="font-black">1 - Saída</span>
+                        <span className="border-l border-black pl-1 font-black">1</span>
+                      </div>
+                      <span className="font-bold mt-1 text-[8px]">Nº {viewingDANFENota.id.replace("NF-2026-", "")} • SÉRIE: 001</span>
+                    </div>
+                    {/* Barcode and Access Key */}
+                    <div className="col-span-5 border border-black p-2 flex flex-col justify-between text-left">
+                      <div className="flex flex-col items-center">
+                        {/* Barcode SVG representation */}
+                        <svg viewBox="0 0 100 12" className="w-full h-8 max-w-[150px] mb-1">
+                          <rect x="0" y="0" width="1" height="12" fill="black" />
+                          <rect x="2" y="0" width="2" height="12" fill="black" />
+                          <rect x="5" y="0" width="1" height="12" fill="black" />
+                          <rect x="7" y="0" width="3" height="12" fill="black" />
+                          <rect x="11" y="0" width="1" height="12" fill="black" />
+                          <rect x="13" y="0" width="2" height="12" fill="black" />
+                          <rect x="16" y="0" width="1" height="12" fill="black" />
+                          <rect x="18" y="0" width="2" height="12" fill="black" />
+                          <rect x="22" y="0" width="4" height="12" fill="black" />
+                          <rect x="27" y="0" width="1" height="12" fill="black" />
+                          <rect x="29" y="0" width="2" height="12" fill="black" />
+                          <rect x="33" y="0" width="1" height="12" fill="black" />
+                          <rect x="35" y="0" width="3" height="12" fill="black" />
+                          <rect x="39" y="0" width="1" height="12" fill="black" />
+                          <rect x="41" y="0" width="2" height="12" fill="black" />
+                          <rect x="44" y="0" width="2" height="12" fill="black" />
+                          <rect x="47" y="0" width="1" height="12" fill="black" />
+                          <rect x="49" y="0" width="3" height="12" fill="black" />
+                          <rect x="53" y="0" width="1" height="12" fill="black" />
+                          <rect x="55" y="0" width="2" height="12" fill="black" />
+                          <rect x="58" y="0" width="4" height="12" fill="black" />
+                          <rect x="63" y="0" width="1" height="12" fill="black" />
+                          <rect x="65" y="0" width="2" height="12" fill="black" />
+                          <rect x="68" y="0" width="1" height="12" fill="black" />
+                          <rect x="70" y="0" width="3" height="12" fill="black" />
+                          <rect x="74" y="0" width="2" height="12" fill="black" />
+                          <rect x="77" y="0" width="1" height="12" fill="black" />
+                          <rect x="79" y="0" width="2" height="12" fill="black" />
+                          <rect x="82" y="0" width="3" height="12" fill="black" />
+                          <rect x="86" y="0" width="1" height="12" fill="black" />
+                          <rect x="88" y="0" width="2" height="12" fill="black" />
+                          <rect x="91" y="0" width="1" height="12" fill="black" />
+                          <rect x="93" y="0" width="3" height="12" fill="black" />
+                          <rect x="97" y="0" width="1" height="12" fill="black" />
+                          <rect x="99" y="0" width="1" height="12" fill="black" />
+                        </svg>
+                        <span className="text-[7.5px] font-bold text-slate-500 uppercase">CHAVE DE ACESSO</span>
+                        <span className="font-mono font-bold text-[8px] select-all tracking-wider text-center">
+                          {viewingDANFENota.chaveFiscal.replace(/(.{4})/g, "$1 ")}
+                        </span>
+                      </div>
+                      <div className="border-t border-black pt-1 mt-1 text-[7.5px] flex justify-between text-slate-600">
+                        <span>PROTOCOLO DE AUTORIZAÇÃO DE USO</span>
+                        <span className="font-bold text-black">{135260001029123 + (viewingDANFENota.id.charCodeAt(8) || 0)} - {formatDate(viewingDANFENota.dataEmissao)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Natureza da Operação */}
+                  <div className="border border-black p-1.5 flex justify-between uppercase font-bold text-[8px] text-slate-600 text-left">
+                    <span>NATUREZA DA OPERAÇÃO: <strong className="text-black">Venda de produção do estabelecimento</strong></span>
+                    <span>INSCRIÇÃO ESTADUAL: <strong className="text-black">110.220.330.110</strong></span>
+                  </div>
+
+                  {/* Destinatário / Remetente */}
+                  <div className="border border-black p-2 space-y-1.5 text-left">
+                    <span className="font-black border-b border-black pb-0.5 block">DESTINATÁRIO / REMETENTE</span>
+                    <div className="grid grid-cols-12 gap-2 text-[8px]">
+                      <div className="col-span-7">
+                        <span className="text-slate-500 block">NOME / RAZÃO SOCIAL</span>
+                        <strong className="text-black text-[9px]">{viewingDANFENota.destinatarioNome}</strong>
+                      </div>
+                      <div className="col-span-3">
+                        <span className="text-slate-500 block">CNPJ / CPF</span>
+                        <strong className="text-black text-[9px]">{viewingDANFENota.destinatarioDocumento}</strong>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-slate-500 block">DATA EMISSÃO</span>
+                        <strong className="text-black" suppressHydrationWarning>{new Date(viewingDANFENota.dataEmissao).toLocaleDateString("pt-BR")}</strong>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-2 text-[8px] border-t border-slate-200 pt-1">
+                      <div className="col-span-6">
+                        <span className="text-slate-500 block">ENDEREÇO</span>
+                        <strong className="text-black">Av. Central, 1200 - Centro</strong>
+                      </div>
+                      <div className="col-span-3">
+                        <span className="text-slate-500 block">MUNICÍPIO / UF</span>
+                        <strong className="text-black">Aracaju / SE</strong>
+                      </div>
+                      <div className="col-span-3">
+                        <span className="text-slate-500 block">INSCRIÇÃO ESTADUAL</span>
+                        <strong className="text-black">Isento</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Impostos Calculados (Calculadora Fiscal) */}
+                  {(() => {
+                    const bcIcms = viewingDANFENota.valorTotal * 0.7;
+                    const vIcms = bcIcms * 0.18;
+                    const vPis = viewingDANFENota.valorTotal * 0.0165;
+                    const vCofins = viewingDANFENota.valorTotal * 0.076;
+
+                    return (
+                      <div className="border border-black p-2 space-y-1.5 text-left">
+                        <span className="font-black border-b border-black pb-0.5 block">CÁLCULO DO IMPOSTO (DEMONSTRATIVO LEI DA TRANSPARÊNCIA)</span>
+                        <div className="grid grid-cols-5 gap-2 text-[8.5px] text-center font-bold">
+                          <div className="border-r border-slate-200">
+                            <span className="text-slate-500 block text-[7px]">BASE CÁLCULO ICMS</span>
+                            <span className="text-slate-700">{formatCurrency(bcIcms)}</span>
+                          </div>
+                          <div className="border-r border-slate-200">
+                            <span className="text-slate-500 block text-[7px]">VALOR DO ICMS (18%)</span>
+                            <span className="text-slate-700">{formatCurrency(vIcms)}</span>
+                          </div>
+                          <div className="border-r border-slate-200">
+                            <span className="text-slate-500 block text-[7px]">PIS (1,65%)</span>
+                            <span className="text-slate-700">{formatCurrency(vPis)}</span>
+                          </div>
+                          <div className="border-r border-slate-200">
+                            <span className="text-slate-500 block text-[7px]">COFINS (7,6%)</span>
+                            <span className="text-slate-700">{formatCurrency(vCofins)}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block text-[7px] text-emerald-600">TOTAL DA NOTA</span>
+                            <span className="text-emerald-700 font-extrabold">{formatCurrency(viewingDANFENota.valorTotal)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Itens Grid */}
+                  <div className="border border-black text-left">
+                    <div className="bg-slate-100 border-b border-black px-2 py-1 font-black">DADOS DOS PRODUTOS / SERVIÇOS</div>
+                    <table className="w-full text-left border-collapse text-[8px]">
+                      <thead>
+                        <tr className="border-b border-black bg-slate-50 font-bold text-slate-700">
+                          <th className="p-1.5">CÓD. PROD</th>
+                          <th className="p-1.5">DESCRIÇÃO DO PRODUTO/SERVIÇO</th>
+                          <th className="p-1.5 text-center">NCM</th>
+                          <th className="p-1.5 text-center">CFOP</th>
+                          <th className="p-1.5 text-center">UN</th>
+                          <th className="p-1.5 text-center">QTD</th>
+                          <th className="p-1.5 text-right">VALOR UNIT</th>
+                          <th className="p-1.5 text-right">VALOR TOTAL</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr>
+                          <td className="p-1.5 font-mono">PROD-GEN-01</td>
+                          <td className="p-1.5 font-semibold">LOTE DE MERCADORIAS GERAIS E INSUMOS INTEGRADOS</td>
+                          <td className="p-1.5 text-center">8542.31.90</td>
+                          <td className="p-1.5 text-center">5.101</td>
+                          <td className="p-1.5 text-center">UN</td>
+                          <td className="p-1.5 text-center">1</td>
+                          <td className="p-1.5 text-right">{formatCurrency(viewingDANFENota.valorTotal)}</td>
+                          <td className="p-1.5 text-right font-bold">{formatCurrency(viewingDANFENota.valorTotal)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Observações adicionais */}
+                  <div className="border border-black p-2 min-h-12 flex flex-col justify-between text-left">
+                    <span className="font-bold block text-[7.5px] text-slate-500">INFORMAÇÕES COMPLEMENTARES</span>
+                    <span className="text-[7.5px] leading-relaxed text-slate-700">
+                      Documento emitido por ERP Pro S.A. Regime tributário: Simples Nacional. Lei da Transparência Fiscal: Carga tributária estimada de 27,25% (Fonte: IBPT). Autorizado sob o protocolo de mensageria Sefaz virtual.
+                    </span>
+                  </div>
+
+                </div>
+              )}
+
+              {/* NFS-e Layout (Nota Fiscal de Serviços) */}
+              {viewingDANFENota.tipoDocumento === "NFS-e" && (
+                <div className="bg-white border-2 border-slate-400 p-6 space-y-4 max-w-[800px] mx-auto text-[10px] font-sans text-slate-800 text-left">
+                  
+                  {/* Header Municipal */}
+                  <div className="flex items-center gap-4 border-b-2 border-slate-300 pb-3">
+                    <div className="h-12 w-12 bg-slate-100 border border-slate-300 rounded flex items-center justify-center font-black text-slate-600 text-xs shrink-0">
+                      BRASÃO
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-extrabold text-sm text-slate-900 leading-none">PREFEITURA MUNICIPAL DE LAGARTO</h4>
+                      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider block mt-0.5">Secretaria Municipal de Finanças e Tributos</span>
+                      <h5 className="font-black text-[11px] text-slate-700 mt-1 uppercase">Nota Fiscal de Serviços Eletrônica - NFS-e</h5>
+                    </div>
+                    <div className="border border-slate-300 rounded p-2 text-center shrink-0 bg-slate-50/50">
+                      <div className="text-[7px] font-bold text-slate-500">NÚMERO DA NOTA</div>
+                      <div className="text-xs font-black text-slate-950">NFS-{viewingDANFENota.id.replace("NF-2026-", "")}</div>
+                      <div className="text-[7px] text-slate-500 font-bold mt-1">EMISSÃO: {new Date(viewingDANFENota.dataEmissao).toLocaleDateString("pt-BR")}</div>
+                    </div>
+                  </div>
+
+                  {/* Prestador / Tomador */}
+                  <div className="grid grid-cols-2 gap-4 border-b border-slate-200 pb-3">
+                    <div className="border border-slate-200 rounded-lg p-2.5 space-y-1">
+                      <strong className="text-[8.5px] text-indigo-600 uppercase font-black block">Prestador dos Serviços</strong>
+                      <div className="font-black text-slate-900 text-[10.5px]">ERP Pro S.A.</div>
+                      <div>CNPJ: 12.345.678/0001-90 | Insc. Municipal: 99182</div>
+                      <div className="text-slate-500">Av. Das Nações, 1500 - Distrito Industrial - Lagarto/SE</div>
+                    </div>
+                    <div className="border border-slate-200 rounded-lg p-2.5 space-y-1">
+                      <strong className="text-[8.5px] text-slate-500 uppercase font-black block">Tomador dos Serviços</strong>
+                      <div className="font-black text-slate-900 text-[10.5px]">{viewingDANFENota.destinatarioNome}</div>
+                      <div>CPF/CNPJ: {viewingDANFENota.destinatarioDocumento}</div>
+                      <div className="text-slate-500">Endereço comercial informado no cadastro do ERP.</div>
+                    </div>
+                  </div>
+
+                  {/* Discriminação do Serviço */}
+                  <div className="border border-slate-200 rounded-lg p-3 space-y-2 min-h-24 flex flex-col justify-between">
+                    <strong className="text-[8.5px] text-slate-500 uppercase font-black border-b border-slate-100 pb-1 block">Discriminação dos Serviços Prestados</strong>
+                    <p className="text-[10px] leading-relaxed text-slate-950 font-semibold italic flex-1 mt-1.5">
+                      "Cessão de direito de uso de sistema de software integrado de ERP Pro, licenciamento de módulos gerenciais de vendas, controle financeiro, faturamento fiscal e suporte técnico operacional associado."
+                    </p>
+                    <span className="text-[7.5px] text-slate-400 font-bold uppercase tracking-wider block">Código de Serviço: 1.05 - Licenciamento ou Cessão de Direito de Uso de Softwares</span>
+                  </div>
+
+                  {/* Retenções Federais and ISS Calculator */}
+                  {(() => {
+                    const iss = viewingDANFENota.valorTotal * 0.05;
+                    const pis = viewingDANFENota.valorTotal * 0.0065;
+                    const cofins = viewingDANFENota.valorTotal * 0.03;
+                    const csll = viewingDANFENota.valorTotal * 0.01;
+                    const vLiquido = viewingDANFENota.valorTotal - (pis + cofins + csll);
+
+                    return (
+                      <div className="border border-slate-200 rounded-lg p-3 bg-slate-50/50 space-y-3">
+                        <strong className="text-[8.5px] text-slate-500 uppercase font-black border-b border-slate-100 pb-1 block">Valores de Retenções e ISSQN</strong>
+                        
+                        <div className="grid grid-cols-4 gap-3 text-center text-[9px] font-bold">
+                          <div className="border-r border-slate-200">
+                            <span className="text-[7px] text-slate-500 block">PIS (0,65%)</span>
+                            <span className="text-slate-700">{formatCurrency(pis)}</span>
+                          </div>
+                          <div className="border-r border-slate-200">
+                            <span className="text-[7px] text-slate-500 block">COFINS (3,00%)</span>
+                            <span className="text-slate-700">{formatCurrency(cofins)}</span>
+                          </div>
+                          <div className="border-r border-slate-200">
+                            <span className="text-[7px] text-slate-500 block">CSLL (1,00%)</span>
+                            <span className="text-slate-700">{formatCurrency(csll)}</span>
+                          </div>
+                          <div>
+                            <span className="text-[7px] text-slate-500 block text-indigo-600">ISSQN RETIDO (5%)</span>
+                            <span className="text-indigo-600 font-extrabold">{formatCurrency(iss)}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center border-t border-slate-200 pt-2.5 text-xs font-black">
+                          <span className="text-slate-500 uppercase text-[9px]">Valor Líquido da Nota Fiscal:</span>
+                          <span className="text-slate-900 text-sm font-extrabold">{formatCurrency(vLiquido)}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <div className="text-[7.5px] text-slate-400 italic text-center font-medium mt-2">
+                    NFS-e gerada eletronicamente de acordo com as especificações da ABRASF. O ISSQN será recolhido nos prazos de vencimento municipais.
+                  </div>
+
+                </div>
+              )}
+
+              {/* NFC-e Layout (Cupom Fiscal) */}
+              {viewingDANFENota.tipoDocumento === "NFC-e" && (
+                <div className="bg-[#fffdf6] text-black border border-amber-800/25 p-5 max-w-[340px] mx-auto text-[8.5px] font-mono space-y-4 shadow-sm border-t-4 border-t-amber-500 leading-normal text-left">
+                  <div className="text-center space-y-1">
+                    <strong className="text-[11px] font-black block text-center">ERP Pro S.A.</strong>
+                    <span className="block text-center">CNPJ: 12.345.678/0001-90</span>
+                    <span className="block text-center">Av. Das Nações, 1500 - Lagarto/SE</span>
+                    <span className="block uppercase border-y border-dashed border-slate-400 py-1.5 font-bold my-1 text-center">
+                      Cupom Fiscal Eletrônico - NFC-e
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex justify-between font-bold">
+                      <span>QTD | CÓD | DESCRIÇÃO</span>
+                      <span>VLR TOTAL</span>
+                    </div>
+                    <div className="flex justify-between border-b border-dashed border-slate-300 pb-1">
+                      <span>1 UN x {formatCurrency(viewingDANFENota.valorTotal)} (GEN-01) Lote Consumidor</span>
+                      <span className="font-bold">{formatCurrency(viewingDANFENota.valorTotal)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-right font-bold text-[10px]">
+                    <div className="flex justify-between">
+                      <span>QTD. TOTAL DE ITENS:</span>
+                      <span>1</span>
+                    </div>
+                    <div className="flex justify-between text-slate-800 text-[11px]">
+                      <span>VALOR TOTAL:</span>
+                      <span>{formatCurrency(viewingDANFENota.valorTotal)}</span>
+                    </div>
+                  </div>
+
+                  {/* QRCode simulation */}
+                  <div className="flex flex-col items-center justify-center py-2.5 border-y border-dashed border-slate-400 gap-1.5 text-center">
+                    <span className="text-[7.5px] font-bold text-slate-500 uppercase tracking-widest block">Consulta via Leitor QR Code</span>
+                    <svg viewBox="0 0 40 40" className="h-20 w-20 fill-black bg-white p-1 border border-slate-300">
+                      {/* Simulated QR Code blocks */}
+                      <rect x="2" y="2" width="8" height="8" />
+                      <rect x="4" y="4" width="4" height="4" fill="white" />
+                      <rect x="30" y="2" width="8" height="8" />
+                      <rect x="32" y="4" width="4" height="4" fill="white" />
+                      <rect x="2" y="30" width="8" height="8" />
+                      <rect x="4" y="32" width="4" height="4" fill="white" />
+                      
+                      {/* Random dot pattern */}
+                      <rect x="14" y="4" width="2" height="4" />
+                      <rect x="18" y="2" width="4" height="2" />
+                      <rect x="24" y="6" width="2" height="6" />
+                      <rect x="14" y="14" width="4" height="2" />
+                      <rect x="14" y="20" width="2" height="4" />
+                      <rect x="22" y="16" width="6" height="2" />
+                      <rect x="30" y="14" width="4" height="4" />
+                      <rect x="34" y="22" width="2" height="6" />
+                      <rect x="20" y="24" width="4" height="4" />
+                      <rect x="16" y="32" width="6" height="2" />
+                      <rect x="26" y="30" width="2" height="6" />
+                    </svg>
+                    <span className="text-[7px] text-slate-500 tracking-tighter uppercase block">Chave: {viewingDANFENota.chaveFiscal.slice(0, 20)}...</span>
+                  </div>
+
+                  <div className="text-center text-[7.5px] text-slate-500 space-y-0.5 font-bold leading-tight">
+                    <div>CONSUMIDOR NÃO IDENTIFICADO</div>
+                    <div>Tributação aproximada (Lei 12.741): {formatCurrency(viewingDANFENota.valorTotal * 0.31)} (31,00%)</div>
+                    <div>Protocolo: 135260002938491 - {formatDate(viewingDANFENota.dataEmissao)}</div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between no-print shrink-0 border-l border-r border-b rounded-b-2xl">
+              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                ERP PRO • Módulo de Faturamento Fiscal Autorizado
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewingDANFENota(null)}
+                  className="h-9 border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold text-xs cursor-pointer"
+                >
+                  Fechar Espelho Fiscal
+                </Button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

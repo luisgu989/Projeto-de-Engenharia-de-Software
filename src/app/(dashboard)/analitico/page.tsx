@@ -6,19 +6,25 @@ import { PrevisaoDemandaComponent } from "@/components/analitico/PrevisaoDemanda
 import { AcoesInteligentesComponent } from "@/components/analitico/AcoesInteligentes";
 import { MetasOrganizacionaisComponent } from "@/components/analitico/MetasOrganizacionais";
 import { GerenciarKPIsComponent } from "@/components/analitico/GerenciarKPIs";
-import { Sparkles, Target, Gauge, LineChart, AlertTriangle } from "lucide-react";
+import { DashboardBIComponent } from "@/components/analitico/DashboardBI";
+import { Sparkles, Target, Gauge, LineChart, AlertTriangle, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type AnaliticoTab = "previsoes" | "sugestoes" | "metas" | "kpis";
+type AnaliticoTab = "dashboard" | "previsoes" | "sugestoes" | "metas" | "kpis";
 
 export default function AnaliticoPage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<AnaliticoTab>("previsoes");
+  const [activeTab, setActiveTab] = useState<AnaliticoTab>("dashboard");
 
   const cargo = user.cargo?.toLowerCase() || "";
   const isGerente = user.role === "admin" || cargo.includes("gerente") || cargo.includes("diretor");
 
   const tabs = [
+    {
+      id: "dashboard" as AnaliticoTab,
+      label: "Overview BI",
+      icon: Gauge,
+    },
     {
       id: "previsoes" as AnaliticoTab,
       label: "Previsão de Demanda",
@@ -37,7 +43,7 @@ export default function AnaliticoPage() {
     {
       id: "kpis" as AnaliticoTab,
       label: "Indicadores KPI",
-      icon: Gauge,
+      icon: BarChart3,
     },
   ];
 
@@ -86,6 +92,7 @@ export default function AnaliticoPage() {
 
       {/* Tab Contents */}
       <div className="space-y-4">
+        {activeTab === "dashboard" && <DashboardBIComponent />}
         {activeTab === "previsoes" && <PrevisaoDemandaComponent />}
         {activeTab === "sugestoes" && <AcoesInteligentesComponent />}
         {activeTab === "metas" && <MetasOrganizacionaisComponent />}

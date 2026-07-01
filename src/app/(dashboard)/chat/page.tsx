@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useFuncionarios } from "@/hooks/useFuncionarios";
 import { useAuth } from "@/contexts/auth-context";
+import { useSessoes } from "@/hooks/useSessoes";
 import { Button } from "@/components/ui/button";
 import { MessagesSquare, Send, User, CheckCheck, Trash2, ShieldCheck, Mail, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,19 @@ export default function ChatPage() {
   const { user } = useAuth();
   const { mensagens, error, enviarMensagem, limparConversa } = useChat();
   const { funcionarios } = useFuncionarios();
+  const { sessoes } = useSessoes();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const isUserOnline = (email: string) => {
+    return sessoes.some(
+      (s) => s.email.toLowerCase() === email.toLowerCase() && s.status === "Ativa"
+    );
+  };
+
+  // Rolar para o final do feed
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const activeEmployees = funcionarios.filter((f) => f.status === "ativo");
   const systemUsers = [
@@ -34,6 +48,11 @@ export default function ChatPage() {
       (m.remetenteEmail.toLowerCase() === selectedContactEmail.toLowerCase() &&
         m.destinatarioEmail.toLowerCase() === user?.email?.toLowerCase())
   );
+
+  // Disparar rolagem quando novas mensagens chegam ou ao trocar de contato
+  useEffect(() => {
+    scrollToBottom();
+  }, [conversationMessages.length, selectedContactEmail]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,8 +104,13 @@ export default function ChatPage() {
                         : "bg-accent/10 border-transparent hover:bg-accent/20 text-foreground"
                     )}
                   >
-                    <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                      {u.nome.slice(0, 2)}
+                    <div className="relative shrink-0">
+                      <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center font-bold text-xs uppercase">
+                        {u.nome.slice(0, 2)}
+                      </div>
+                      {isUserOnline(u.email) && (
+                        <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-card" />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="text-xs font-bold text-foreground truncate">{u.nome}</div>
@@ -106,12 +130,28 @@ export default function ChatPage() {
               {/* Active Header */}
               <div className="p-4 border-b border-border flex items-center justify-between bg-accent/10 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase border border-primary/20">
-                    {activeContact.nome.slice(0, 2)}
+                  <div className="relative shrink-0">
+                    <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase border border-primary/20">
+                      {activeContact.nome.slice(0, 2)}
+                    </div>
+                    {isUserOnline(activeContact.email) && (
+                      <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-card" />
+                    )}
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-foreground">{activeContact.nome}</h4>
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-bold text-foreground leading-none">{activeContact.nome}</h4>
+                      {isUserOnline(activeContact.email) ? (
+                        <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-bold text-emerald-500 uppercase tracking-wider leading-none">
+                          Online
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-muted/20 px-1.5 py-0.5 text-[8px] font-bold text-muted-foreground uppercase tracking-wider leading-none">
+                          Offline
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
                       <Mail className="h-3 w-3" /> {activeContact.email}
                     </span>
                   </div>
@@ -161,6 +201,7 @@ export default function ChatPage() {
                     );
                   })
                 )}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Bottom Input Form */}

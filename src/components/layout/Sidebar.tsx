@@ -39,6 +39,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/contexts/auth-context";
+import { useNotifications } from "@/contexts/notifications-context";
 
 export interface SidebarProps {
   collapsed: boolean;
@@ -238,6 +239,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { addToast } = useNotifications();
 
   const [favoritos, setFavoritos] = useState<string[]>([]);
   const [menuSearch, setMenuSearch] = useState("");
@@ -263,7 +265,7 @@ export function Sidebar({
         updated = prev.filter((h) => h !== href);
       } else {
         if (prev.length >= 4) {
-          alert("Limite atingido: Você pode fixar no máximo 4 módulos nos favoritos.");
+          addToast("Limite Atingido", "Você pode fixar no máximo 4 módulos nos favoritos.", "warning");
           return prev;
         }
         updated = [...prev, href];
