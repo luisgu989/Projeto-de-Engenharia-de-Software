@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useFiscal, DocumentoFiscal } from "@/hooks/useFiscal";
 import { useFiscalEntrada, NotaFiscalEntrada } from "@/hooks/useFiscalEntrada";
 import { useClientes } from "@/hooks/useClientes";
+import { useEstoque } from "@/hooks/useEstoque";
 import {
   FileText,
   Search,
@@ -36,6 +37,7 @@ export function FaturamentoFiscal() {
   const { documentos, errorMessage: saídasError, limparErro: limparSaidasErro, emitirDocumentoFiscal, cancelarDocumentoFiscal } = useFiscal();
   const { notas: notasEntrada, darEntradaNota, receberNotaPorXML } = useFiscalEntrada();
   const { clientes } = useClientes();
+  const { estoque } = useEstoque();
 
   // Navigation
   const [abaAtiva, setAbaAtiva] = useState<"saidas" | "entradas">("saidas");
@@ -51,6 +53,8 @@ export function FaturamentoFiscal() {
   const [clienteId, setClienteId] = useState("");
   const [tipoDoc, setTipoDoc] = useState<"NF-e" | "NFS-e" | "NFC-e">("NF-e");
   const [valor, setValor] = useState<string>("");
+  const [produtoSelecionadoId, setProdutoSelecionadoId] = useState("");
+  const [descricaoServico, setDescricaoServico] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -84,6 +88,16 @@ export function FaturamentoFiscal() {
       return;
     }
 
+    if (tipoDoc === "NFS-e" && !descricaoServico.trim()) {
+      setFormError("Descreva o trabalho de serviço prestado.");
+      return;
+    }
+
+    if ((tipoDoc === "NF-e" || tipoDoc === "NFC-e") && !produtoSelecionadoId) {
+      setFormError("Selecione o produto a ser vendido.");
+      return;
+    }
+
     const valorNum = parseFloat(valor);
     if (isNaN(valorNum) || valorNum <= 0) {
       setFormError("Informe um valor válido maior que zero.");
@@ -96,17 +110,24 @@ export function FaturamentoFiscal() {
       return;
     }
 
+    const produtoSelecionado = estoque.find((p) => p.id === produtoSelecionadoId);
+
     const sucesso = emitirDocumentoFiscal({
       tipoDocumento: tipoDoc,
       destinatarioId: clienteSelecionado.id,
       destinatarioNome: clienteSelecionado.nome,
       destinatarioDocumento: clienteSelecionado.documento,
-      valorTotal: valorNum
+      valorTotal: valorNum,
+      descricaoServico: tipoDoc === "NFS-e" ? descricaoServico.trim() : undefined,
+      produtoNome: (tipoDoc === "NF-e" || tipoDoc === "NFC-e") ? produtoSelecionado?.nome : undefined,
+      produtoSku: (tipoDoc === "NF-e" || tipoDoc === "NFC-e") ? produtoSelecionado?.sku : undefined,
     });
 
     if (sucesso) {
       setClienteId("");
       setValor("");
+      setProdutoSelecionadoId("");
+      setDescricaoServico("");
       setTipoDoc("NF-e");
       setModalOpen(false);
     }
@@ -819,7 +840,12 @@ export function FaturamentoFiscal() {
                     <button
                       key={t}
                       type="button"
-                      onClick={() => setTipoDoc(t)}
+                      onClick={() => {
+                        setTipoDoc(t);
+                        setProdutoSelecionadoId("");
+                        setDescricaoServico("");
+                        setValor("");
+                      }}
                       className={`flex-1 text-xs font-bold px-3 py-2 rounded-lg border transition-all duration-150 cursor-pointer ${
                         tipoDoc === t
                           ? "bg-primary border-primary text-primary-foreground shadow-sm"
@@ -832,7 +858,52 @@ export function FaturamentoFiscal() {
                 </div>
               </div>
 
-              <div>
+              {tipoDoc === "NFS-e" && (
+                <div className="space-y-1 animate-in fade-in slide-in-from-top-1 duration-200 text-left">
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                    Descrição dos Serviços Prestados / Trabalho Realizado
+                  </label>
+                  <textarea
+                    value={descricaoServico}
+                    onChange={(e) => setDescricaoServico(e.target.value)}
+                    rows={3}
+                    placeholder="Descreva detalhadamente o trabalho prestado..."
+                    className="w-full bg-accent/25 hover:bg-accent/40 focus:bg-background border border-border focus:border-primary rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none resize-none"
+                    required
+                  />
+                </div>
+              )}
+
+              {(tipoDoc === "NF-e" || tipoDoc === "NFC-e") && (
+                <div className="space-y-1 animate-in fade-in slide-in-from-top-1 duration-200 text-left">
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                    Selecionar Produto Vendido
+                  </label>
+                  <select
+                    value={produtoSelecionadoId}
+                    onChange={(e) => {
+                      const prodId = e.target.value;
+                      setProdutoSelecionadoId(prodId);
+                      const prod = estoque.find((p) => p.id === prodId);
+                      if (prod) {
+                        setValor(String(prod.precoVenda));
+                      } else {
+                        setValor("");
+                      }
+                    }}
+                    className="w-full bg-accent/30 hover:bg-accent/50 focus:bg-background border border-border focus:border-primary rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none cursor-pointer"
+                  >
+                    <option value="">Selecione o produto no estoque...</option>
+                    {estoque.filter(p => p.status === "ativo").map((prod) => (
+                      <option key={prod.id} value={prod.id}>
+                        {prod.nome} ({prod.sku}) - Preço: {formatCurrency(prod.precoVenda)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="text-left font-semibold">
                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
                   Valor Total do Lote/Serviço (R$)
                 </label>
@@ -844,6 +915,7 @@ export function FaturamentoFiscal() {
                   value={valor}
                   onChange={(e) => setValor(e.target.value)}
                   className="h-9 text-xs bg-background"
+                  disabled={tipoDoc === "NF-e" || tipoDoc === "NFC-e"}
                 />
               </div>
 
@@ -1258,8 +1330,8 @@ export function FaturamentoFiscal() {
                       </thead>
                       <tbody className="divide-y divide-slate-200">
                         <tr>
-                          <td className="p-1.5 font-mono">PROD-GEN-01</td>
-                          <td className="p-1.5 font-semibold">LOTE DE MERCADORIAS GERAIS E INSUMOS INTEGRADOS</td>
+                          <td className="p-1.5 font-mono">{viewingDANFENota.produtoSku || "PROD-GEN-01"}</td>
+                          <td className="p-1.5 font-semibold uppercase">{viewingDANFENota.produtoNome || "LOTE DE MERCADORIAS GERAIS E INSUMOS INTEGRADOS"}</td>
                           <td className="p-1.5 text-center">8542.31.90</td>
                           <td className="p-1.5 text-center">5.101</td>
                           <td className="p-1.5 text-center">UN</td>
@@ -1323,7 +1395,7 @@ export function FaturamentoFiscal() {
                   <div className="border border-slate-200 rounded-lg p-3 space-y-2 min-h-24 flex flex-col justify-between">
                     <strong className="text-[8.5px] text-slate-500 uppercase font-black border-b border-slate-100 pb-1 block">Discriminação dos Serviços Prestados</strong>
                     <p className="text-[10px] leading-relaxed text-slate-950 font-semibold italic flex-1 mt-1.5">
-                      "Cessão de direito de uso de sistema de software integrado de ERP Pro, licenciamento de módulos gerenciais de vendas, controle financeiro, faturamento fiscal e suporte técnico operacional associado."
+                      "{viewingDANFENota.descricaoServico || "Cessão de direito de uso de sistema de software integrado de ERP Pro, licenciamento de módulos gerenciais de vendas, controle financeiro, faturamento fiscal e suporte técnico operacional associado."}"
                     </p>
                     <span className="text-[7.5px] text-slate-400 font-bold uppercase tracking-wider block">Código de Serviço: 1.05 - Licenciamento ou Cessão de Direito de Uso de Softwares</span>
                   </div>
@@ -1392,7 +1464,7 @@ export function FaturamentoFiscal() {
                       <span>VLR TOTAL</span>
                     </div>
                     <div className="flex justify-between border-b border-dashed border-slate-300 pb-1">
-                      <span>1 UN x {formatCurrency(viewingDANFENota.valorTotal)} (GEN-01) Lote Consumidor</span>
+                      <span>1 UN x {formatCurrency(viewingDANFENota.valorTotal)} ({viewingDANFENota.produtoSku || "GEN-01"}) {viewingDANFENota.produtoNome || "Lote Consumidor"}</span>
                       <span className="font-bold">{formatCurrency(viewingDANFENota.valorTotal)}</span>
                     </div>
                   </div>

@@ -18,6 +18,9 @@ export interface DocumentoFiscal {
   motivoCancelamento?: string;
   dataCancelamento?: string;
   usuarioResponsavel?: string;
+  descricaoServico?: string;
+  produtoNome?: string;
+  produtoSku?: string;
 }
 
 const documentosFiscaisIniciais: DocumentoFiscal[] = [
